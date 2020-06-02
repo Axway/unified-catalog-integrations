@@ -1,0 +1,201 @@
+{
+	"schemaVersion": "4",
+	"info": {
+		"name": "token - get /token"
+	},
+	"parameter": {
+		"properties": {
+			"params": {
+				"type": "object",
+				"description": "The parameters from the endpoint."
+			},
+			"request": {
+				"type": "object",
+				"description": "The HTTP request."
+			},
+			"config": {
+				"type": "object",
+				"description": "The service's configuration"
+			},
+			"env": {
+				"type": "object",
+				"description": "The host OS environment"
+			}
+		},
+		"additionalProperties": false,
+		"required": [
+			"params",
+			"request",
+			"config",
+			"env"
+		]
+	},
+	"start": "authz.1",
+	"nodes": {
+		"authz.1": {
+			"type": "nodehandler://axway-flow-authorization/authz",
+			"name": "Get Credential",
+			"method": "getCredential",
+			"parameters": [
+				{
+					"name": "name",
+					"type": "string",
+					"value": "\"central\"",
+					"metaName": "name",
+					"metaDescription": "The name of the configured credential to find and return."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.credential",
+					"routes": [
+						"javascript.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"javascript.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Get Credential"
+		},
+		"http.1": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "OK Response",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "status",
+					"type": "number",
+					"value": "200",
+					"metaName": "status",
+					"metaDescription": "The HTTP status code"
+				},
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.body",
+					"metaName": "body",
+					"metaDescription": "The response payload"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Set HTTP Response"
+		},
+		"javascript.1": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "Format body",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"return { \\\"access_token\\\": data };\"",
+					"metaName": "code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises"
+				},
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.credential",
+					"metaName": "data",
+					"metaDescription": "The value to apply as the `data` argument to the JavaScript code. For objects and arrays, `data` is passed by reference."
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.body",
+					"routes": [
+						"http.1"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"javascript.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		},
+		"http.2": {
+			"type": "nodehandler://axway-flow/http",
+			"name": "Error Response",
+			"method": "setresponse",
+			"parameters": [
+				{
+					"name": "body",
+					"type": "jsonpath",
+					"value": "$.error",
+					"metaName": "body",
+					"metaDescription": "The response payload"
+				},
+				{
+					"name": "status",
+					"type": "number",
+					"value": "400",
+					"metaName": "status",
+					"metaDescription": "The HTTP status code"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.response",
+					"routes": [],
+					"metaName": "Next"
+				}
+			},
+			"metaMethod": "Set HTTP Response"
+		},
+		"javascript.2": {
+			"type": "nodehandler://@axway/api-builder-plugin-fn-javascript/javascript",
+			"name": "Format error",
+			"method": "Execute",
+			"parameters": [
+				{
+					"name": "data",
+					"type": "jsonpath",
+					"value": "$.error",
+					"metaName": "data",
+					"metaDescription": "The value to apply as the `data` argument to the JavaScript code. For objects and arrays, `data` is passed by reference."
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"value": "\"if (data) {\\n    return { \\\"error\\\": data };\\n  } else {\\n    return { \\\"error\\\": \\\"An unknown error occured\\\" };\\n  }\"",
+					"metaName": "code",
+					"metaDescription": "A JavaScript function body. Supports `await` and returning promises"
+				}
+			],
+			"outputs": {
+				"next": {
+					"context": "$.error",
+					"routes": [
+						"http.2"
+					],
+					"metaName": "Next"
+				},
+				"error": {
+					"context": "$.error",
+					"routes": [
+						"http.2"
+					],
+					"metaName": "Error"
+				}
+			},
+			"metaMethod": "Execute"
+		}
+	}
+}

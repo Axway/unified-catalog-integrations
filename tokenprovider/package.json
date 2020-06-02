@@ -1,0 +1,38 @@
+{
+	"name": "tokenprovider",
+	"description": "An API Builder service",
+	"main": "app.js",
+	"version": "1.0.0",
+	"license": "",
+	"keywords": [
+		"api-builder",
+		"micro-service",
+		"middleware",
+		"orm",
+		"service"
+	],
+	"engines": {
+		"node": ">=12.15"
+	},
+	"repository": {},
+	"private": true,
+	"dependencies": {
+		"@axway/api-builder-plugin-fn-base64": "^2.0.0",
+		"@axway/api-builder-plugin-fn-javascript": "^1.0.0",
+		"@axway/api-builder-plugin-fn-json": "^2.0.0",
+		"@axway/api-builder-plugin-fn-mustache": "^1.0.1",
+		"@axway/api-builder-plugin-fn-restclient": "^2.0.0",
+		"@axway/api-builder-plugin-fn-swagger": "^2.0.0",
+		"@axway/api-builder-runtime": "^4.22.0",
+		"@axway/api-builder-admin": "^1.10.10",
+		"express-basic-auth": "^1.2.0"
+	},
+	"devDependencies": {
+		"chai": "^4.1.2",
+		"mocha": "^5.2.0"
+	},
+	"scripts": {
+		"start": "node .",
+		"test": "mocha --colors ./test --recursive -R spec"
+	}
+}
