@@ -1,0 +1,501 @@
+{
+    "id": 34590,
+    "name": "Azure Registration Flow",
+    "userId": 18408,
+    "accountId": 7688,
+    "createdDate": "2020-04-16T23:23:07Z",
+    "steps": [
+        {
+            "id": 297658,
+            "onSuccess": [
+                "updateSubscriptionStateApproved"
+            ],
+            "onFailure": [],
+            "name": "buildApproveSubData",
+            "type": "script",
+            "properties": {
+                "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'APPROVED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+            }
+        },
+        {
+            "id": 326624,
+            "onSuccess": [
+                "checkActionApprove"
+            ],
+            "onFailure": [],
+            "name": "buildAzureSubscriptionData",
+            "type": "script",
+            "properties": {
+                "body": "\nconst consumerInstance = steps.getApiServerConsumerInstance.response.body;\n\nlet resourceGroupName;\nlet serviceName;\nlet apiName;\n\nif(consumerInstance) {\n  resourceGroupName = consumerInstance.attributes.azureResourceGroupName;\n  serviceName = consumerInstance.attributes.azureServiceName;\n  apiName = consumerInstance.attributes.azureApiName;\n}\n\nconst headers = {'Authorization': `Bearer ${steps.getAzureToken.response.body.access_token}`};\nconst azureSubUrl = `https://management.azure.com/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${steps.readTriggerActionAndPrepareData.subscriptionId}?api-version=2019-01-01`;\nconst azureSubBody = {\n    \"properties\": {\n        \"displayName\": \"Subscription from Unified Catalog- IB Flow for \" + steps.getConsumerEmail,\n        \"scope\": `/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${apiName}`,\n        \"state\": \"active\",\n        \"allowTracing\": false\n    }\n};\n\ndone ({headers, azureSubUrl, azureSubBody});"
+            }
+        },
+        {
+            "id": 297395,
+            "onSuccess": [
+                "createSubscriptionAzureService"
+            ],
+            "onFailure": [],
+            "name": "buildDataToCreateSubscription",
+            "type": "script",
+            "properties": {
+                "body": "\nconst consumerInstance = steps.getApiServerConsumerInstance.response.body;\n\nlet resourceGroupName;\nlet serviceName;\nlet apiName;\n\nif(consumerInstance) {\n  resourceGroupName = consumerInstance.attributes.azureResourceGroupName;\n  serviceName = consumerInstance.attributes.azureServiceName;\n  apiName = consumerInstance.attributes.azureApiName;\n}\n\nconst headers = {'Authorization': `Bearer ${steps.getAzureToken.response.body.access_token}`};\nconst azureSubUrl = `https://management.azure.com/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${steps.readTriggerActionAndPrepareData.subscriptionId}?api-version=2019-01-01`;\nconst azureSubBody = {\n    \"properties\": {\n        \"displayName\": \"Subscription from Unified Catalog- IB Flow for \" + steps.getConsumerEmail,\n        \"scope\": `/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${apiName}`,\n        \"state\": \"active\",\n        \"allowTracing\": false\n    }\n};\n\ndone ({headers, azureSubUrl, azureSubBody});"
+            }
+        },
+        {
+            "id": 297389,
+            "onSuccess": [
+                "deleteSubscription"
+            ],
+            "onFailure": [],
+            "name": "buildDataToDeleteSubscription",
+            "type": "script",
+            "properties": {
+                "body": "\nconst headers = {'Authorization': `Bearer ${steps.getAzureToken.response.body.access_token}`};\nconst azureSubUrl = `https://management.azure.com/subscriptions/${config.subid}/resourceGroups/${config.resourceGroupName}/providers/Microsoft.ApiManagement/service/${config.serviceName}/subscriptions/${steps.readTriggerActionAndPrepareData.subscriptionId}?api-version=2019-01-01`;\n\n\ndone ({headers, azureSubUrl});"
+            }
+        },
+        {
+            "id": 297404,
+            "onSuccess": [
+                "updateSubscriptionStateRejected"
+            ],
+            "onFailure": [],
+            "name": "buildRejectedData",
+            "type": "script",
+            "properties": {
+                "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'REJECTED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+            }
+        },
+        {
+            "id": 297408,
+            "onSuccess": [
+                "updateSubscriptionFailState"
+            ],
+            "onFailure": [],
+            "name": "buildSubFailData",
+            "type": "script",
+            "properties": {
+                "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'FAILED_TO_SUBSCRIBE',\n  \"description\": 'Failed to create subscription- IB Flow'\n  }\n}\n\ndone(body)"
+            }
+        },
+        {
+            "id": 297400,
+            "onSuccess": [
+                "updateSubscriptionStateUnsubscribe"
+            ],
+            "onFailure": [],
+            "name": "buildUnsubscribeData",
+            "type": "script",
+            "properties": {
+                "body": "\nconst body = \n{\n  'subData' : \n  {\n 'state' : 'UNSUBSCRIBED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+            }
+        },
+        {
+            "id": 297399,
+            "onSuccess": [
+                "updateSubscriptionState"
+            ],
+            "onFailure": [],
+            "name": "buildUpdateSubData",
+            "type": "script",
+            "properties": {
+                "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'ACTIVE',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+            }
+        },
+        {
+            "id": 297391,
+            "onSuccess": [
+                "buildApproveSubData"
+            ],
+            "onFailure": [
+                "checkActionUnsubscribeInitiated"
+            ],
+            "name": "checkActionApprove",
+            "type": "filter",
+            "properties": {
+                "body": "const action = steps.readTriggerActionAndPrepareData.action;\n\ndone(action.toLowerCase() == \"approved\")"
+            }
+        },
+        {
+            "id": 297403,
+            "onSuccess": [
+                "buildRejectedData"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "checkActionRejected",
+            "type": "filter",
+            "properties": {
+                "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"rejected\");"
+            }
+        },
+        {
+            "id": 297410,
+            "onSuccess": [
+                "deleteSubscription"
+            ],
+            "onFailure": [
+                "checkActionRejected"
+            ],
+            "name": "checkActionUnsubscribeInitiated",
+            "type": "filter",
+            "properties": {
+                "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"unsubscribeinitiated\");"
+            }
+        },
+        {
+            "id": 297396,
+            "onSuccess": [
+                "buildUpdateSubData"
+            ],
+            "onFailure": [
+                "buildSubFailData"
+            ],
+            "name": "createSubscriptionAzureService",
+            "type": "httpRequest",
+            "properties": {
+                "body": "${steps.buildAzureSubscriptionData.azureSubBody}",
+                "method": "PUT",
+                "url": "${steps.buildAzureSubscriptionData.azureSubUrl}",
+                "headers": "${steps.buildAzureSubscriptionData.headers}"
+            }
+        },
+        {
+            "id": 297390,
+            "onSuccess": [
+                "buildUnsubscribeData"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "deleteSubscription",
+            "type": "httpRequest",
+            "properties": {
+                "method": "DELETE",
+                "body": "",
+                "url": "${steps.buildAzureSubscriptionData.azureSubUrl}",
+                "headers": "${steps.buildAzureSubscriptionData.headers}"
+            }
+        },
+        {
+            "id": 297407,
+            "onSuccess": [],
+            "onFailure": [],
+            "name": "end",
+            "type": "script",
+            "properties": {
+                "body": "done(false);"
+            }
+        },
+        {
+            "id": 326623,
+            "onSuccess": [
+                "getPlatformOrgUsers"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getApiServerConsumerInstance",
+            "type": "httpRequest",
+            "properties": {
+                "method": "GET",
+                "url": "${steps.readTriggerActionAndPrepareData.apiServerConsumerInstanceUrl}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297383,
+            "onSuccess": [
+                "readTriggerActionAndPrepareData"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getAzureToken",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "url": "https://login.microsoftonline.com/${config.azureTenantId}/oauth2/token",
+                "form": "${steps.prepareAzureTokenInfo.form}",
+                "headers": "${steps.prepareAzureTokenInfo.headers}"
+            }
+        },
+        {
+            "id": 297640,
+            "onSuccess": [
+                "buildAzureSubscriptionData"
+            ],
+            "onFailure": [],
+            "name": "getConsumerEmail",
+            "type": "script",
+            "properties": {
+                "body": "const results = steps.getPlatformOrgUsers.response.body.result;\nconst consumerId = steps.readTriggerActionAndPrepareData.consumerUserId;\n\nlet consumerEmail = {};\n consumerEmail =  results.find(function (value) {\n     return value.guid == consumerId\n});\nconsole.log(consumerEmail);\n\ndone(consumerEmail.email);"
+            }
+        },
+        {
+            "id": 297353,
+            "onSuccess": [
+                "getUserToken"
+            ],
+            "onFailure": [],
+            "name": "getHeaders",
+            "type": "script",
+            "properties": {
+                "body": "\nconst orgId = config.axwayTenantId;\nconst tokenServiceHeaders = {'APIKey': `${config.apiCentralTokenCredentials}`};\n\ndone({\n  orgId,\n  tokenServiceHeaders\n})"
+            }
+        },
+        {
+            "id": 297636,
+            "onSuccess": [
+                "getConsumerEmail"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getPlatformOrgUsers",
+            "type": "httpRequest",
+            "properties": {
+                "method": "GET",
+                "url": "${steps.readTriggerActionAndPrepareData.platformGetUserUrl}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297380,
+            "onSuccess": [
+                "prepareAzureTokenInfo"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getUserToken",
+            "type": "httpRequest",
+            "properties": {
+                "method": "GET",
+                "url": "${config.apiCentralTokenUrl}",
+                "headers": "${steps.getHeaders.tokenServiceHeaders}"
+            }
+        },
+        {
+            "id": 297382,
+            "onSuccess": [
+                "getAzureToken"
+            ],
+            "onFailure": [],
+            "name": "prepareAzureTokenInfo",
+            "type": "script",
+            "properties": {
+                "body": "const headers = {'Content-Type': 'application/x-www-form-urlencoded'};\nconst form = \n  {\n    'grant_type': 'client_credentials',\n    'client_id': config.azureClientId,\n    'client_secret': config.azureClientSecret,\n    'resource': 'https://management.azure.com/'\n  };\n  \n  done({headers,form});"
+            }
+        },
+        {
+            "id": 325551,
+            "onSuccess": [
+                "sendEmail"
+            ],
+            "onFailure": [],
+            "name": "prepSubscriptionEmailNotification",
+            "type": "script",
+            "properties": {
+                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst accesKey = steps.createSubscriptionAzureService.response.body.properties.primaryKey;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Subscription key: <b>${accesKey}</b>` ;\n\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
+            }
+        },
+        {
+            "id": 297392,
+            "onSuccess": [
+                "getApiServerConsumerInstance"
+            ],
+            "onFailure": [],
+            "name": "readTriggerActionAndPrepareData",
+            "type": "script",
+            "properties": {
+                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getUserToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${config.apiCentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `${config.platformURL}/api/v1/org/${config.axwayTenantId}/user`;\n\nconst apiServerConsumerInstanceUrl = `${config.apiCentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl\n};\n\ndone(data);"
+            }
+        },
+        {
+            "id": 325552,
+            "onSuccess": [],
+            "onFailure": [],
+            "name": "sendEmail",
+            "type": "elementRequest",
+            "properties": {
+                "elementInstanceId": "${config.outlookEmail}",
+                "api": "/messages",
+                "body": "${steps.prepSubscriptionEmailNotification.body}",
+                "method": "POST"
+            }
+        },
+        {
+            "id": 297409,
+            "onSuccess": [],
+            "onFailure": [
+                "end"
+            ],
+            "name": "updateSubscriptionFailState",
+            "type": "httpRequest",
+            "properties": {
+                "body": "${steps.buildSubFailData.subData}",
+                "method": "POST",
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297398,
+            "onSuccess": [
+                "prepSubscriptionEmailNotification"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "updateSubscriptionState",
+            "type": "httpRequest",
+            "properties": {
+                "body": "${steps.buildUpdateSubData.subData}",
+                "method": "POST",
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297659,
+            "onSuccess": [
+                "createSubscriptionAzureService"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "updateSubscriptionStateApproved",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "body": "${steps.buildApproveSubData.subData}",
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297405,
+            "onSuccess": [
+                "prepSubscriptionEmailNotification"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "updateSubscriptionStateRejected",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "body": "${steps.buildRejectedData.subData}",
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        },
+        {
+            "id": 297401,
+            "onSuccess": [
+                "prepSubscriptionEmailNotification"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "updateSubscriptionStateUnsubscribe",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "body": "${steps.buildUnsubscribeData.subData}",
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
+            }
+        }
+    ],
+    "triggers": [
+        {
+            "id": 30768,
+            "onSuccess": [
+                "getHeaders"
+            ],
+            "onFailure": [],
+            "type": "manual",
+            "async": false,
+            "name": "trigger",
+            "properties": {}
+        }
+    ],
+    "engine": "v3",
+    "active": true,
+    "debugLoggingEnabled": false,
+    "singleThreaded": false,
+    "configuration": [
+        {
+            "id": 64954,
+            "key": "apiCentralTokenCredentials",
+            "name": "apiCentralTokenCredentials",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64953,
+            "key": "apiCentralTokenUrl",
+            "name": "apiCentralTokenUrl",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64971,
+            "key": "apiCentralUrl",
+            "name": "apiCentralUrl",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64955,
+            "key": "axwayTenantId",
+            "name": "axwayTenantId",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64970,
+            "key": "azureClientId",
+            "name": "azureClientId",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64957,
+            "key": "azureClientSecret",
+            "name": "azureClientSecret",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64956,
+            "key": "azureTenantId",
+            "name": "azureTenantId",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 68922,
+            "key": "outlookEmail",
+            "name": "outlookEmail",
+            "type": "elementInstance",
+            "required": true
+        },
+        {
+            "id": 65009,
+            "key": "platformURL",
+            "name": "platformURL",
+            "type": "value",
+            "required": true
+        },
+        {
+            "id": 64973,
+            "key": "subid",
+            "name": "subid",
+            "type": "value",
+            "required": true
+        }
+    ]
+}
