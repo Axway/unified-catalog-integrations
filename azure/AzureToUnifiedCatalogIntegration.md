@@ -27,12 +27,14 @@ This is a **Node.js** script that fetches the APIs from Azure API Management and
 
 * **Environment** groups the set of APIs that are fetched from Azure API Management. An environment represents the logical grouping of APIs. 
 * **Webhook** defines the webhook URL that will be invoked to post a notification in Microsoft Teams and update the subscription in Azure API Management.
-* **Secret** provides key value pairs of named secrets that are used to secure your webhooks. Setting a webhook secret allows you yo ensure that POST requests sent to the payload URL are from Axway. 
+* **Secret** provides key value pairs of named secrets that are used to secure your webhooks. Setting a webhook secret allows you to ensure that POST requests sent to the payload URL are from Axway. 
 * **ConsumerSubscriptionDefinition** allows the configuration of the data needed from a consumer to subscribe to the API from the Unified Catalog.  It also has a reference to the webhook that will get invoked on subscription, and it is referenced in the ConsumerInstance resources. 
 * **APIService** holds all the information needed to represent your API (image, description, markdown documentation etc). 
 * **APIServiceRevision** holds the OAS specification file. Multiple revisions can be created. 
 * **APIServiceInstance** contains the endpoints (host and port information) where the API is deployed.
 * **ConsumerInstance**  contains all the details for creating the asset in the Unified Catalog. It also contains a reference to the ConsumerSubscriptionDefinition that has the link to the webhook. That means that for each Subscription Update event generated from Unified Catalog related to the Catalog Item created from the ConsumerInstance, the webhook will get invoked
+
+The above resources structure map to the API Server REST API resources as defined in the API Server [OAS3 specs](https://apicentral.axway.com/apis/docs).
 
 ![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
 
