@@ -1,4 +1,4 @@
-**Discover APIs from Azure API Management and configure custom approval flows**
+##Discover APIs from Azure API Management and configure custom approval flows
 
 
 The basic use case is as follows:
@@ -12,7 +12,7 @@ The basic use case is as follows:
 * On approval, a subscription key will be created in Azure API Management and the key will be sent to the API Consumer's email. After the key has been sent, the state of the Subscription in Unified Catalog gets updated to Active and the Consumer can now use the API with the key that was received over email. 
 * Can cancel the subscription from the Unified Catalog. When cancelled, the subscription in Azure Management will be removed and the state of the Unified Catalog will be updated to unsubscribed, indicating the consumer will no longer be able to use the API with the key received. 
   
-  [Insert diagram here]
+![Use Case Diagram](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/Azure2UnifiedCatalogDiagram.png)
   
 The technologies that were used for this project: 
 
@@ -34,18 +34,22 @@ This is a **Node.js** script that fetches the APIs from Azure API Management and
 * **APIServiceInstance** contains the endpoints (host and port information) where the API is deployed.
 * **ConsumerInstance**  contains all the details for creating the asset in the Unified Catalog. It also contains a reference to the ConsumerSubscriptionDefinition that has the link to the webhook. That means that for each Subscription Update event generated from Unified Catalog related to the Catalog Item created from the ConsumerInstance, the webhook will get invoked
 
-  [Insert diagram here]
-  The script will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
-  The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
+![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
+
+The script will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
+The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
   
 ### Microsoft Teams flow to Approve / Reject subscription requests
 The flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
 The MS flow will also post notifications in the channel for any subscription updates. 
+
 Check this [wiki page](https://github.com/Axway/mulesoft-catalog-integration/wiki/Configure-Microsoft-Flow-for-receiving-AMPLIFY-Unified-Catalog-Subscription-events) to learn how to configure the MS Flow. 
 
+![MS Teams Adaptive Card](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MSTeamsAdaptiveCard.png)
 
 ### Integration Builder flow to update subscriptions and send email notifications
 This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog,  then will subscribe / unsubscribe the consumer to the APIs in Azure API Management. It will also send email notifications to the user with the key to authenticate the API calls. The flow will call the API Builder app with get a valid Bearer token, then updates the Subscription states in Unified Catalog.
-[insert image here]
+
 Check this [wiki page](https://github.com/Axway/mulesoft-catalog-integration/wiki/Configure-Integration-Builder-flow-to-update-subscriptions-in-Azure-and-send-email-notifications-to-subscribers) to learn how to configure the flow. 
 
+![Integration Builder Flow](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/IntegrationBuilderFlow.png)
