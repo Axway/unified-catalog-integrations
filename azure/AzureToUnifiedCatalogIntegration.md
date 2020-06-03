@@ -1,4 +1,4 @@
-##Discover APIs from Azure API Management and configure custom approval flows
+### Discover APIs from Azure API Management and configure custom approval flows
 
 
 The basic use case is as follows:
