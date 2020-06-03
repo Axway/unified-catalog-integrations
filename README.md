@@ -1,6 +1,6 @@
 This repo provides a set of assets that can help you automate the discovery of all integration assets and APIs, from across multiple gateway environments, and publish them in a centralized catalog to drive consumption and reuse of your existing APIs.
 
-AMPLIFY Unified Catalog  provides event-driven subscription management capabilities, that can enables you to create custom subscription flows for each registered environment, enabling complex approval flows and integration with existing systems to streamline experience and reduce time for approval. The full capabilities of the Unified Catalog are available through CLI to automate the discovery and management of your APIs in the Catalog. 
+AMPLIFY Unified Catalog  provides event-driven subscription management capabilities, that can enable you to create custom subscription flows for each registered environment, enabling complex approval flows and integration with existing systems to streamline experience and reduce time for approval. The full capabilities of the Unified Catalog are available through CLI to automate the discovery and management of your APIs in the Catalog. 
 
 ![Multigateway Environments](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MultiGatewayDiscovery.PNG)
 
