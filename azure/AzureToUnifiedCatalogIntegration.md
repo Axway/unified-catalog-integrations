@@ -5,7 +5,7 @@ The basic use case is as follows:
 
 **API Provider**
 * Will publish APIs from Azure API Management into the Unified Catalog via script.  Those APIs will require manual approval of subscription requests from consumers.
-* Is notified in Microsoft Teams, when there is a new subscription requests, and will where approve or reject the request. 
+* Is notified in Microsoft Teams when there is a new subscription requests, and will approve or reject the request. 
 
 **API Consumer**
 * Discovers the API in the Unified Catalog and request access by subscribing.
