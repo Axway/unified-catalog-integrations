@@ -34,9 +34,12 @@ This is a **Node.js** script that fetches the APIs from Mulesoft Anypoint Exchan
 * **APIServiceInstance** contains the endpoints (host and port information) where the API is deployed.
 * **ConsumerInstance**  contains all the details for creating the asset in the Unified Catalog. It also contains a reference to the ConsumerSubscriptionDefinition that has the link to the webhook. That means that for each Subscription Update event generated from Unified Catalog related to the Catalog Item created from the ConsumerInstance, the webhook will get invoked
 
+The above resources structure map to the API Server REST API resources as defined in the API Server [OAS3 specs](https://apicentral.axway.com/apis/docs).
+
 ![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
 
-  
+
+ 
 ### Microsoft Teams flow to Approve / Reject subscription requests
 The flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
 The MS flow will also post notifications in the channel for any subscription updates. 
