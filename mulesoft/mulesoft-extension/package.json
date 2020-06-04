@@ -1,0 +1,56 @@
+{
+  "name": "@axway/amplify-central-mulesoft-extension",
+  "version": "0.0.1",
+  "description": "Create AMPLIFY Central resources from Mulesoft API Management APIs",
+  "author": {
+    "email": "support@axway.com",
+    "name": "Axway",
+    "url": "https://axway.com"
+  },
+  "scripts": {
+    "build": "yarn tsc && npm run copy:assets",
+    "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">= 8.9"
+  },
+  "main": "./dist/main.js",
+  "amplify": {
+    "type": "central-cli-plugin"
+  },
+  "cli-kit": {
+    "main": "./dist/cli.js",
+    "name": "mulesoft-extension"
+  },
+  "keywords": [
+    "axway",
+    "amplify",
+    "apicentral",
+    "central",
+    "amplify-package",
+    "cli-kit"
+  ],
+  "aliases": [
+    "mulesoft"
+  ],
+  "devDependencies": {
+    "@types/form-data": "^2.5.0",
+    "@types/fs-extra": "^9.0.1",
+    "@types/node": "^14.0.1",
+    "@types/node-fetch": "^2.5.7",
+    "cli-kit": "^1.1.0",
+    "cpx": "^1.5.0",
+    "typescript": "^3.9.2"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.14",
+    "form-data": "^3.0.0",
+    "fs-extra": "^9.0.0",
+    "js-yaml": "^3.14.0",
+    "mime-types": "^2.1.27",
+    "mkdirp": "^1.0.4",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.2"
+  }
+}
