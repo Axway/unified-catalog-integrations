@@ -15,7 +15,7 @@ You can benefit from this:
 Check out our [wiki page](https://github.com/Axway/mulesoft-catalog-integration/blob/master/azure/AzureToUnifiedCatalogIntegration.md) to learn how to publish APIs from Azure API Management to Unified Catalog, and build a custom subscription flow to delegate the approval of subscription requests to Microsoft Teams. 
 
 ### Integration with Mulesoft Anypoint Exchange
-Check out our [wiki page](https://github.com/Axway/mulesoft-catalog-integration/blob/master/mulesoft/MulesofttIntegtration.md) to learn how to discover APIs from Mulesoft to Unified Catalog, and build a custom subscription flow to delegate the aprroval of suscription requests to Microsoft Teams. 
+Check out our [wiki page](https://github.com/Axway/mulesoft-catalog-integration/blob/master/mulesoft/MulesofttIntegtration.md) to learn how to publish APIs from Mulesoft to Unified Catalog, and build a custom subscription flow to delegate the aprroval of suscription requests to Microsoft Teams. 
 
 ### Integration with Github
 Read our wiki pages to learn how to fetch APIs from Github and publish them to the Unified Catalog.  
