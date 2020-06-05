@@ -18,7 +18,7 @@ Check out our [wiki page](https://github.com/Axway/mulesoft-catalog-integration/
 Check out our [wiki page](https://github.com/Axway/mulesoft-catalog-integration/blob/master/mulesoft/MulesofttIntegtration.md) to learn how to publish APIs from Mulesoft to Unified Catalog, and build a custom subscription flow to delegate the aprroval of suscription requests to Microsoft Teams. 
 
 ### Integration with Github
-Read our [wiki pages](https://github.com/Axway/mulesoft-catalog-integration/blob/master/github/github-extension/README.md) to learn how to fetch APIs from Github and publish them to the Unified Catalog.  
+Read our [wiki pages](https://github.com/Axway/mulesoft-catalog-integration/blob/master/github/github-extension/Readme.md) to learn how to fetch APIs from Github and publish them to the Unified Catalog.  
 
 ### Integration with SwaggerHub
 Check our [wiki pages](https://github.com/Axway/mulesoft-catalog-integration/blob/master/swaggerhub/swaggerhub-extension/README.md) to learn how to fetch your API definitions from SwaggerHub and publish them to the Unified Catalog. 
