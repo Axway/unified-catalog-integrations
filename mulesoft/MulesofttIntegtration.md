@@ -14,6 +14,8 @@ The basic use case is as follows:
   
  ![Mulesoft Integration UseCase Diagram](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MulesoftIntegrationDiagram.PNG)
  
+### Watch the [demo video](https://youtu.be/R4SPnhTp6TE) as we break down and explain the Mulesoft to Unified Catalog integration.
+
 The technologies that were used for this project: 
 
 * [AMPLIFY Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs. 
