@@ -1,7 +1,8 @@
 {
   "name": "@axway/amplify-central-swaggerhub-extension",
-  "version": "0.0.1",
+  "version": "0.0.1-dev.0",
   "description": "Create AMPLIFY Central resources from Swagger Hub API Management APIs",
+  "homepage": "https://platform.axway.com",
   "author": {
     "email": "support@axway.com",
     "name": "Axway",
@@ -30,12 +31,12 @@
     "central",
     "amplify-package",
     "cli-kit"
-  ],	
+  ],
   "repository": {
-		"type": "git",
+    "type": "git",
     "url": "https://github.com/Axway/unified-catalog-integrations.git",
     "directory": "swaggerhub/swaggerhub-extension"
-	},
+  },
   "aliases": [
     "swaggerhub"
   ],
