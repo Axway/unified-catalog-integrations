@@ -208,7 +208,6 @@ async function trawlRepo(config) {
       };
 
       resources.push(apiServiceRevision);
-    
       // APIServiceInstance
       const apiServiceInstance = {
         apiVersion: "v1alpha1",
@@ -223,7 +222,12 @@ async function trawlRepo(config) {
         },
         spec: {
           apiServiceRevision: apiServiceRevisionName,
-          endpoint: [],
+          endpoint: [{
+            host: api.host,
+            protocol: (api.schemes || []).includes('https') ? 'https': 'http',
+            port: (api.schemes || []).includes('https') ? 443: 80,
+            ...(api.basePath ? { routing: { basePath: api.basePath } } : {})
+          }],
         },
       };
 
