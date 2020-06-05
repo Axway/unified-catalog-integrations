@@ -30,7 +30,12 @@
     "central",
     "amplify-package",
     "cli-kit"
-  ],
+  ],	
+  "repository": {
+		"type": "git",
+    "url": "https://github.com/Axway/unified-catalog-integrations.git",
+    "directory": "apigee/apigee-extension"
+	},
   "aliases": [
     "apigee"
   ],

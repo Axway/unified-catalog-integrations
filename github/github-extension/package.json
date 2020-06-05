@@ -30,7 +30,12 @@
     "central",
     "amplify-package",
     "cli-kit"
-  ],
+  ],	
+  "repository": {
+		"type": "git",
+    "url": "https://github.com/Axway/unified-catalog-integrations.git",
+    "directory": "github/github-extension"
+	},
   "aliases": [
     "github"
   ],
