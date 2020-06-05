@@ -3,7 +3,7 @@ This repo provides a set of assets that can help you automate the discovery of a
 
 AMPLIFY Unified Catalog  provides event-driven subscription management capabilities, that can enable you to create custom subscription flows for each registered environment, enabling complex approval flows and integration with existing systems to streamline experience and reduce time for approval. The full capabilities of the Unified Catalog are available through CLI to automate the discovery and management of your APIs in the Catalog. 
 
-![Multigateway Environments](https://github.com/Axwayunified-catalog-integrations/blob/master/images/MultiGatewayDiscovery.PNG)
+![Multigateway Environments](https://github.com/Axway/unified-catalog-integrations/blob/master/images/MultiGatewayDiscovery.PNG)
 
 You can benefit from this: 
 * if you have APIs that are spread across multiple gateways from multiple vendors, such as Azure or Mulesoft
