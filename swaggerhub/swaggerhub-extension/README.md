@@ -1,6 +1,6 @@
 # @axway/swaggerhub-extension
 
-AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resources for Swaggerhub.
+AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resources to publish APIs from Swaggerhub to Unified Catalog.
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
 
