@@ -38,8 +38,10 @@ The above resources structure map to the API Server REST API resources as define
 
 ![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
 
-The script will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
+The will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
 The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
+
+You can read how to install, configure and run the CLI extension [here](https://github.com/Axway/unified-catalog-integrations/blob/master/azure/azure-extension/README.md). 
   
 ### Microsoft Teams flow to Approve / Reject subscription requests
 The flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
