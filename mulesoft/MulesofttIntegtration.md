@@ -24,8 +24,8 @@ The technologies that were used for this project:
 * API Builder service running in [ARS](https://www.axway.com/en/platform/runtime-services) to keep an authenticated user credentials green. 
 * MS Teams for notifications and approval or rejection of subscription requests. 
 
-### Azure API Management to Unified Catalog import script
-This is a **Node.js** script that fetches the APIs from Mulesoft Anypoint Exchange and builds the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
+### Azure API Management to Unified Catalog import CLI extension
+This is a **Node.js** script that YOU CAN install as a CLI extension to fetch the APIs from Mulesoft Anypoint Exchange and build the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
 
 * **Environment** groups the set of APIs that are fetched from Mulesoft Anypoint Exchange. An environment represents the logical grouping of APIs. All resources required for promoting an API to Unified Catalog need to be created under an Environment.
 * **Webhook** defines the webhook URL that will be invoked to post a notification in Microsoft Teams and update the subscription in Mulesoft.
@@ -40,7 +40,7 @@ The above resources structure map to the API Server REST API resources as define
 
 ![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
 
-
+Learn how to install, configure and run the CLI extenstion [here](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/mulesoft-extension/README.md). 
  
 ### Microsoft Teams flow to Approve / Reject subscription requests
 The flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
