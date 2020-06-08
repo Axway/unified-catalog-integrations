@@ -25,7 +25,7 @@ The technologies that were used for this project:
 * MS Teams for notifications and approval or rejection of subscription requests. 
 
 ### Azure API Management to Unified Catalog import CLI extension
-This is a **Node.js** script that YOU CAN install as a CLI extension to fetch the APIs from Mulesoft Anypoint Exchange and build the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
+CLI extension to fetch the APIs from Mulesoft Anypoint Exchange and build the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
 
 * **Environment** groups the set of APIs that are fetched from Mulesoft Anypoint Exchange. An environment represents the logical grouping of APIs. All resources required for promoting an API to Unified Catalog need to be created under an Environment.
 * **Webhook** defines the webhook URL that will be invoked to post a notification in Microsoft Teams and update the subscription in Mulesoft.
