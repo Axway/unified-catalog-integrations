@@ -23,7 +23,7 @@ The technologies that were used for this project:
 * MS Teams for notifications and approval or rejection of subscription requests. 
 
 ### Azure API Management to Unified Catalog import script
-This is a **Node.js** script that fetches the APIs from Azure API Management and builds the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
+CLI extension that fetches the APIs from Azure API Management and builds the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
 
 * **Environment** groups the set of APIs that are fetched from Azure API Management. An environment represents the logical grouping of APIs. 
 * **Webhook** defines the webhook URL that will be invoked to post a notification in Microsoft Teams and update the subscription in Azure API Management.
