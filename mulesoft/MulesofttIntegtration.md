@@ -101,12 +101,12 @@ Watch the [demo video](https://youtu.be/0mJXeD_zJhI) as we break down and explai
 **AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions. This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
 The MS flow will also post notifications in the channel for any subscription updates. 
 
-![MS Teams Adaptive Card](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MSTeamsAdaptiveCard.png)
+<img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MSTeamsAdaptiveCard.png" width="440" height="500" />
 
 **Pre-requisite:** 
 * You'll need [Microsoft Flow](flow.microsoft.com), with a Free Trial account at a minimum to be able to create the flow. 
 
-### Steps: 
+**Follow the these steps, to configure the flow:**
 
 1. Navigate to [Microsoft Flow](flow.microsoft.com).
 2. Create the Webhook entry point that Unified Catalog will send the events to. 
