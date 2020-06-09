@@ -60,7 +60,7 @@ acs logcat tokenprovider
 
 To shutdown the service, run the following command: `acs unpublish tokenprovider`. 
 
-### Step 3: Create a Service Principal in Azure API Management using the CLI
+### Step 2: Create a Service Principal in Azure API Management using the CLI
 ***
 
 This will be used to authenticate to Azure API Managemement. 
@@ -113,7 +113,7 @@ Flow these steps to configure the flow:
 
 Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.
 
-### Step4: Configure Microsoft Teams flow to Approve / Reject subscription requests
+### Step 4: Configure Microsoft Teams flow to Approve / Reject subscription requests
 ***
 
 **AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
