@@ -124,7 +124,7 @@ The MS flow will also post notifications in the channel for any subscription upd
 **Pre-requisite:** 
 * You'll need [Microsoft Flow](flow.microsoft.com), with a Free Trial account at a minimum to be able to create the flow. 
 
-To configure the flow:
+**To configure the flow:**
 
 1. Navigate to [Microsoft Flow](flow.microsoft.com).
 2. Create the Webhook entry point that Unified Catalog will send the events to. 
