@@ -23,7 +23,7 @@ The technologies that were used for this project:
 * MS Teams for notifications and approval or rejection of subscription requests. 
 * Azure API Management.
 
-Follow the steps bellow to use this example: 
+Follow the steps below to use this example: 
 
 ### Step 1: Configure a token provider service in API Builder
 
@@ -86,7 +86,7 @@ This will be used to authenticate to Azure API Managemement.
 
 This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog,  then will subscribe / unsubscribe the consumer to the APIs in Azure API Management. It will also send email notifications to the user with the key to authenticate the API calls. The flow will call the API Builder app with get a valid Bearer token, then updates the Subscription states in Unified Catalog.
 
-Flow this steps to configure the flow: 
+Flow these steps to configure the flow: 
 1. Download the [Azure Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/azure/Azure%20Registration%20Flow.json). 
 2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).  
 3. Import the flow as a Flow template. 
@@ -114,6 +114,8 @@ Flow this steps to configure the flow:
 Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.
 
 ### Step4: Configure Microsoft Teams flow to Approve / Reject subscription requests
+***
+
 **AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
 The MS flow will also post notifications in the channel for any subscription updates. 
 
