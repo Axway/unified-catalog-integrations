@@ -625,7 +625,7 @@ CLI extension that fetches the APIs from Azure API Management and builds the res
 
 The above resources structure map to the API Server REST API resources as defined in the API Server [OAS3 specs](https://apicentral.axway.com/apis/docs).
 
-![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
+<img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png" width="560" height="200" />
 
 The will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
 The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
