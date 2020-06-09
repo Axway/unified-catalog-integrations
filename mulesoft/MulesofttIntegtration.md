@@ -607,7 +607,7 @@ CLI extension to fetch the APIs from Mulesoft Anypoint Exchange and build the re
 
 The above resources structure map to the API Server REST API resources as defined in the API Server [OAS3 specs](https://apicentral.axway.com/apis/docs).
 
-![API Server Data Model](https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png)
+<img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png" width="560" height="200" />
 
 Learn how to install, configure and run the CLI extenstion [here](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/mulesoft-extension/README.md). 
  
