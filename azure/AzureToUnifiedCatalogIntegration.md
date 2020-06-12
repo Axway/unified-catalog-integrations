@@ -32,7 +32,8 @@ Follow the steps below to use this example:
 This service is used to authenticate from Integration Builder to AMPLIFY Central, and keep the authenticated user credentials green.  It will expose a `GET /token` endpoint that will return the current `access_token` for the configured credentials. This `access_token` is then used by the Integration Builder flow to allow it to call AMPLIFY Central APIs. The service was created with API Builder and deployed to AMPLIFY Runtime Services ( ARS ). 
 
 **Pre-requisites**
-*  **AMPLIFY Runtime Service** enabled on your AMPLIFY platform account. To enable your ARS trial, navigate to https://platform.axway.com and select _Start Free Trial_ under the _Application Development_ tile, from "Service Offerings & Products". * User with **Runtime Services Admin** role.  
+*  **AMPLIFY Runtime Service** enabled on your AMPLIFY platform account. To enable your ARS trial, navigate to https://platform.axway.com and select _Start Free Trial_ under the _Application Development_ tile, from "Service Offerings & Products".
+* User with **Runtime Services Admin** role.  
 
 To configure the token provider service:
 
