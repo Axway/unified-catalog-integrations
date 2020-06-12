@@ -79,6 +79,9 @@ This will be used to authenticate to Azure API Managemement.
      "tenant": "300f59df-*******"
    }
    ```
+   
+ Note: If you have more than one subscriptions with your Azure account, run the following command `az account set --subscription "subcription_name`. You need to have at least Owner rights to be able to create the Service principal account. 
+
 4. Retrieve your subscription id with `az account show --query id`. You will use this value later in the Integration Builder flow. 
 
 ### Step 3: Configure Integration Builder flow to update subscriptions and send email notifications
