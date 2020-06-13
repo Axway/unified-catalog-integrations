@@ -67,6 +67,9 @@ To shutdown the service, run the following command: `acs unpublish tokenprovider
 
 This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog,  then will subscribe / unsubscribe the consumer to the APIs in Mulesoft. It will also send email notifications to the user with the key to authenticate the API calls. The flow will call the API Builder app to get a valid Bearer token, then updates the Subscription states in Unified Catalog.
 
+> Note: If you don't want or cannot use Microsoft Teams for subscription notifications: 
+> * Use this flow **[No_MS_Team_Mulesosft_Registration_Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/integrationbuilder/MuleSoft%20Registration%20Flow.json)** and skip **Step 3: Microsoft Teams flow to Approve / Reject subscription requests**. 
+
 To configure the Integration Builder flow, follow this steps: 
 
 1. Download the Integration Builder flow **[MuleSoft Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/integrationbuilder/MuleSoft%20Registration%20Flow.json)** from this repo.  
