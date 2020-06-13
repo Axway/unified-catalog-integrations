@@ -663,7 +663,7 @@ Set the environment name:
 ```powershell
 $ amplify central mulesoft-extension config set --environment-name "my_env_name"
 ```
-Set the Organization Id for your Mulesoft account: 
+Set the organization id for your Mulesoft account: 
 ```powershell
 $ amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_domain>
 ```
@@ -698,6 +698,7 @@ The generate command will create AMPLIFY Central resource files for your configu
 $ amplify central mulesoft-extension resources generate
 ```
 **4. Fetch the APIs in Mulesoft and publish to Catalog**
+
 After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
 ```powershell
