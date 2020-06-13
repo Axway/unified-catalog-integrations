@@ -111,8 +111,8 @@ To configure the Integration Builder flow, follow this steps:
   * `muleSoftOrgID`: The organization id of your Mulesoft Anypoint account. 
   * `muleSoftUserName`: The username for your Mulesoft Anypoint account. 
   * `muleSoftPassword`:The password for your Mulesfot Anypoint account.   
-  * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com/. 
-  * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com/. 
+  * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
+  * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
  
 Watch the [demo video](https://youtu.be/0mJXeD_zJhI) as we break down and explain how to import and configure the flow template.
 
