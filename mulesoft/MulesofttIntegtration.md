@@ -113,7 +113,7 @@ To configure the Integration Builder flow, follow this steps:
   * `muleSoftPassword`:The password for your Mulesfot Anypoint account.   
   * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
   * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
- 
+* Select `Create instance`. Please make sure to save the instance id. You will need it later.
 Watch the [demo video](https://youtu.be/0mJXeD_zJhI) as we break down and explain how to import and configure the flow template.
 
 ### Step 3: Microsoft Teams flow to Approve / Reject subscription requests
@@ -530,7 +530,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 5. Add an action of type `HTTP` to configure calling to Integration Builder
 
    * Set `Method`to `POST`
-   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
+   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FLOW_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 2: Configure Integration Builder flow to update subscriptions and send email notifications
    * Set `Headers`to `Content-Type: application/json`<p/>
    * Set the `Body`to
     
