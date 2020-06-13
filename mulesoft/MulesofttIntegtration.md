@@ -679,11 +679,11 @@ $ amplify central mulesoft-extension config set --output-dir <directory>
 ```
 Set the environment name: 
 ```powershell
-$ amplify central mulesoft-extension config set --environment-name "my_env_name"
+$ amplify central mulesoft-extension config set --environment-name <my_env_name>
 ```
 Set the organization id for your Mulesoft account: 
 ```powershell
-$ amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_domain>
+$ amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_id>
 ```
 Choose to fetch the mock endpoints with the APIs in Mulesoft. Set to `false`, you don't want to include the mock endpoints.
 ```powershell
