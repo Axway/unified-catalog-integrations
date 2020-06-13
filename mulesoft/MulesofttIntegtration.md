@@ -125,11 +125,11 @@ The MS flow will also post notifications in the channel for any subscription upd
 <img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MSTeamsAdaptiveCard.png" width="440" height="500" />
 
 **Pre-requisite:** 
-* You'll need [Microsoft Flow](flow.microsoft.com), with a Free Trial account at a minimum to be able to create the flow. 
+* You'll need [Microsoft Flow](https://flow.microsoft.com), with a Free Trial account at a minimum to be able to create the flow. 
 
 **Follow the these steps, to configure the flow:**
 
-1. Navigate to [Microsoft Flow](flow.microsoft.com).
+1. Navigate to [Microsoft Flow](https://flow.microsoft.com).
 2. Create the Webhook entry point that Unified Catalog will send the events to. 
     * Go to "My flows". 
     * Create an `Instant flow`, provide a `name` and select `When an HTTP request is received` as an entry point.
