@@ -48,12 +48,12 @@ acs new tokenprovider --force
 3. Config the port with the following command: `acs config --set PORT=8080 tokenprovider`
 4. Build your tokenprovider image by running 
 ```powershell
-docker build --tag tokenprovider ./` 
+docker build --tag tokenprovider ./
 ```
 
 5. Publish the tokenprovider image
 ```powwershell
-acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1`
+acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1
 ```
 You should get back the HOST ENDPOINT where the token provider service will be published. 
 
@@ -69,7 +69,7 @@ You will be asked to restart the service . Type `yes` when prompted to restart.
    * Login with AxwayID. 
 8. You can Test the service by with
 ```powershell
-curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token`
+curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token
 ```
 
 9. To monitor your service run
