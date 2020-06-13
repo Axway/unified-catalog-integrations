@@ -46,14 +46,32 @@ acs login
 acs new tokenprovider --force
 ```
 3. Config the port with the following command: `acs config --set PORT=8080 tokenprovider`
-4. Build your tokenprovider image by running `docker build --tag tokenprovider ./` command. 
-5. Publish the tokenprovider image by running `acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1` command. You should get back the HOST ENDPOINT where the token provider service will be publish.
-6. Configure the OAuth callback by running `acs config --set CALLBACK_URI={HOST ENDPOINT}/auth/callback -d <path to your tokenprovider dir>` command, which will ask to restart the service . Type `yes` when prompted to restart. 
+4. Build your tokenprovider image by running 
+```powershell
+docker build --tag tokenprovider ./` 
+```
+
+5. Publish the tokenprovider image
+```powwershell
+acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1`
+```
+You should get back the HOST ENDPOINT where the token provider service will be published. 
+
+6. Configure the OAuth callback 
+```powershell
+acs config --set CALLBACK_URI={HOST ENDPOINT}/auth/callback 
+``` 
+You will be asked to restart the service . Type `yes` when prompted to restart. 
+
 7. Initiate the access/refresh tokens from the API Builder console. 
    * Navigate to `{HOST ENDPOINT}/console/project/credentials` and login with `username: admin `, `password: the apikey from default.js file`. We recommend updating the _default.js_ with a new unique _apikey_.  
    * Click Authorize/Re-authorize. 
    * Login with AxwayID. 
-8. You can Test the service by running `curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token`
+8. You can Test the service by with
+```powershell
+curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token`
+```
+
 9. To monitor your service run
 ```powershell
 acs list tokenprovider
