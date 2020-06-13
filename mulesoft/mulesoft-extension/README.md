@@ -65,7 +65,7 @@ AMPLIFY CENTRAL EXTENSION FOR MULESOFT API MANAGEMENT COMMANDS:
 
 The `config` command is utilized to configure the extension prior to generating resources. There are two config sub-commands; `list` and `set`.
 
-```bash
+```powershell
 $ amplify central mulesoft-extension config -h
 USAGE: amplify central mulesoft-extension config <command> [options]
 
@@ -78,7 +78,7 @@ CONFIG COMMANDS:
 
 ### config examples:
 
-```bash
+```powershell
 # set output dir for the generated resources:
 $ amplify central mulesoft-extension config set --output-dir <directory>
 # view config:
@@ -87,15 +87,16 @@ $ amplify central mulesoft-extension config list
 $ amplify central mulesoft-extension config set -h
 
 SET OPTIONS:
-  --environment-name=<value>  Set environment name to create
-  --generate-consumer-instances=<value>  Bool to generate consumer instances
+  --environment-name=<value>  Set the environment name to create in AMPLIFY Central
+  --generate-consumer-instances=<value>  Boolean to generate consumer instances
   --icon=<value>  Set absolute path for custom icon
-  --include-mock-endpoints=<value>  Bool to include mock endpoints
-  --master-organization-id=<value>  Set your Mulesoft Master Organizatoin Id
+  --include-mock-endpoints=<value>  Boolean to include mock endpoints
+  --master-organization-id=<value>  Set your Mulesoft Master Organization Id
   --output-dir=<value>  Set absolute path for output directory
   --password=<value>  Set your Mulesoft password
   --username=<value>  Set your Mulesoft username
-  --webhook-url=<value>  Set webhook url to use
+  --webhook-url=<value>  Set webhook url to use to the integration flow
+  --webhook-secret=<value>  Set secret to invoke webhook
 ```
 
 ---
@@ -104,7 +105,7 @@ SET OPTIONS:
 
 The `resources` command is utilized to generate mulesoft resources for Central. There is one resources sub-command: `generate`
 
-```bash
+```powershell
 $ amplify central mulesoft-extension resources -h
 
 USAGE: amplify central mulesoft-extension resources <command> [options]
@@ -127,7 +128,7 @@ The generate command will create AMPLIFY Central resource files for your configu
 
 After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
-```bash
+```powershell
 $ amplify central create -h
 USAGE: amplify central create <command> [options]
 
@@ -144,7 +145,7 @@ CREATE OPTIONS:
 
 ### create example:
 
-```bash
+```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
 amplify central create -f=~/Desktop/Environment.yaml
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
