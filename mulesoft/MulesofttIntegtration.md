@@ -641,25 +641,26 @@ Follow these steps to download and configure the AMPLIFY Centra resources to pub
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central. 
 
 ```powershell
-$ [sudo] npm install -g @axway/amplify-cli
+[sudo] npm install -g @axway/amplify-cli
 ```
 
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```powershell
-$ amplify pm install @axway/amplify-central-cli@dev
+amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
-You can then install the @axway/amplify-central-mulesoft-extension:
+With the AMPLIFY Central CLI installed, run this command in the mulesoft-extension directory, assuming you have cloned/downloaded this repo at previous steps.  
 
 ```powershell
-$ amplify pm install @axway/amplify-central-mulesoft-extension
+yarn && yarn build
 ```
+> **Note**: If you get a command not found error for yarn, please run `npm install -g yarn. 
 
 To configure this extension with the AMPLIFY Central CLI:
 
 ```powershell
-$ amplify central config set extensions.mulesoft-extension '~/.axway/packages/@axway/amplify-central-mulesoft-extension'
+amplify central config set extensions.mulesoft-extension <path_to_your_mulesoft_extension_directory>
 ```
 
 **2. Configure extension**
@@ -669,55 +670,70 @@ You must be logged into the Axway AMPLIFY Platform before uploading any generate
 
 Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
 ```powershell
-$ amplify auth login --client-id <DOSA Service Account> --secret-file <private key for Service Account>
+amplify auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
 ```
 Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
  
-Set the output directory for generated resources
+Set the output directory where you want the resources to be generated. 
 ```powershell
-$ amplify central mulesoft-extension config set --output-dir <directory>
+amplify central mulesoft-extension config set --output-dir <directory_name>
 ```
+Example: `amplify central mulesoft-extension config set --output-dir ./mulesoft-resources`.
+
 Set the environment name: 
 ```powershell
-$ amplify central mulesoft-extension config set --environment-name <my_env_name>
+amplify central mulesoft-extension config set --environment-name <env_name>
 ```
+Example: `amplify central mulesoft-extension config set --environment-name mulesoft-env`
+
 Set the organization id for your Mulesoft account: 
 ```powershell
-$ amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_id>
+amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_id>
 ```
 Choose to fetch the mock endpoints with the APIs in Mulesoft. Set to `false`, you don't want to include the mock endpoints.
 ```powershell
-$ amplify central mulesoft-extension config set --include-mock-endpoints true
+amplify central mulesoft-extension config set --include-mock-endpoints true
 ```
 
 Set the Mulesoft username and password: 
 ```powershell
-$ amplify central mulesoft-extension config set --username mulesoft_username
-$ amplify central mulesoft-extension config set --password mulesoft_password
+amplify central mulesoft-extension config set --username <mulesoft_username>
+amplify central mulesoft-extension config set --password <mulesoft_password>
+```
+
+Set the image for the environment
+```powershell
+amplify central mulesoft-extension config set --icon <path_to_your_image>
+```
+
+Set to publish your Mulesoft assets to the Unified Catalog. By default, it is set to `false`. 
+```powershell
+amplify central mulesoft-extension config set --generate-consumer-instances true
 ```
 
 Set the Webhook URL to send the HTTP POST request for a subcription update event.
 ```powershell
-$ amplify central mulesoft-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
+amplify central mulesoft-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
 ```
 > **Note**: If you skipped the MF FLow Step, set the webhook-url to the Integration Builder execution url: `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
 
-Set the secret if the webhook is secure and needs a key to invoke.
+(Optional) Set the secret if the webhook is secure and needs a key to invoke. Skip this step if you have configured the MS flow. 
 ```powershell
-$ amplify central mulesoft-extension config set --webhook-secret ${SECRET} 
+amplify central mulesoft-extension config set --webhook-secret ${SECRET} 
 ```
 > **Note**: If you skipped the MF FLow Step, the webhook secret will be Integration Builder credentials: User ****, Organization ****
 
 **3. Generate AMPLIFY Central resources**`
 
-The generate command will create AMPLIFY Central resource files for your configured Mulesoft instance. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
+The generate command will create AMPLIFY Central resource files for your configured Mulesoft instance. These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
 
 ```
-$ amplify central mulesoft-extension resources generate
+amplify central mulesoft-extension resources generate
 ```
+
 **4. Fetch the APIs in Mulesoft and publish to Catalog**
 
-After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
+After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
