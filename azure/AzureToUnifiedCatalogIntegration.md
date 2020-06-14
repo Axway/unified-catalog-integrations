@@ -45,14 +45,32 @@ acs login
 acs new tokenprovider --force
 ```
 3. Config the port with the following command: `acs config --set PORT=8080 tokenprovider`
-4. Build your tokenprovider image by running `docker build --tag tokenprovider "<path_to_your_tokenprovider_dir>"` command. 
-5. Publish the tokenprovider image by running `acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1/` command. You should get back the HOST ENDPOINT where the token provider service will be publish.
-6. Configure the OAuth callback by running `acs config --set CALLBACK_URI={HOST ENDPOINT}/auth/callback -d <path to your tokenprovider dir>` command, which will ask to restart the service . Type `yes` when prompted to restart. 
+4. Build your tokenprovider image by running 
+```powershell
+docker build --tag tokenprovider ./
+```
+
+5. Publish the tokenprovider image
+```powwershell
+acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1
+```
+You should get back the HOST ENDPOINT where the token provider service will be published. 
+
+6. Configure the OAuth callback 
+```powershell
+acs config --set CALLBACK_URI={HOST ENDPOINT}/auth/callback 
+``` 
+You will be asked to restart the service . Type `yes` when prompted to restart. 
+
 7. Initiate the access/refresh tokens from the API Builder console. 
    * Navigate to `{HOST ENDPOINT}/console/project/credentials` and login with `username: admin `, `password: the apikey from default.js file`. We recommend updating the _default.js_ with a new unique _apikey_.  
    * Click Authorize/Re-authorize. 
    * Login with AxwayID. 
-8. You can Test the service by running `curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token`
+8. You can Test the service by with
+```powershell
+curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token
+```
+
 9. To monitor your service run
 ```powershell
 acs list tokenprovider
@@ -107,13 +125,13 @@ Flow these steps to configure the flow:
 * Provide a `Name` for the instance. 
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
-   * `apiCentralTokenCredentials`: The authentication token from the `API Builder tokenProvider` service. Please refer to [Configure TokenProvider service in API Builder](https://github.com/Axway/mulesoft-catalog-integration/wiki/Configure-TokenProvider-service-in-API-Builder).
-  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service. 
-  * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com/. 
+   * `apiCentralTokenCredentials`: The authentication token from the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**
+  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**
+  * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
   * `azureTenantId`: The tenant id of your Azure account. 
   * `azureClientSecret`: The password from the Azure service principal. 
   * `subId`: The subscription id of your Azure account.
-  * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com/. 
+  * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
 
 Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.
 
@@ -529,7 +547,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 5. Add an action of type `HTTP` to configure calling to Integration Builder
 
    * Set `Method`to `POST`
-   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
+   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
    * Set `Headers`to `Content-Type: application/json`<p/>
    * Set the `Body`to
     
@@ -585,7 +603,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 9. On the `If yes` branch, send the event data to Integration Builder.
    * Select a `HTTP` action. 
    * Set the `Method` to `POST`
-   * Set the `URI` to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
+   * Set the `URI` to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
    * Set the `Headers` to `Content-Type: application/json`
    * Set the `Body`to:
     
@@ -634,8 +652,134 @@ The above resources structure map to the API Server REST API resources as define
 The will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
 The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
 
-You can read how to install, configure and run the CLI extension [here](https://github.com/Axway/unified-catalog-integrations/blob/master/azure/azure-extension/README.md). 
+**1. Install @axway/mulesoft-extension**
+
+Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central. 
+
+```powershell
+[sudo] npm install -g @axway/amplify-cli
+```
+
+Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
+
+```powershell
+amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
+```
+
+With the AMPLIFY Central CLI installed, run this command in the azure-extension directory, assuming you have cloned/downloaded this repo at previous steps.  
+
+```powershell
+yarn && yarn build
+```
+> **Note**: If you get a command not found error for yarn, please run `npm install -g yarn. 
+
+To configure this extension with the AMPLIFY Central CLI:
+
+```powershell
+amplify central config set extensions.azure-extension <path_to_your_azure_extension_directory>
+```
+
+**2. Configure extension**
+
+Configure the extensions prior to generating the resources. 
+You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one, visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). 
+
+Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
+```powershell
+amplify auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
+```
+Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
+ 
+Set the output directory where you want the resources to be generated. 
+```powershell
+amplify central azure-extension config set --output-dir <directory_name>
+```
+Example: `amplify central azure-extension config set --output-dir ./azure-resources`.
+
+Set the environment name: 
+```powershell
+amplify central azure-extension config set --environment-name <env_name>
+```
+Example: `amplify central azure-extension config set --environment-name azure-env`
   
+Set your Azure Subcription Id
+```powershell
+amplify central azure-extension config set --subscription-id <your_azure_subbscription_id>
+```
+
+Set the Azure Client Id
+```powershell
+amplify central azure-extension config set --client-id <your_azure_client_id>
+```
+  
+Set the Azure Client Secret:
+```powershell
+amplify central azure-extension config set --client-secret <your_azure_client_secret>
+```
+
+Set the Azure Service name
+```powershell
+amplify central azure-extension config set --service-name <your_azure_service_name>
+```
+
+Set the Azure Resource Group name
+```powershell
+amplify central azure-extension config set --resource-group-name <your_azure_resource_group_name>
+```
+
+Set the filtering option. Only APIs with this tag will be fetched from Azure. 
+```powershell
+amplify central azure-extension config set --filter <tag_value>
+```
+
+Set the Azure Tenant Id
+```powershell
+amplify central azure-extension config set  --tenant-id <your_azure_tenant_id>
+```
+
+Set the image for the environment
+```powershell
+amplify central azure-extension config set --icon <path_to_your_image>
+```
+
+Set to publish your Azure assets to the Unified Catalog. By default, it is set to `false`. 
+```powershell
+amplify central azure-extension config set --generate-consumer-instances true
+```
+
+Set the Webhook URL to send the HTTP POST request for a subcription update event.
+```powershell
+amplify central azure-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
+```
+  
+**3. Generate AMPLIFY Central resources**`
+
+The generate command will create AMPLIFY Central resource files for your configured Azure instances. These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
+
+```
+amplify central azure-extension resources generate
+```
+
+**4. Fetch the APIs in Mulesoft and publish to Catalog**
+
+After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
+
+```powershell
+# Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
+amplify central create --file=<path_to_environment_file>
+# Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
+amplify central create -f=~<path_to_service_yaml_file>
+```
+Example:
+```powershell
+# Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
+amplify central create -f=~/Desktop/Environment.yaml
+# Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
+amplify central create -f=~/Desktop/APIService-swagger-petstore.yaml
+```
+
+For full list of supported commands, please refer to [here](https://github.com/Axway/unified-catalog-integrations/blob/master/azure/azure-extension/README.md). 
+ 
 
 
 
