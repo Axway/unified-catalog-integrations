@@ -461,11 +461,7 @@ The MS flow will also post notifications in the channel for any subscription upd
                             {
                                 "title": "Message",
                                 "value": "@{triggerBody()?['payload']?['subscription']?['currentStateDescription']}"
-                            },
-                            { 
-                            "title":"Requested plan",
-                            "value": "@{triggerBody()?['payload']?['subscription']?['properties']?['profile']?['plan']}"
-                        }
+                            }
                         ]
                     }
                 ]
