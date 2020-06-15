@@ -38,7 +38,7 @@ This service is used to authenticate from Integration Builder to AMPLIFY Central
 To configure the token provider service:
 
 1. Download the TokenProvider service from this [repo](https://github.com/Axway/unified-catalog-integrations/tree/master/tokenprovider). 
-2. Setup the acs cli by running the following commands sequence:
+2. Setup the acs cli (AMPLIFY Runtime Service) by running the following commands sequence:
 ```poweshell
 npm install -g acs
 acs login
