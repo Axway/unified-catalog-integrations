@@ -707,10 +707,10 @@ amplify central azure-extension config set --generate-consumer-instances true
 ```
 Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
 ```powershell
-amplify central azure-extension config set --filter="tags=<tag_value>"
+amplify central azure-extension config set --filter tags=<tag_value>
 ```
 
-Example: `amplify central azure-extension config set --filter="tags=unifiedcatalog`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
+Example: `amplify central azure-extension config set --filter tags=unifiedcatalog`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
 
 ![Set API tags](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPISetTags.png)
 
