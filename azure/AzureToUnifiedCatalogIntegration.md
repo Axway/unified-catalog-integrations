@@ -713,12 +713,12 @@ Set the Azure Client Secret. This should be the `password'`from the service prin
 amplify central azure-extension config set --client-secret <your_azure_client_secret>
 ```
 
-Set the Azure Service name. The `service name` configured when you first created the API in Azure API Management. 
+Set the Azure Service name. The `service name` of your API Management service in Azure Portal. 
 ```powershell
 amplify central azure-extension config set --service-name <your_azure_service_name>
 ```
 
-Set the Azure Resource Group name. The `resource group name` provided when you first created the API in Azure API Management. 
+Set the Azure Resource Group name. The `resource group name` under your API Management service in Azure Portal. 
 ```powershell
 amplify central azure-extension config set --resource-group-name <your_azure_resource_group_name>
 ```
