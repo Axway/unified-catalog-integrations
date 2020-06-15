@@ -705,7 +705,7 @@ Set to publish your Azure assets to the Unified Catalog. By default, it is set t
 ```powershell
 amplify central azure-extension config set --generate-consumer-instances true
 ```
-Set the filtering option. Only APIs with this tag will be fetched from Azure. 
+Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
 ```powershell
 amplify central azure-extension config set --filter <tag_value>
 ```
