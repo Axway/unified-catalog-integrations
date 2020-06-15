@@ -12,13 +12,13 @@ export const ensureConfigFileExists = () => !pathExistsSync(configFilePath) && o
 
 // Creates a promise for a request 
 export const requestPromise = (options: any) => {
-  return new Promise((resolve, reject) => {
-    request(options, (err: any, response: any) => {
-      if (err) reject(new Error(err));
-      if (response.statusCode > 200) reject(new Error(`Bad response ${response.body}`))
-      resolve(response.body);
-    });
-  });
+	return new Promise((resolve, reject) => {
+		request(options, (err: any, response: any) => {
+			if (err) reject(new Error(err));
+			if (response.statusCode > 200) reject(new Error(`Bad response ${response.body}`))
+			resolve(response.body);
+		});
+	});
 };
 
 // Creates local yaml files given the resource params.
@@ -26,6 +26,7 @@ export const createSupportResources = async (config: any) => {
 	const {
 		environmentName,
 		icon,
+		webhookSecret,
 		webhookUrl,
 		outputDir
 	} = config;
@@ -54,7 +55,7 @@ export const createSupportResources = async (config: any) => {
 			createdBy: 'yaml',
 			randomNum: 1
 		},
-		tags: [ 'axway', 'cli' ],
+		tags: ['axway', 'cli'],
 		spec: {
 			description: `${environmentName} Environment`,
 			icon: iconData
@@ -63,53 +64,98 @@ export const createSupportResources = async (config: any) => {
 
 	const subscriptionDefinition = {
 		apiVersion: 'v1alpha1',
-		title: 'Invoke msflow Flow for approval',
+		title: 'Invoke IB Flow for approval',
 		name: 'consumersubdef',
 		kind: 'ConsumerSubscriptionDefinition',
 		metadata: {
 			scope: {
 				kind: 'Environment',
 				name: environmentName
-				}
+			}
 		},
-		tags: [ 'apisvcinst', 'cli', 'axway' ],
-		spec: 
+		tags: ['subDefinition', 'cli', 'axway'],
+		spec:
 		{
-			webhooks: [ 'msflow' ],
+			webhooks: ['ibflow'],
 			schema: {
-				properties: [ {
-					key: 'profile', value: {} 
-				} ] 
+				properties: [
+					{
+						key: "profile",
+						value: {
+							additionalProperties: false,
+							description: "Catalog Item access information.",
+							properties: {
+								plan: {
+									default: "Silver",
+									enum: ["Gold", "Silver"],
+									type: "string",
+								},
+							},
+							required: ["plan"],
+							type: "object",
+						},
+					},
+				],
 			}
 		}
 	};
 
-	const webhook = {
-		apiVersion: 'v1alpha1',
-		title: 'webhook1 title',
-		name: 'msflow',
-		kind: 'Webhook',
+	const secret = {
+		apiVersion: "v1alpha1",
+		title: "secret title",
+		name: "ibflow",
+		kind: "Secret",
 		metadata: {
 			scope: {
-				kind: 'Environment', name: environmentName 
-			}
+				kind: "Environment",
+				name: environmentName,
+			},
 		},
 		attributes: {
-			target: 'msflow'
+			target: "ibflow",
 		},
-		tags: [ 'webhook', 'cli', 'axway' ],
+		tags: ["secret", "cli", "axway"],
+		spec: {
+			data: {
+				apiKey: webhookSecret,
+			},
+		},
+	};
+
+	const webhook = {
+		apiVersion: "v1alpha1",
+		title: "webhook1 title",
+		name: "ibflow",
+		kind: "Webhook",
+		metadata: {
+			scope: {
+				kind: "Environment",
+				name: environmentName,
+			},
+		},
+		attributes: {
+			target: "ibflow",
+		},
+		tags: ["webhook", "cli", "axway"],
 		spec: {
 			enabled: true,
 			url: webhookUrl,
 			headers: {
-				'Content-Type': 'application/json' 
-			}
-		}
-	}
+				"Content-Type": "application/json",
+			},
+			auth: {
+				secret: {
+					name: secret.name,
+					key: "apikey",
+				},
+			},
+		},
+	};
 
 	//write yaml files to outputDir
 	await commitToFs(environment, outputDir, [
 		environment,
+		secret,
 		webhook,
 		subscriptionDefinition
 	]);

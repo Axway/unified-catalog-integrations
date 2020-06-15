@@ -2,6 +2,7 @@ export enum ConfigKeys {
   OUTPUT_DIR = "outputDir",
   ENVIRONMENT_NAME = "environmentName",
   WEBHOOK_URL = "webhookUrl",
+  WEBHOOK_SECRET = "webhookSecret",
   ICON = "icon",
 
   USERNAME = "username",

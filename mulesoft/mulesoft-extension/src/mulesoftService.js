@@ -9,6 +9,7 @@ const ORDER = [
 	'APIService',
 	'APIServiceRevision',
 	'APIServiceInstance',
+	'Secret',
 	'Webhook',
 	'ConsumerSubscriptionDefinition',
 	'ConsumerInstance',
@@ -64,7 +65,7 @@ const getApiDetails = async (api, token) => {
 	let specContent;
 
 	//which data to fetch as a spec for the api service
-	let specFileClassifier = (function(apiType) {
+	let specFileClassifier = (function (apiType) {
 		switch (apiType) {
 			case 'template':
 				return 'mule-application-template';
@@ -89,7 +90,7 @@ const getApiDetails = async (api, token) => {
 	let packaging = 'txt';
 	if (fileEntries.length > 0) {
 		if (fileEntries[0].packaging === 'zip' && (specFileClassifier === 'oas' || specFileClassifier === 'wsdl')) {
-			await unzipper.downloadAndUnzip(fileEntries[0].externalLink, fileEntries[0].mainFile).then(function(value) {
+			await unzipper.downloadAndUnzip(fileEntries[0].externalLink, fileEntries[0].mainFile).then(function (value) {
 				specContent = value;
 			});
 			packaging = 'json';
@@ -104,7 +105,7 @@ const getApiDetails = async (api, token) => {
 			});
 			packaging = fileEntries[0].packaging;
 		}
-		
+
 	} else if (specFileClassifier === 'oas') {
 		//for rest-api, there might not be an oas spec generated if it's an old asset, download raml
 		fileEntries = api.files.filter(filter => filter.classifier === 'fat-raml');
@@ -200,7 +201,7 @@ const generateResourcesFromMulesoftAssets = async (config = {}, log) => {
 			resources = [];
 			try {
 				const apiDetails = await getApiDetails(api, token);
-				let type = (function(apiType, spec, packaging) {
+				let type = (function (apiType, spec, packaging) {
 					switch (apiType) {
 						case 'soap-api':
 							return 'wsdl';
@@ -239,7 +240,7 @@ const generateResourcesFromMulesoftAssets = async (config = {}, log) => {
 						api.assetId,
 						api.version
 					);
-					
+
 					const consumerInstance = {
 						apiVersion: 'v1alpha1',
 						kind: 'ConsumerInstance',
@@ -473,7 +474,7 @@ const generateResourcesFromMulesoftAssets = async (config = {}, log) => {
 			} catch (error) {
 				console.error(error);
 			}
-			resources = resources.sort((l,r) =>  ORDER.indexOf(l.kind) - ORDER.indexOf(r.kind));
+			resources = resources.sort((l, r) => ORDER.indexOf(l.kind) - ORDER.indexOf(r.kind));
 			await commitToFs(apiService, outputDir, resources);
 		}
 	}

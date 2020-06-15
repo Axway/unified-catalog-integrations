@@ -1,6 +1,6 @@
 {
   "name": "@axway/amplify-central-mulesoft-extension",
-  "version": "0.0.1-dev.0",
+  "version": "0.0.1",
   "description": "Create AMPLIFY Central resources from Mulesoft API Management APIs",
   "author": {
     "email": "support@axway.com",
@@ -31,11 +31,6 @@
     "amplify-package",
     "cli-kit"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Axway/unified-catalog-integrations.git",
-    "directory": "mulesoft/mulesoft-extension"
-  },
   "aliases": [
     "mulesoft"
   ],

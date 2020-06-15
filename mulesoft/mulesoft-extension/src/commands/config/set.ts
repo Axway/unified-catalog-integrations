@@ -32,6 +32,7 @@ export const set = {
     "--output-dir [value]": "Set absolute path for output directory",
     "--environment-name [value]": "Set environment name to create",
     "--webhook-url [value]": "Set webhook url to use",
+    "--webhook-secret [value]": "Set secret to invoke webhook",
     "--icon [value]": "Set absolute path for custom icon",
 
     "--username [value]": "Set your Mulesoft username",
