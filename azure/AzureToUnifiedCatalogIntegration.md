@@ -648,7 +648,7 @@ The above resources structure map to the API Server REST API resources as define
 The will fetch from Azure only the APIs that are tagged with unifiedcatalog. 
 The APIs will be visible in the Unified Catalog and consumer can subscribe to them. 
 
-**1. Install @axway/mulesoft-extension**
+**1. Install @axway/azure-extension**
 
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central. 
 
