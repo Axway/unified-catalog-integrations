@@ -698,27 +698,27 @@ amplify central azure-extension config set --environment-name <env_name>
 ```
 Example: `amplify central azure-extension config set --environment-name azure-env`
   
-Set your Azure Subcription Id
+Set your Azure Subcription Id. This will be the value of the subscription id from you service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
-amplify central azure-extension config set --subscription-id <your_azure_subbscription_id>
+amplify central azure-extension config set --subscription-id <your_azure_subscription_id>
 ```
 
-Set the Azure Client Id
+Set the Azure Client Id. This should be the `appId` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set --client-id <your_azure_client_id>
 ```
   
-Set the Azure Client Secret:
+Set the Azure Client Secret. This should be the `password'`from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set --client-secret <your_azure_client_secret>
 ```
 
-Set the Azure Service name
+Set the Azure Service name. The `service name` configured when you first created the API in Azure API Management. 
 ```powershell
 amplify central azure-extension config set --service-name <your_azure_service_name>
 ```
 
-Set the Azure Resource Group name
+Set the Azure Resource Group name. The `resource group name` provided when you first created the API in Azure API Management. 
 ```powershell
 amplify central azure-extension config set --resource-group-name <your_azure_resource_group_name>
 ```
@@ -728,7 +728,7 @@ Set the filtering option. Only APIs with this tag will be fetched from Azure.
 amplify central azure-extension config set --filter <tag_value>
 ```
 
-Set the Azure Tenant Id
+Set the Azure Tenant Id. This will be the `tenant id` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set  --tenant-id <your_azure_tenant_id>
 ```
