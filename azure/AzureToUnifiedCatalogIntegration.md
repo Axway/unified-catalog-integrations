@@ -127,14 +127,26 @@ Flow these steps to configure the flow:
 * Provide a `Name` for the instance. 
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
-  * `apiCentralTokenCredentials`: The apikey from default.js file in the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**  
-  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service: `{HOST ENDPOINT}/api/token`, where the {HOST_ENDPOINT} is the URL of the tokenprovider service. Please refer to **Step 1: Configure a token provider service in API Builder.**
+  * `apiCentralTokenCredentials`: The apikey from `default.js` file in the API Builder `tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**  
+  * `apiCentralTokenUrl`: The ENDPOINT URL of the API Builder `tokenProvider` service: `{HOST ENDPOINT}/api/token`, where the {HOST_ENDPOINT} is the URL of the tokenprovider service. Please refer to **Step 1: Configure a token provider service in API Builder.**
   * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
-  * `azureTenantId`: The tenant id of your Azure account. 
-  * `azureClientSecret`: The password from the Azure service principal. 
-  * `subId`: The subscription id of your Azure account.
   * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
-
+  * `azureTenantId`: The tenant id of your Azure account. 
+  * `azureClientSecret`: The password from the Azure service principal.
+  * `subId`: The subscription id of your Azure account, that you retrieved with `az account set --subscription "subcription_name` command at Step1. 
+ 
+```powershell
+   Creating a role assignment under the scope of "/subscriptions/b3700142-5855-4c3c-b8a0-ff1bbda1d53e"
+    Retrying role assignment creation: 1/36
+   {
+     "appId": "f4b7a269-******",
+     "displayName": "cataog-integration",
+     "name": "http://catalog-integration",
+     "password": "63c9503f-*****",
+     "tenant": "300f59df-*******" 
+   }
+   ```
+   
 Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.
 
 ### Step 4: Configure Microsoft Teams flow to Approve / Reject subscription requests
