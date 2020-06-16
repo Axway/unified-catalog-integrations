@@ -107,7 +107,7 @@ To configure the Integration Builder flow, follow this steps:
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
   * `apiCentralTokenCredentials`: The apikey from default.js file in the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**
-  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**
+  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service: `{HOST ENDPOINT}/api/token`, where the {HOST_ENDPOINT} is the URL of the tokenprovider service. Please refer to **Step 1: Configure a token provider service in API Builder.**
   * `muleSoftOrgID`: The organization id of your Mulesoft Anypoint account. 
   * `muleSoftUserName`: The username for your Mulesoft Anypoint account. 
   * `muleSoftPassword`:The password for your Mulesfot Anypoint account.   
