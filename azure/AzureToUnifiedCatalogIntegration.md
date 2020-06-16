@@ -99,7 +99,9 @@ This will be used to authenticate to Azure API Managemement.
    }
    ```
    
- Note: If you have more than one subscriptions with your Azure account, run the following command `az account set --subscription "subcription_name`. You need to have at least Owner rights to be able to create the Service principal account. 
+ When you create the Azure principal the return gives you info you're going to need later. If you happen to lose the info, you can retrieve it again with the following command:   `az ad sp list --filter "displayname eq 'service-principal'`, where `service-principal` is the name of the principal you created.   
+ 
+Note: If you have more than one subscriptions with your Azure account, run the following command `az account set --subscription "subcription_name`. You need to have at least Owner rights to be able to create the Service principal account. 
 
 4. Retrieve your subscription id with `az account show --query id`. You will use this value later in the Integration Builder flow. 
 
@@ -126,7 +128,7 @@ Flow these steps to configure the flow:
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
   * `apiCentralTokenCredentials`: The apikey from default.js file in the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**  
-  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**
+  * `apiCentralTokenUrl`: The ENDPOINT URL of the `API Builder tokenProvider` service: `{HOST ENDPOINT}/api/token`, where the {HOST_ENDPOINT} is the URL of the tokenprovider service. Please refer to **Step 1: Configure a token provider service in API Builder.**
   * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
   * `azureTenantId`: The tenant id of your Azure account. 
   * `azureClientSecret`: The password from the Azure service principal. 
