@@ -1,0 +1,34 @@
+apiVersion: v1alpha1
+title: Petstore Version ${VERSION}
+name: petstore-${CENTRAL_ENV_TYPE}
+kind: ConsumerInstance
+metadata:
+  scope:
+    kind: Environment
+    name: ${CENTRAL_ENV_NAME}
+tags:
+  - example
+  - petstore
+  - ${CENTRAL_ENV_TYPE}
+attributes:
+  version: ${VERSION}
+spec:
+  name: Petstore (${CENTRAL_ENV_TYPE})
+  apiServiceInstance: petstore-${CENTRAL_ENV_TYPE}
+  description: Petstore APIs
+  visibility: ${CATALOG_ITEM_VISIBILITY}
+  version: ${VERSION}
+  state: ${CATALOG_ITEM_STATE}
+  owningTeam: ${OWNING_TEAM_NAME}
+  status: GA
+  tags:
+    - example
+    - petstore
+    - ${CENTRAL_ENV_TYPE}
+  icon:
+    contentType: image/jpeg
+    data: ${SERVICE_IMAGE}
+  documentation: "${CATALOG_DOCUMENTAION}"
+  subscription:
+    enabled: false
+    autoSubscribe: true

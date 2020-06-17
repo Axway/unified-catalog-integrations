@@ -1,0 +1,21 @@
+apiVersion: v1alpha1
+title: Petstore version ${VERSION}
+name: petstore-${CENTRAL_ENV_TYPE}
+kind: APIServiceInstance
+metadata:
+  scope:
+    kind: Environment
+    name: ${CENTRAL_ENV_NAME}
+tags:
+  - example
+  - petstore
+  - ${CENTRAL_ENV_TYPE}
+attributes:
+  version: ${VERSION}
+spec:
+  apiServiceRevision: petstore-${VERSION}
+  endpoint:
+    - host: ${SERVICE_HOST}
+      protocol: https
+      routing:
+        basePath: ${SERVICE_HOST_BASEPATH}

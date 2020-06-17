@@ -1,0 +1,16 @@
+apiVersion: v1alpha1
+title: Petstore 
+name: petstore
+kind: APIService
+metadata:
+  scope:
+    kind: Environment
+    name: ${CENTRAL_ENV_NAME}
+tags:
+  - example
+  - petstore
+spec:
+  description: A sample service for petstore
+  icon:
+    contentType: image/png
+    data: ${SERVICE_IMAGE}

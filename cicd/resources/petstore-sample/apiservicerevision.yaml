@@ -1,0 +1,18 @@
+apiVersion: v1alpha1
+title: Petstore Version ${VERSION}
+name: petstore-${VERSION}
+kind: APIServiceRevision
+metadata:
+  scope:
+    kind: Environment
+    name: ${CENTRAL_ENV_NAME}
+tags:
+  - example
+  - petstore
+attributes:
+  version: ${VERSION}
+spec:
+  apiService: petstore
+  definition:
+    type: oas2
+    value: SPECIFICATION_BASE64

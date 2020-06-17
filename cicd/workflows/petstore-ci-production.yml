@@ -1,0 +1,53 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Production-Publish-To-Unified-Catalog
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+# Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*'
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  publish-petstore:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    container:
+      image:  axway-docker-public-registry.bintray.io/node-amplify-cli:0.1.3-dev.10
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a set of commands using the runners shell
+    - uses: actions/checkout@v2
+    - name: update-cli
+      run: |
+            amplify pm install @axway/amplify-central-cli@$CLI_VERSION
+            gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.LARGE_SECRET_PASSPHRASE }} --output $HOME/key.pem key.pem.gpg
+            amplify config set auth.tokenStoreType file
+    - name: Get the version
+      id: get_version
+      run: |
+            echo ${GITHUB_REF#refs/*/}
+            echo ::set-output name=VERSION::${GITHUB_REF#refs/*/}
+    - name: petstore-publish
+      env:
+        VERSION: ${{ steps.get_version.outputs.VERSION }}
+      run: |
+            ./create.sh -did=$DOSA_CLIENT_ID -pk=$HOME/key.pem -cet=$CENTRAL_ENV_TYPE -cen=$CENTRAL_ENV_NAME -rp=$RESOURCES_PATH
+    env:
+      CLI_VERSION: 0.1.3-dev.10
+      RESOURCES_PATH: resources/petstore-sample
+      CATALOG_DOCUMENTATION_FILE_NAME: catalogDocumentation.md
+      IMAGE_LOCATION_FILE_NAME: image.png
+      CENTRAL_ENV_TYPE: production
+      # VERSION: Set during the job execution.
+      SERVICE_HOST: petstore.swagger.io
+      SERVICE_HOST_BASEPATH: /v2
+      CENTRAL_ENV_NAME: petstore-production
+      DOSA_CLIENT_ID: DOSA_75a1be4d2d0e4f24acc484ccb9284bf3
+      SPECIFICATION_URL: https://petstore.swagger.io/v2/swagger.json
+      CATALOG_ITEM_STATE: PUBLISHED
+      CATALOG_ITEM_VISIBILITY: PUBLIC
+      OWNING_TEAM_NAME: "Default Team"

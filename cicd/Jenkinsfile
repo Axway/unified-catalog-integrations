@@ -1,0 +1,95 @@
+#!groovy
+pipeline {
+    agent {
+        docker {
+            image 'node-amplify-cli:0.1.3-dev.10'
+            registryUrl 'https://axway-docker-public-registry.bintray.io/'
+            alwaysPull true
+        }
+    }
+
+    parameters {
+        string(
+            name: 'CLI_VERSION',
+            description: 'amplify central cli version to be used.',
+            defaultValue: params.CLI_VERSION ?: '0.1.3-dev.10')
+        string(
+            name: 'RESOURCES_PATH',
+            description: 'User Resource file paths to create in amplify central using the cli.',
+            defaultValue: params.RESOURCES_PATH ?: '')
+        string(
+            name: 'CATALOG_DOCUMENTATION_FILE_NAME',
+            description: 'User Documentation to be added in the catalog item',
+            defaultValue: params.CATALOG_DOCUMENTATION_FILE_NAME ?: '')
+        string(
+            name: 'IMAGE_LOCATION_FILE_NAME',
+            description: 'User Image of the catalog Item to be published.',
+            defaultValue: params.IMAGE_LOCATION_FILE_NAME ?: '')
+        string(
+            name: 'CENTRAL_ENV_TYPE',
+            defaultValue: params.CENTRAL_ENV_TYPE ?: '',
+            description: 'User specified environment type for which catalog item will be published. eg: staging,production')
+        string(
+            name: 'VERSION',
+            defaultValue: params.VERSION ?: '',
+            description: 'User version of the specification to be published in central.')
+        string(
+            name: 'SERVICE_HOST',
+            description: 'User Service host where apis are hosted/deployed.',
+            defaultValue: params.SERVICE_HOST ?: '')
+        string(
+            name: 'SERVICE_HOST_BASEPATH',
+            description: 'User Service basepath to be called with apis.',
+            defaultValue: params.SERVICE_HOST_BASEPATH ?: '')
+        string(
+            name: 'CENTRAL_ENV_NAME',
+            description: 'Central Environment name used for creation of these resources.',
+            defaultValue: params.CENTRAL_ENV_NAME ?: '')
+        string(
+            name: 'DOSA_CLIENT_ID',
+            description: 'Central DOSA Service account client Id. ',
+            defaultValue: params.DOSA_CLIENT_ID ?: '')
+        string(
+            name: 'SPECIFICATION_URL',
+            description: 'User service specification url for fetching the swagger/oas3 etc. Used in the script',
+            defaultValue: params.SPECIFICATION_URL ?: '')
+        string(
+            name: 'CATALOG_ITEM_STATE',
+            description: 'Central catalog Item state to be PUBLISHED or UNPUBLISHED.',
+            defaultValue: params.CATALOG_ITEM_STATE ?: 'PUBLISHED')
+        string(
+            name: 'OWNING_TEAM_NAME',
+            description: 'Central owning team of the catalog Item published.',
+            defaultValue: params.OWNING_TEAM_NAME ?: 'Default Team')
+        string(
+            name: 'CATALOG_ITEM_VISIBILITY',
+            description: 'Central catalog Item visibility for restriction to specific teams in central or public to organization.',
+            defaultValue: params.CATALOG_ITEM_VISIBILITY ?: 'RESTRICTED')
+        credentials(
+            name: 'DOSA_SECRET',
+            credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl',
+            required: true,
+            description: 'DevOps Service Account secret key file to be used for managing Amplify Central resources. ',
+            defaultValue: params.DOSA_SECRET ?: '')
+
+    }
+    stages {
+        stage('Updating the amplify central cli') {
+            steps {
+                    sh '''
+                    amplify pm install @axway/amplify-central-cli@${CLI_VERSION}
+                    amplify config set auth.tokenStoreType file
+                    '''
+            }
+        }
+        stage('Publish to Amplify central') {
+            steps {
+                withCredentials([file(credentialsId: '${DOSA_SECRET}', variable: 'DOSA_SECRET')]) {
+                    sh '''
+                     ./create.sh -did=$DOSA_CLIENT_ID -pk=$DOSA_SECRET -cet=$CENTRAL_ENV_TYPE -cen=$CENTRAL_ENV_NAME -rp=$RESOURCES_PATH
+                    '''
+                }
+            }
+        }
+    }
+}
