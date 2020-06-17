@@ -13,7 +13,7 @@ This sample petstore project uses the following resources
 3. APIServiceRevision : An object for representing the specification of your service across the different versions. The input specification could be of type oas3, oas2, wsdl, protobuf etc.
 4. APIServiceInstance : It is a deployed instance of your service. It provides the protocol, host, port, basePath for where the service is deployed.
 5. ConsumerInstance: It describes the catalog item configuration details (owning team, visibility, state, status, tags, icon, documentation...).
-![Definitions](../.screenshots/definition.png)
+![Definitions](../images/definition.png)
 
 We also download the specification file of petstore and add it in APIServiceRevision. Specification URl used is https://petstore.swagger.io/v2/swagger.json
 
@@ -41,7 +41,7 @@ Environments can be created with AMPLIFY central cli. Refer: https://docs.axway.
 UI:
 * Login to AMPLIFY central and navigate from Topology to Environments option.
 * Create a new environment. Make a note of the environment name as it will be used as env variable in pipelines.
-![Environments Screen](../.screenshots/environments.png)
+![Environments Screen](../images/environments.png)
 
 For this tutorial we have created two environments as shown in the above screenshot.
 
@@ -78,7 +78,7 @@ Value: (Paste the secret passphrase used for encrypting the key)
 ```
 Select Add secret.
 
-![Secrets](../.screenshots/secrets.png)
+![Secrets](../images/secrets.png)
 
 4. Copy the resources directory into your github repository at root level. 
 5. Copy the workflows directory to your github repository folder .github. This .github folder will be used for the workflow actions. To create a new workflow, you can use the below procedure
@@ -237,9 +237,9 @@ Note: Jenkins should be able to run docker. If docker is not used, then you can 
 
 1. Copy the contents of cicd folder into your github/gitlab root directory.
 2. Add a secret file type credential with the ID DOSA_SECRET eg:
-![Jenkins Secret file](../.screenshots/jenkins_secret.png)
+![Jenkins Secret file](../images/jenkins_secret.png)
 3. Create a new job type of pipeline.
-![Jenkins Job ](../.screenshots/jenkins_job.png)
+![Jenkins Job ](../images/jenkins_job.png)
 4. Select the pipeline from SCM for configuring the job and give the path to Jenkinsfile from your gitlab repo. Also you can configure for SCM change options to trigger the job.
 5. Make sure the environment variables are set as needed in order to execute the job.
 
