@@ -1,0 +1,254 @@
+{
+  "customFileAPI": {
+    "groupId": "someapiid",
+    "assetId": "trading-american-flights-example",
+    "version": "1.0.0",
+    "minorVersion": "1.0",
+    "versionGroup": "1.0.0",
+    "description": "Mulesoft Connector for BNP",
+    "isPublic": false,
+    "name": "BNP Connector",
+    "type": "custom",
+    "isSnapshot": false,
+    "status": "published",
+    "externalFile": { "url": null },
+    "createdDate": "2020-05-20T04:37:47.809Z",
+    "updatedDate": "2020-05-20T04:38:30.893Z",
+    "minMuleVersion": null,
+    "labels": [],
+    "categories": [],
+    "files": [
+      {
+        "classifier": "custom",
+        "packaging": "zip",
+        "externalLink": "https://example.com/0.0-custom.zip",
+        "createdDate": "2020-05-20T04:37:47.560Z",
+        "md5": "0053944e33d7829569b482b12699cd23",
+        "sha1": "e3e50ba97458db253ec4e4028531c1eb269545b5",
+        "mainFile": null,
+        "isGenerated": false
+      },
+      {
+        "classifier": "icon",
+        "packaging": "png",
+        "externalLink": "http://example.com/icon.png",
+        "createdDate": "2020-05-20T04:38:08.149Z",
+        "md5": "77affbc5513d74da3959cd710bf33b88",
+        "sha1": "a26525d4e30e2152a405a686df29bb5bb7c19719",
+        "mainFile": null,
+        "isGenerated": false
+      }
+    ],
+    "customFields": [],
+    "rating": 0,
+    "numberOfRates": 0,
+    "createdBy": {
+      "id": "f4064710-f048-4c81-9434-2d1f5246db7c",
+      "userName": "ssmogos",
+      "firstName": "Sebastian",
+      "lastName": "Mogos"
+    },
+    "organization": {
+      "id": "someapiid",
+      "name": "personal",
+      "parentOrganizationIds": [],
+      "subOrganizationIds": [],
+      "tenantOrganizationIds": [],
+      "isMaster": true,
+      "domain": "ssmogos"
+    },
+    "id": "someapiid/trading-american-flights-example/1.0.0",
+    "icon": "http://example.com/icon.png",
+    "createdAt": "2020-05-20T04:37:47.809Z",
+    "modifiedAt": "2020-05-20T04:38:30.893Z"
+  },
+  "zipOAS": {
+    "groupId": "someid",
+    "assetId": "music-ssmogos",
+    "version": "1.0.0",
+    "minorVersion": "1.0",
+    "versionGroup": "v1",
+    "description": "additional descriptions",
+    "isPublic": false,
+    "name": "music-ssmogos",
+    "type": "rest-api",
+    "isSnapshot": false,
+    "status": "published",
+    "externalFile": { "url": null },
+    "createdDate": "2020-05-19T01:07:13.989Z",
+    "updatedDate": "2020-05-19T01:10:27.262Z",
+    "minMuleVersion": null,
+    "labels": [],
+    "categories": [],
+    "files": [
+      {
+        "classifier": "oas",
+        "packaging": "zip",
+        "externalLink": "http://example.com/oas.zip",
+        "createdDate": "2020-05-19T01:07:13.177Z",
+        "md5": "e3207c3d657a98467962b1519793e8b7",
+        "sha1": "397fca33cbdd8683212ef665c04564d321c01015",
+        "mainFile": "MusicalInstruments-swagger.json",
+        "isGenerated": false
+      },
+      {
+        "classifier": "fat-raml",
+        "packaging": "zip",
+        "externalLink": "http://example.com/raml.zip",
+        "createdDate": "2020-05-19T01:07:13.607Z",
+        "md5": "9d5f6af2c4cca9d712be2eac2f79df50",
+        "sha1": "08fc80a41e6173b2a69de8522b7629e9e4f6323e",
+        "mainFile": "api.raml",
+        "isGenerated": true
+      },
+      {
+        "classifier": "raml",
+        "packaging": "zip",
+        "externalLink": "http://example.com/raml.zip",
+        "createdDate": "2020-05-19T01:07:13.607Z",
+        "md5": "8d815f918b9faa7990e6eeb428f9f882",
+        "sha1": "cabafdbdb08737f4237911ceeaf02d9c2e66428c",
+        "mainFile": "api.raml",
+        "isGenerated": true
+      },
+      {
+        "classifier": "icon",
+        "packaging": "png",
+        "externalLink": "http://example.com/icon.png",
+        "createdDate": "2020-05-20T04:36:31.061Z",
+        "md5": "c6e5955a7ca5245e42e2d4544fa7b995",
+        "sha1": "e52ef3918ceda516564d02131f69d3ab78d955d9",
+        "mainFile": null,
+        "isGenerated": false
+      }
+    ],
+    "customFields": [],
+    "rating": 0,
+    "numberOfRates": 0,
+    "createdBy": {
+      "id": "f4064710-f048-4c81-9434-2d1f5246db7c",
+      "userName": "ssmogos",
+      "firstName": "Sebastian",
+      "lastName": "Mogos"
+    },
+    "organization": {
+      "id": "someid",
+      "name": "personal",
+      "parentOrganizationIds": [],
+      "subOrganizationIds": [],
+      "tenantOrganizationIds": [],
+      "isMaster": true,
+      "domain": "ssmogos"
+    },
+    "id": "someid/music-ssmogos/1.0.0",
+    "icon": "http://example.com/icon.png",
+    "createdAt": "2020-05-19T01:07:13.989Z",
+    "modifiedAt": "2020-05-19T01:10:27.262Z"
+	},
+	"specClassOAS": {
+    "groupId": "someapiid",
+    "assetId": "trading-american-flights-example",
+    "version": "1.0.0",
+    "minorVersion": "1.0",
+    "versionGroup": "1.0.0",
+    "description": "Mulesoft Connector for BNP",
+    "isPublic": false,
+    "name": "BNP Connector",
+    "type": "rest-api",
+    "isSnapshot": false,
+    "status": "published",
+    "externalFile": { "url": null },
+    "createdDate": "2020-05-20T04:37:47.809Z",
+    "updatedDate": "2020-05-20T04:38:30.893Z",
+    "minMuleVersion": null,
+    "labels": [],
+    "categories": [],
+    "files": [
+			{
+        "classifier": "fat-raml",
+        "packaging": "zip",
+        "externalLink": "https://example.com/raml.zip",
+        "createdDate": "2020-05-19T01:07:13.607Z",
+        "md5": "9d5f6af2c4cca9d712be2eac2f79df50",
+        "sha1": "08fc80a41e6173b2a69de8522b7629e9e4f6323e",
+        "mainFile": "api.raml",
+        "isGenerated": true
+      }
+    ],
+    "customFields": [],
+    "rating": 0,
+    "numberOfRates": 0,
+    "createdBy": {
+      "id": "f4064710-f048-4c81-9434-2d1f5246db7c",
+      "userName": "ssmogos",
+      "firstName": "Sebastian",
+      "lastName": "Mogos"
+    },
+    "organization": {
+      "id": "someapiid",
+      "name": "personal",
+      "parentOrganizationIds": [],
+      "subOrganizationIds": [],
+      "tenantOrganizationIds": [],
+      "isMaster": true,
+      "domain": "ssmogos"
+    },
+    "id": "someapiid/trading-american-flights-example/1.0.0",
+    "icon": "http://example.com/icon.png",
+    "createdAt": "2020-05-20T04:37:47.809Z",
+    "modifiedAt": "2020-05-20T04:38:30.893Z"
+	},
+	"jar": {
+    "groupId": "someapiid",
+    "assetId": "trading-american-flights-example",
+    "version": "1.0.0",
+    "minorVersion": "1.0",
+    "versionGroup": "1.0.0",
+    "description": "Mulesoft Connector for BNP",
+    "isPublic": false,
+    "name": "BNP Connector",
+    "type": "foobar",
+    "isSnapshot": false,
+    "status": "published",
+    "externalFile": { "url": null },
+    "createdDate": "2020-05-20T04:37:47.809Z",
+    "updatedDate": "2020-05-20T04:38:30.893Z",
+    "minMuleVersion": null,
+    "labels": [],
+    "categories": [],
+    "files": [
+			{
+        "classifier": "fat-raml",
+        "packaging": "jar",
+        "externalLink": "https://example.com/raml.zip",
+        "createdDate": "2020-05-19T01:07:13.607Z",
+        "md5": "9d5f6af2c4cca9d712be2eac2f79df50",
+        "sha1": "08fc80a41e6173b2a69de8522b7629e9e4f6323e",
+        "mainFile": "api.raml",
+        "isGenerated": true
+      }
+    ],
+    "customFields": [],
+    "rating": 0,
+    "numberOfRates": 0,
+    "createdBy": {
+      "id": "f4064710-f048-4c81-9434-2d1f5246db7c",
+      "userName": "ssmogos",
+      "firstName": "Sebastian",
+      "lastName": "Mogos"
+    },
+    "organization": {
+      "id": "someapiid",
+      "name": "personal",
+      "parentOrganizationIds": [],
+      "subOrganizationIds": [],
+      "tenantOrganizationIds": [],
+      "isMaster": true,
+      "domain": "ssmogos"
+    },
+    "id": "someapiid/trading-american-flights-example/1.0.0",
+    "icon": "http://example.com/icon.png",
+    "createdAt": "2020-05-20T04:37:47.809Z",
+    "modifiedAt": "2020-05-20T04:38:30.893Z"
+  }
+}

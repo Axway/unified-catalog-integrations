@@ -3,10 +3,10 @@ import { snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
 import { configFilePath, createSupportResources } from "../../utils";
-const { generateResources } = require('../../githubService.js');
+const GithubService = require('../../service.js');
+const chalk = require('chalk');
 
 type args = {
-  argv: { json: boolean };
   console: Console;
 };
 
@@ -16,9 +16,11 @@ export const generate = {
   action: async ({ console }: args) => {
     log("Generating resources");
     const config: Config = readJsonSync(configFilePath);
-    await generateResources(config);
+    config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
+    const githubService = new GithubService(config);
+    await githubService.generateResources(config);
     await createSupportResources(config);
-    console.log(`Resources created in ${config.outputDir}`);
-    console.log(`Upload example: 'amplify central create -f=<path to resource>'`);
+    console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
+    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
   },
 };

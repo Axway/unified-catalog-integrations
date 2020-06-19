@@ -1,6 +1,6 @@
 // @ts-ignore
 import { chalk } from "cli-kit";
-import { description, name, version } from "./package.json";
+const { description, name, version } = require("../package.json");
 
 export const banner =
   chalk`{cyan ${name} v${version}}` +

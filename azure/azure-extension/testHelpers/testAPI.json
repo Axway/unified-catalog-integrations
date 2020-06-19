@@ -1,0 +1,25 @@
+{
+  "value": [
+    {
+      "id": "/subscriptions/6fac4298-ec76-426b-b0b3-96045a80281b/resourceGroups/stoda/providers/Microsoft.ApiManagement/service/stoda/apis/swagger-petstore",
+      "type": "Microsoft.ApiManagement/service/apis",
+      "name": "swagger-petstore",
+      "properties": {
+        "displayName": "Swagger Petstore",
+        "apiRevision": "1",
+        "description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.",
+        "subscriptionRequired": true,
+        "serviceUrl": "https://petstore.swagger.io/v2",
+        "path": "",
+        "protocols": [
+          "http",
+          "https"
+        ],
+        "authenticationSettings": null,
+        "subscriptionKeyParameterNames": null,
+        "isCurrent": true
+      }
+    }
+  ],
+  "count": 1
+}

@@ -2,11 +2,11 @@
 import { snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
-import { configFilePath, createResources } from "../../utils";
-const AzureService = require('../../azureService.js');
+import { configFilePath, createSupportResources } from "../../utils";
+const AzureService = require('../../service.js');
+const chalk = require('chalk');
 
 type args = {
-  argv: { json: boolean };
   console: Console;
 };
 
@@ -16,12 +16,14 @@ export const generate = {
   action: async ({ console }: args) => {
     log("Generating resources");
     const config: Config = readJsonSync(configFilePath);
+    config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
     const azureService = new AzureService(config, log)
 
     // fetch & generate assets
-    await createResources(await azureService.fetch(), config.outputDir);
+    await azureService.generateResources(config);
+    await createSupportResources(config);
 
-    console.log(`Resources created in ${config.outputDir}`);
-    console.log(`Upload example: 'amplify central create -f=<path to resource>'`);
+    console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
+    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
   },
 };

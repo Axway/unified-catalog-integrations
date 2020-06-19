@@ -1,7 +1,7 @@
 // @ts-ignore
 import CLI from "cli-kit";
 import { banner } from "./banner";
-import { name, version } from "./package.json";
+const { name, version } = require("../package.json");
 import { commands } from "./src/commands";
 import { ensureConfigFileExists } from "./src/utils";
 

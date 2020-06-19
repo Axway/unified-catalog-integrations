@@ -5,7 +5,6 @@ import * as fs from "fs";
 const yaml = require('js-yaml');
 const request = require('request');
 const mime = require('mime-types');
-const mkdir = require("mkdirp");
 
 export const configFilePath = join(homedir(), ".axway", "apigee-extension.json");
 export const ensureConfigFileExists = () => !pathExistsSync(configFilePath) && outputJsonSync(configFilePath, {});
@@ -14,24 +13,24 @@ export const ensureConfigFileExists = () => !pathExistsSync(configFilePath) && o
 export const requestPromise = (options: any) => {
   return new Promise((resolve, reject) => {
     request(options, (err: any, response: any) => {
-      if (err) reject(new Error(err));
-      if (response.statusCode > 200) reject(new Error(`Bad response ${response.body}`))
+      if (err) {
+				return reject(new Error(err));
+			} else if (response.statusCode > 200) {
+				return reject(new Error(`Bad response ${response.body}`))
+			}
       resolve(response.body);
     });
   });
 };
 
-// TODO: maybe use handlebars in the future instead of these objects
-// TODO: what is a good default directory?
-// Creates local yaml files given the resource params.
-export const createResources = async (environmentConfig: any, resourceParams: [any], outputDir: string = './resources') => {
-	// write environment resource - webhook and subscription definitions are not used for apigee
+export const getIconData = (icon: string) => {
 	let iconData;
 	let iconPath;
 	let defaultIconPath = resolve(__dirname, './assets/env_icon.png');
+
 	// Use the custom abosolute icon path if provided/found
-	if (fs.existsSync(environmentConfig.icon)) {
-		iconPath = environmentConfig.icon;
+	if (fs.existsSync(icon)) {
+		iconPath = icon;
 	} else {
 		iconPath = defaultIconPath;
 	}
@@ -39,29 +38,35 @@ export const createResources = async (environmentConfig: any, resourceParams: [a
 		contentType: mime.lookup(iconPath),
 		data: fs.readFileSync(iconPath, { encoding: 'base64' })
 	}
+	return iconData;
+}
+
+export const createSupportResources = async (config: any) => {
+	const {
+		environmentName,
+		icon,
+		outputDir
+	} = config;
+
+	// Use the custom abosolute icon path if provided/found
+	const iconData = getIconData(icon);
+
 	const environment = {
 		apiVersion: 'v1alpha1',
-		title: `${environmentConfig.name} Environment`,
-		name: environmentConfig.name,
+		title: `${environmentName} Environment`,
+		name: environmentName,
 		kind: 'Environment',
 		tags: [ 'axway', 'cli' ],
 		spec: {
-			description: `${environmentConfig.name} Environment`,
+			description: `${environmentName} Environment`,
 			icon: iconData
 		}
 	}
 
-	//write the environment resource
+	//write yaml files to outputDir
 	await commitToFs(environment, outputDir, [
-		environment,
+		environment
 	]);
-
-	//write each set of resources in its file
-	for (let i = 0; i < resourceParams.length; i++) {
-		const resourceGroup = resourceParams[i];
-		// Build yaml files and commit to fs
-		await writeResources(resourceGroup.name, outputDir, resourceGroup.resources);
-	}
 }
 
 // Given an properly orderd array of resource defs, create 1 yaml str
@@ -74,13 +79,14 @@ export const createYamlStr = (resources: Array<any>) => {
 }
 
 // Write resource to file
-export const writeResources = async (fileName: string, directory: string, resources: Array<any>) => {
-	await mkdir((directory));
-	fs.writeFileSync(`${directory}/${fileName}.yaml`, createYamlStr(resources));
+export const writeResource = async (resource: any, directory: string, content: string) => {
+	directory = directory[0] === '~' ? join(homedir(), directory.substr(1)) : directory;
+	fs.mkdirSync((directory), { recursive: true });
+	fs.writeFileSync(`${directory}/${resource.kind}-${resource.name}.yaml`, content);
 };
 
-
-export const commitToFs = async (resource: any, outputDir: string, resources: Array<any>) => {
-	await writeResources(`${resource.kind}-${resource.name}`, outputDir, resources)
+export const commitToFs = async (resource: any, outputDir: (string|boolean), resources: Array<any>) => {
+	outputDir = typeof outputDir === 'string' ? outputDir : './resources';
+	await writeResource(resource, outputDir, createYamlStr(resources));
 }
 

@@ -2,11 +2,11 @@
 import { snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
-import { configFilePath, createResources } from "../../utils";
-const SwaggerHubService = require("../../SwaggerHubService.js");
+import { configFilePath, createSupportResources } from "../../utils";
+const Service = require("../../service.js");
+const chalk = require('chalk');
 
 type args = {
-  argv: { json: boolean };
   console: Console;
 };
 
@@ -16,13 +16,13 @@ export const generate = {
   action: async ({ console }: args) => {
     log("Generating resources");
     const config: Config = readJsonSync(configFilePath);
-    const swaggerHubService = new SwaggerHubService(config, log);
+    config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
+    const swaggerHubService = new Service(config);
     // fetch & generate assets
-    await createResources(await swaggerHubService.fetch(), config.outputDir);
+    await createSupportResources(config);
+    await swaggerHubService.generateResources()
 
-    console.log(`Resources created in ${config.outputDir}`);
-    console.log(
-      `Upload example: 'amplify central create -f=<path to resource>'`
-    );
+    console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
+    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
   },
 };

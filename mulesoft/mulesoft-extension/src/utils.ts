@@ -5,32 +5,25 @@ import * as fs from "fs";
 const yaml = require('js-yaml');
 const request = require('request');
 const mime = require('mime-types');
-const mkdir = require("mkdirp");
 
 export const configFilePath = join(homedir(), ".axway", "mulesoft-extension.json");
 export const ensureConfigFileExists = () => !pathExistsSync(configFilePath) && outputJsonSync(configFilePath, {});
 
 // Creates a promise for a request 
 export const requestPromise = (options: any) => {
-	return new Promise((resolve, reject) => {
-		request(options, (err: any, response: any) => {
-			if (err) reject(new Error(err));
-			if (response.statusCode > 200) reject(new Error(`Bad response ${response.body}`))
-			resolve(response.body);
-		});
-	});
+  return new Promise((resolve, reject) => {
+    request(options, (err: any, response: any) => {
+      if (err) {
+				return reject(new Error(err));
+			} else if (response.statusCode > 200) {
+				return reject(new Error(`Bad response ${response.body}`))
+			}
+      resolve(response.body);
+    });
+  });
 };
 
-// Creates local yaml files given the resource params.
-export const createSupportResources = async (config: any) => {
-	const {
-		environmentName,
-		icon,
-		webhookSecret,
-		webhookUrl,
-		outputDir
-	} = config;
-
+export const getIconData = (icon: string) => {
 	let iconData;
 	let iconPath;
 	let defaultIconPath = resolve(__dirname, './assets/env_icon.png');
@@ -45,6 +38,20 @@ export const createSupportResources = async (config: any) => {
 		contentType: mime.lookup(iconPath),
 		data: fs.readFileSync(iconPath, { encoding: 'base64' })
 	}
+	return iconData;
+}
+
+// Creates local yaml files given the resource params.
+export const createSupportResources = async (config: any) => {
+	const {
+		environmentName,
+		icon,
+		webhookSecret = '',
+		webhookUrl,
+		outputDir
+	} = config;
+
+	let iconData = getIconData(icon);
 
 	const environment = {
 		apiVersion: 'v1alpha1',
@@ -172,10 +179,12 @@ export const createYamlStr = (resources: Array<any>) => {
 
 // Write resource to file
 export const writeResource = async (resource: any, directory: string, content: string) => {
-	await mkdir((directory));
+	directory = directory[0] === '~' ? join(homedir(), directory.substr(1)) : directory;
+	fs.mkdirSync((directory), { recursive: true });
 	fs.writeFileSync(`${directory}/${resource.kind}-${resource.name}.yaml`, content);
 };
 
-export const commitToFs = async (resource: any, outputDir: string, resources: Array<any>) => {
-	await writeResource(resource, outputDir, createYamlStr(resources))
+export const commitToFs = async (resource: any, outputDir: (string|boolean), resources: Array<any>) => {
+	outputDir = typeof outputDir === 'string' ? outputDir : './resources';
+	await writeResource(resource, outputDir, createYamlStr(resources));
 }

@@ -30,14 +30,12 @@ export const set = {
   aliases: ["set"],
   options: {
     "--output-dir [value]": "Set absolute path for output directory",
-    "--environment-name [value]": "Set environment name to create",
+    "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",
 
-    "--git-token [value]": "github access_token",
-    "--git-user-name [value]": "github username",
-    "--repo [value]": "repository to search in",
-    "--branch [value]": "repository branch to search in",
-
-   
+    "--git-token [value]": "Required: github access_token",
+    "--git-user-name [value]": "Required: github username",
+    "--repo [value]": "Required: repository to search in",
+    "--branch [value]": "Required: repository branch to search in"
   },
 };

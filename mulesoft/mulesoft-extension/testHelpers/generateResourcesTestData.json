@@ -1,0 +1,106 @@
+{
+  "detailsCallZero": {
+    "spec": {
+      "type": "Buffer",
+      "data": [1, 2, 3]
+    },
+    "icon": "someicondata",
+    "instances": [],
+    "packaging": "zip"
+  },
+  "detailsCallOne": {
+    "type": "rest-api",
+    "spec": "{}",
+    "icon": "icondata",
+    "instances": [
+      {
+        "versionGroup": "v1",
+        "organizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "id": "mocking-service",
+        "groupId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "assetId": "music-ssmogos",
+        "version": "1.0.0",
+        "minorVersion": "1.0",
+        "productAPIVersion": "v1",
+        "environmentId": null,
+        "providerId": null,
+        "endpointUri": "https://anypoint.mulesoft.com/mocking/api/v1/sources/exchange/assets/c46af7f7-06a6-4ff6-8e67-7bdd0f714448/music-ssmogos/1.0.0/m",
+        "name": "Mocking Service",
+        "isPublic": true,
+        "type": "mocked",
+        "fullname": "music-ssmogos - Mocking Service",
+        "assetName": "music-ssmogos"
+      },
+      {
+        "versionGroup": "v1",
+        "organizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "id": "16157283",
+        "groupId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "assetId": "music-ssmogos",
+        "version": "1.0.0",
+        "minorVersion": "1.0",
+        "productAPIVersion": "v1",
+        "environmentId": "df737268-5fc0-4d37-8ad2-15e1eb7f305a",
+        "providerId": null,
+        "endpointUri": "http://music-ssmogos.us-e2.cloudhub.io",
+        "name": "v1:16157283",
+        "isPublic": true,
+        "type": "managed",
+        "fullname": "music-ssmogos - Sandbox - v1:16157283",
+        "assetName": "music-ssmogos",
+        "environmentName": "Sandbox"
+      }
+    ],
+    "packaging": "json"
+  },
+  "assetLinkedAPI": {
+    "total": 1,
+    "assets": [
+      {
+        "audit": {
+          "created": { "date": "2020-05-19T01:07:27.040Z" },
+          "updated": {}
+        },
+        "masterOrganizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "organizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "id": 211351050,
+        "name": "groupId:c46af7f7-06a6-4ff6-8e67-7bdd0f714448:assetId:music-ssmogos",
+        "exchangeAssetName": "music-ssmogos",
+        "groupId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+        "assetId": "music-ssmogos",
+        "apis": [
+          {
+            "audit": {
+              "created": { "date": "2020-05-19T01:07:27.040Z" },
+              "updated": { "date": "2020-05-19T01:10:17.560Z" }
+            },
+            "masterOrganizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+            "organizationId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+            "id": 16157283,
+            "instanceLabel": null,
+            "groupId": "c46af7f7-06a6-4ff6-8e67-7bdd0f714448",
+            "assetId": "music-ssmogos",
+            "assetVersion": "1.0.0",
+            "productVersion": "v1",
+            "description": null,
+            "tags": [],
+            "order": 1,
+            "providerId": null,
+            "deprecated": false,
+            "lastActiveDate": "2020-06-13T13:18:34.036Z",
+            "endpointUri": "http://music-ssmogos.us-e2.cloudhub.io",
+            "environmentId": "df737268-5fc0-4d37-8ad2-15e1eb7f305a",
+            "isPublic": true,
+            "stage": "release",
+            "lastActiveDelta": 289702,
+            "pinned": false,
+            "activeContractsCount": 1,
+            "autodiscoveryInstanceName": "v1:16157283"
+          }
+        ],
+        "totalApis": 1,
+        "autodiscoveryApiName": "groupId:c46af7f7-06a6-4ff6-8e67-7bdd0f714448:assetId:music-ssmogos"
+      }
+    ]
+  }
+}

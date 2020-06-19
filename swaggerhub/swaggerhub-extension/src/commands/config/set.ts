@@ -29,10 +29,10 @@ export const set = {
   desc: "Set AMPLIFY Central swaggerhub-extension configuration",
   aliases: ["set"],
   options: {
-    "--owner [value]": "Set your Swagger Hub owner name",
-    "--root-url [value]": "Set Swagger Hub root url",
+    "--owner [value]": "Required: Set your Swagger Hub owner name",
+    "--root-url [value]": "Required: Set Swagger Hub root url",
     "--output-dir [value]": "Set absolute path for output directory",
-    "--environment-name [value]": "Set environment name to create",
+    "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",
   },
 };

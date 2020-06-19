@@ -1,8 +1,16 @@
 # @axway/swaggerhub-extension
 
-AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resources to publish APIs from Swaggerhub to Unified Catalog.
+AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resources for Swaggerhub.
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
+
+# Disclaimer
+
+This extension is example code and comes with no guarantee of support or maintenance.
+
+# PreReqs
+
+This assumes you already have npm installed and have swaggerhub setup. Visit [NodeJS](https://nodejs.org/) to learn how to install NodeJS. If you need help with getting your swaggerhub settings, you can view the Setup section of the local [DEVREADME.MD](DEVREADME.md)
 
 # Installation
 
@@ -15,19 +23,14 @@ $ [sudo] npm install -g @axway/amplify-cli
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```bash
-$ amplify pm install @axway/amplify-central-cli@dev
+$ amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
 You can then install the @axway/amplify-central-swaggerhub-extension:
 
 ```
-$ amplify pm install @axway/amplify-central-swaggerhub-extension
-```
-
-To configure this extension with the AMPLIFY Central CLI:
-
-```bash
-$ amplify central config set extensions.swaggerhub-extension '~/.axway/packages/@axway/amplify-central-swaggerhub-extension'
+$ npm install @axway/amplify-central-swaggerhub-extension
+$ amplify central config set extensions.swaggerhub <path to where you installed module>
 ```
 
 # Getting started
@@ -80,18 +83,18 @@ CONFIG COMMANDS:
 
 ```bash
 # set output dir for the generated resources:
-$ amplify central swaggerhub-extension config set --output-dir <directory>
+$ amplify central swaggerhub-extension config set --output-dir=<directory>
 # view config:
 $ amplify central swaggerhub-extension config list
 # view list of available options
 $ amplify central swaggerhub-extension config set -h
 
 SET OPTIONS:
-  --environment-name=<value>  Set environment name to create
+  --environment-name=<value>  Required: Set environment name to create
   --icon=<value>  Set absolute path for custom icon
   --output-dir=<value>  Set absolute path for output directory
-  --owner=<value>  Set your Swagger Hub owner name
-  --root-url=<value>  Set Swagger Hub root url
+  --owner=<value>  Required: Set your Swagger Hub owner name
+  --root-url=<value>  Required: Set Swagger Hub root url
 ```
 
 ---

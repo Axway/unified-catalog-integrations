@@ -1,6 +1,6 @@
 {
   "name": "@axway/amplify-central-azure-extension",
-  "version": "0.0.1-dev.0",
+  "version": "0.0.1",
   "description": "Create AMPLIFY Central resources from Azure API Management APIs",
   "author": {
     "email": "support@axway.com",
@@ -8,8 +8,12 @@
     "url": "https://axway.com"
   },
   "scripts": {
-    "build": "yarn tsc && npm run copy:assets",
-    "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'"
+    "build": "npm run tsc && npm run copy:assets",
+    "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'",
+    "test": "nyc yarn test:nc",
+    "test:nc": "ts-mocha --timeout 10000",
+    "postinstall": "npm i --only=dev --ignore-scripts && npm run build && node ./postinstall.js",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "engines": {
@@ -31,24 +35,33 @@
     "amplify-package",
     "cli-kit"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Axway/unified-catalog-integrations.git",
-    "directory": "azure/azure-extension"
-  },
   "aliases": [
     "azure"
   ],
   "devDependencies": {
+    "@types/chai": "^4.2.11",
     "@types/form-data": "^2.5.0",
     "@types/fs-extra": "^9.0.1",
+    "@types/mocha": "^7.0.2",
     "@types/node": "^14.0.1",
     "@types/node-fetch": "^2.5.7",
+    "@types/sinon": "^9.0.4",
+    "chai": "^4.2.0",
     "cli-kit": "^1.1.0",
+    "core-js": "^3.6.5",
     "cpx": "^1.5.0",
+    "dayjs": "^1.8.28",
+    "mocha": "^7.2.0",
+    "nock": "^12.0.3",
+    "nyc": "^15.1.0",
+    "proxyquire": "^2.1.3",
+    "sinon": "^9.0.2",
+    "source-map-support": "^0.5.19",
+    "ts-mocha": "^7.0.0",
     "typescript": "^3.9.2"
   },
   "dependencies": {
+    "chalk": "^4.1.0",
     "form-data": "^3.0.0",
     "fs-extra": "^9.0.0",
     "js-yaml": "^3.14.0",

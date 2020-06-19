@@ -4,7 +4,6 @@ import { readJsonSync } from "fs-extra";
 import { configFilePath } from "../../utils";
 
 type args = {
-  argv: { [k: string]: string };
   console: Console;
 };
 
