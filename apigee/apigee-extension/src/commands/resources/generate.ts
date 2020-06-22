@@ -2,11 +2,11 @@
 import { snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
-import { configFilePath, createResources } from "../../utils";
-const ApigeeService = require('../../apigeeService.js');
+import { configFilePath, createSupportResources } from "../../utils";
+const Service = require('../../service.js');
+const chalk = require('chalk');
 
 type args = {
-  argv: { json: boolean };
   console: Console;
 };
 
@@ -16,12 +16,14 @@ export const generate = {
   action: async ({ console }: args) => {
     log("Generating resources");
     const config: Config = readJsonSync(configFilePath);
-    const apigeeService = new ApigeeService(config, log)
+    config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
+    const apigeeService = new Service(config, log)
 
     // fetch & generate assets
-    await createResources({name: config.environmentName, icon: config.icon}, await apigeeService.fetch(), config.outputDir);
+    await apigeeService.generateResources()
+    await createSupportResources(config);
 
-    console.log(`Resources created in ${config.outputDir}`);
-    console.log(`Upload example: 'amplify central create -f=<path to resource>'`);
+    console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
+    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
   },
 };

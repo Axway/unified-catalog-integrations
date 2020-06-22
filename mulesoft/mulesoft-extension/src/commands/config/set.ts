@@ -30,14 +30,14 @@ export const set = {
   aliases: ["set"],
   options: {
     "--output-dir [value]": "Set absolute path for output directory",
-    "--environment-name [value]": "Set environment name to create",
+    "--environment-name [value]": "Required: Set environment name to create",
     "--webhook-url [value]": "Set webhook url to use",
     "--webhook-secret [value]": "Set secret to invoke webhook",
     "--icon [value]": "Set absolute path for custom icon",
 
-    "--username [value]": "Set your Mulesoft username",
-    "--password [value]": "Set your Mulesoft password",
-    "--master-organization-id [value]": "Set your Mulesoft Master Organizatoin Id",
+    "--username [value]": "Required: Set your Mulesoft username",
+    "--password [value]": "Required: Set your Mulesoft password",
+    "--master-organization-id [value]": "Required: Set your Mulesoft Master Organizatoin Id",
     "--include-mock-endpoints [value]": "Bool to include mock endpoints",
     "--generate-consumer-instances [value]": "Bool to generate consumer instances",
   },

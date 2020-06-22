@@ -4,6 +4,14 @@ AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resou
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
 
+# Disclaimer
+
+This extension is example code and comes with no guarantee of support or maintenance.
+
+# PreReqs
+
+This assumes you already have npm installed and have an azure account setup. Visit [NodeJS](https://nodejs.org/) to learn how to install NodeJS. If you need help with setting up your azure account, you can view the Setup section of the local [DEVREADME.MD](DEVREADME.md)
+
 # Installation
 
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central:
@@ -15,19 +23,14 @@ $ [sudo] npm install -g @axway/amplify-cli
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```bash
-$ amplify pm install @axway/amplify-central-cli@dev
+$ amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
 You can then install the @axway/amplify-central-azure-extension:
 
 ```bash
-$ amplify pm install @axway/amplify-central-azure-extension
-```
-
-To configure this extension with the AMPLIFY Central CLI:
-
-```bash
-$ amplify central config set extensions.azure-extension '~/.axway/packages/@axway/amplify-central-azure-extension'
+$ npm install @axway/amplify-central-azure-extension
+$ amplify central config set extensions.azure <path to where you installed module>
 ```
 
 # Getting started
@@ -80,23 +83,23 @@ CONFIG COMMANDS:
 
 ```bash
 # set output dir for the generated resources:
-$ amplify central azure-extension config set --output-dir <directory>
+$ amplify central azure-extension config set --output-dir=<directory>
 # view config:
 $ amplify central azure-extension config list
 # view list of available options
 $ amplify central azure-extension config set -h
 
 SET OPTIONS:
-  --client-id=<value>  Set your Azure Client ID
-  --client-secret=<value>  Set your Azure Client Secret
-  --environment-name=<value>  Set environment name to create
-  --filter=<value>  Set your filtering options, currently only supports a tag
+  --client-id=<value>  Required: Set your Azure Client ID
+  --client-secret=<value>  Required: Set your Azure Client Secret
+  --environment-name=<value>  Required: Set environment name to create
+  --filter=<value>  Set your filtering options, currently only supports a tag. Ex: --filter tags=myTag
   --icon=<value>  Set absolute path for custom icon
   --output-dir=<value>  Set absolute path for output directory
-  --resource-group-name=<value>  Set your Azure Resource Group Name
-  --service-name=<value>  Set your Azure Service Name
-  --subscription-id=<value>  Set your Azure Subscription ID
-  --tenant-id=<value>  Set your Azure Tenant ID
+  --resource-group-name=<value>  Required: Set your Azure Resource Group Name
+  --service-name=<value>  Required: Set your Azure Service Name
+  --subscription-id=<value>  Required: Set your Azure Subscription ID
+  --tenant-id=<value>  Required: Set your Azure Tenant ID
   --webhook-url=<value>  Set webhook url to use
 ```
 

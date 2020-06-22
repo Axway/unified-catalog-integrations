@@ -29,11 +29,11 @@ export const set = {
   desc: "Set AMPLIFY Central apigee-extension configuration",
   aliases: ["set"],
   options: {
-    "--organization-id [value]": "Set your Apigee Organization ID",
-    "--username [value]": "Set your Apigee Username",
-    "--password [value]": "Set your Apigee Password",
+    "--organization-id [value]": "Required: Set your Apigee Organization ID",
+    "--username [value]": "Required: Set your Apigee Username",
+    "--password [value]": "Required: Set your Apigee Password",
     "--output-dir [value]": "Set absolute path for output directory",
-    "--environment-name [value]": "Set environment name to create",
+    "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",
   },
 };

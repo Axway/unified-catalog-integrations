@@ -4,6 +4,14 @@ AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resou
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
 
+# Disclaimer
+
+This extension is example code and comes with no guarantee of support or maintenance.
+
+# PreReqs
+
+This assumes you already have npm installed and have an mulesoft account setup. Visit [NodeJS](https://nodejs.org/) to learn how to install NodeJS. If you need help with setting up your mulesoft account, you can view the Setup section of the local [DEVREADME.MD](DEVREADME.md)
+
 # Installation
 
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central:
@@ -15,19 +23,14 @@ $ [sudo] npm install -g @axway/amplify-cli
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```bash
-$ amplify pm install @axway/amplify-central-cli@dev
+$ amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
 You can then install the @axway/amplify-central-mulesoft-extension:
 
 ```bash
-$ amplify pm install @axway/amplify-central-mulesoft-extension
-```
-
-To configure this extension with the AMPLIFY Central CLI:
-
-```bash
-$ amplify central config set extensions.mulesoft-extension '~/.axway/packages/@axway/amplify-central-mulesoft-extension'
+$ npm install @axway/amplify-central-mulesoft-extension
+$ amplify central config set extensions.mulesoft <path to where you installed module>
 ```
 
 # Getting started
@@ -80,23 +83,23 @@ CONFIG COMMANDS:
 
 ```powershell
 # set output dir for the generated resources:
-$ amplify central mulesoft-extension config set --output-dir <directory>
+$ amplify central mulesoft-extension config set --output-dir=<directory>
 # view config:
 $ amplify central mulesoft-extension config list
 # view list of available options
 $ amplify central mulesoft-extension config set -h
 
 SET OPTIONS:
-  --environment-name=<value>  Set the environment name to create in AMPLIFY Central
-  --generate-consumer-instances=<value>  Boolean to generate consumer instances
+  --environment-name=<value>  Required: Set environment name to create
+  --generate-consumer-instances=<value>  Bool to generate consumer instances
   --icon=<value>  Set absolute path for custom icon
-  --include-mock-endpoints=<value>  Boolean to include mock endpoints
-  --master-organization-id=<value>  Set your Mulesoft Master Organization Id
+  --include-mock-endpoints=<value>  Bool to include mock endpoints
+  --master-organization-id=<value>  Required: Set your Mulesoft Master Organizatoin Id
   --output-dir=<value>  Set absolute path for output directory
-  --password=<value>  Set your Mulesoft password
-  --username=<value>  Set your Mulesoft username
-  --webhook-url=<value>  Set webhook url to use to the integration flow
+  --password=<value>  Required: Set your Mulesoft password
+  --username=<value>  Required: Set your Mulesoft username
   --webhook-secret=<value>  Set secret to invoke webhook
+  --webhook-url=<value>  Set webhook url to use
 ```
 
 ---
