@@ -132,7 +132,8 @@ Flow these steps to configure the flow:
   * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
   * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
   * `azureTenantId`: The tenant id of your Azure account. 
-  * `azureClientSecret`: The password from the Azure service principal.
+  * `azureClientId`: The `appId`from the Azure service principal.  
+  * `azureClientSecret`: The `password` from the Azure service principal.
   * `subId`: The subscription id of your Azure account, that you retrieved with `az account set --subscription "subcription_name` command at Step1. 
  
 ```powershell
@@ -674,17 +675,11 @@ Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
-With the AMPLIFY Central CLI installed, run this command in the azure-extension directory, assuming you have cloned/downloaded this repo at previous steps.  
+You can then install the @axway/amplify-central-azure-extension:
 
 ```powershell
-yarn && yarn build
-```
-> **Note**: If you get a command not found error for yarn, please run `npm install -g yarn. 
-
-To configure this extension with the AMPLIFY Central CLI:
-
-```powershell
-amplify central config set extensions.azure-extension <path_to_your_azure_extension_directory>
+npm install @axway/amplify-central-azure-extension
+amplify central config set extensions.azure-extension <path to where you installed module>
 ```
 
 **2. Configure extension**
@@ -692,75 +687,74 @@ amplify central config set extensions.azure-extension <path_to_your_azure_extens
 Configure the extensions prior to generating the resources. 
 You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one, visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). 
 
-Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
+* Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
 ```powershell
 amplify auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
 ```
 Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
  
-Set the output directory where you want the resources to be generated. 
+* Set the output directory where you want the resources to be generated. 
 ```powershell
 amplify central azure-extension config set --output-dir <directory_name>
 ```
 Example: `amplify central azure-extension config set --output-dir ./azure-resources`.
 
-Set the environment name: 
+* Set the environment name: 
 ```powershell
 amplify central azure-extension config set --environment-name <env_name>
 ```
 Example: `amplify central azure-extension config set --environment-name azure-env`
 
-Set the image for the environment
+* Set the image for the environment
 ```powershell
 amplify central azure-extension config set --icon <path_to_your_image>
 ```
 
-Set to publish your Azure assets to the Unified Catalog. By default, it is set to `false`. 
+* Set to publish your Azure assets to the Unified Catalog. By default, it is set to `false`. 
 ```powershell
 amplify central azure-extension config set --generate-consumer-instances true
 ```
-Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
+
+* Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
 ```powershell
 amplify central azure-extension config set --filter tags=<tag_value>
 ```
-
 Example: `amplify central azure-extension config set --filter tags=unifiedcatalog`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
 
 ![Set API tags](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPISetTags.png)
 
 
-
-Set the Webhook URL to send the HTTP POST request for a subcription update event.
+* Set the Webhook URL to send the HTTP POST request for a subcription update event.
 ```powershell
 amplify central azure-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
 ```
   
-Set your Azure Subcription Id. This will be the value of the subscription id from you service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set your Azure Subcription Id. This will be the value of the subscription id from you service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set --subscription-id <your_azure_subscription_id>
 ```
 
-Set the Azure Client Id. This should be the `appId` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Client Id. This should be the `appId` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set --client-id <your_azure_client_id>
 ```
   
-Set the Azure Client Secret. This should be the `password'`from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Client Secret. This should be the `password'`from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set --client-secret <your_azure_client_secret>
 ```
 
-Set the Azure Tenant Id. This will be the `tenant id` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Tenant Id. This will be the `tenant id` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
 amplify central azure-extension config set  --tenant-id <your_azure_tenant_id>
 ```
 
-Set the Azure Service name. The `service name` of your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
+* Set the Azure Service name. The `service name` of your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
 amplify central azure-extension config set --service-name <your_azure_service_name>
 ```
 
-Set the Azure Resource Group name. The `resource group name` under your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
+* Set the Azure Resource Group name. The `resource group name` under your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
 amplify central azure-extension config set --resource-group-name <your_azure_resource_group_name>
 ```
