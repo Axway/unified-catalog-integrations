@@ -15,7 +15,7 @@
     "postinstall": "npm i --only=dev --ignore-scripts && npm run build && node ./postinstall.js",
     "tsc": "tsc"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">= 8.9"
   },
