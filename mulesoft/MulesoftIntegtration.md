@@ -27,14 +27,27 @@ The technologies that were used for this project:
 
 Follow the steps bellow to use this example:
 
+
 ### Step 1: Create Amplify Central Service Account
 
 Save the clientId and clientSecret from the response which will be used in Integration Builder flow.
 
-```sh
-curl --location --request POST 'https://apicentral.axway.com/api/v1/serviceAccounts' \
---header 'Bearer ${CENTRAL_BEARER_TOKEN}' \
---header 'X-Axway-Tenant-Id: ${ORG_ID}' \
+##### Option 1
+
+Make sure you log out from all active sessions. 
+
+
+```powershell
+amplify auth logout --all
+```
+
+Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
+To run the command, you need to have jq installed. 
+```powershell
+amplify auth login --client-id apicentral
+ORG_ID=<org_id_value> && TOKEN=$(amplify auth list --json | jq -r ".[] | select( .org.org_id == $ORG_ID ) | .tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
+--header "Authorization: Bearer ${TOKEN}" \
+--header "X-Axway-Tenant-Id: ${ORG_ID}" \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "serviceAccountType": "DOSA",
@@ -43,44 +56,60 @@ curl --location --request POST 'https://apicentral.axway.com/api/v1/serviceAccou
 }'
 ```
 
-### Step 2: Configure Integration Builder flow to update subscriptions and send email notifications
+##### Option 2
 
----
+Use the postman **[collection](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman)**. 
 
-This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog, then will subscribe / unsubscribe the consumer to the APIs in Mulesoft and updates the Subscription states in Unified Catalog. It will also send email notifications to the user with the key to authenticate the API calls.
+1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
 
-> Note: If you don't want or cannot use Microsoft Teams for subscription notifications:
->
-> - Use this flow **[MuleSoft_Registration_Flow_No_MSTeams.json](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/MuleSoft_Registration_Flow_No_MSTeams.json)** and skip **Step 3: Microsoft Teams flow to Approve / Reject subscription requests**.
+2. Import the [AMPLFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
 
-To configure the Integration Builder flow, follow this steps:
+3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
 
-1. Download the Integration Builder flow **[MuleSoft Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/integrationbuilder/MuleSoft%20Registration%20Flow.json)** from this repo.
-2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).
-3. Import the flow as a Flow template.
-   - Go to `Flows`, click on `Build new flow template`.
-   - Select `Import` and choose the flow that you downloaded in the previous step.
-   - Provide a `Name` and click on `Create' to save your flow template.
-4. Configure a flow instance to send email notifications to Outlook.
-   - From `Connectors`, search for `Outlook Email` connector in the search box.
-   - Select the `Outlook Email` connector and click `Authenticate`.
-   - Provide a `Name` and click on `Create instance`. You will be redirected to authenticate with your Outlook credentials.
-   - Go to `Instances` and look for the connector instance that you just created.
-5. Create a flow instance to replace the Value variables in the template with specific values to connect to your Mulesoft environment and AMPLIFY platform tenant.
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/PostmanAuthenticate.PNG" width="300" height="450" /> 
+ 
+4. From the new screen, go to _Authorization_ and click on _Get New Access Token_. To authenticate use: 
+* Grant Type: `Implicit`
+* Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360&redirect_uri=https://apicentral.axway.com`
+* Client ID: `apicentral`
 
-- Navigate to `Flows`, select your flow template and click `Create Instance'.
-- Provide a `Name` for the instance.
-- Select the `outlookEmail` connector instance that you created at Step 4.
-- Provide values for all required Variables:
-  - `axwayClientId`: The `clientId` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
-  - `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
-  - `muleSoftOrgID`: The organization id of your Mulesoft Anypoint account.
-  - `muleSoftUserName`: The username for your Mulesoft Anypoint account.
-  - `muleSoftPassword`:The password for your Mulesfot Anypoint account.
-  - `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com.
-  - `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com.
-- Select `Create instance`. Please make sure to save the instance id. You will need it later.
-  Watch the [demo video](https://youtu.be/0mJXeD_zJhI) as we break down and explain how to import and configure the flow template.
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
+
+Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
+
+5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdow, and then click on the eye button next to the dropdown. 
+* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
+* Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/ConfigureEnvironmentPostman.PNG" width="600" height="400" /> 
+
+
+6. Run the **Create Service Account of type SECRET** POST request. In the body payload, you could change the `serviceAccountName` to a value of your choice. 
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/CreateServiceAccount.PNG" width="600" height="250" /> 
+
+Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
+
+```json
+{
+  "name": "amplify-integration",
+  "type": "DOSA",
+  "clientId": "DOSA_f0c4b70**********",
+  "clientAuthType": "SECRET",
+  "clientSecret": "07b*************",
+  "registrationToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NjE5OGUwZS1lNTcz******",
+  "tokenUrl": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
+  "aud": "https://login.axway.com/auth",
+  "realm": "Broker",
+  "certificate": {},
+  "metadata": {
+    "createTimestamp": "2020-07-01T20:24:02.059Z",
+    "createUserId": "e1add099-59da-40b6-b13f-912bfa816697",
+    "modifyTimestamp": "2020-07-01T20:24:02.059Z",
+    "modifyUserId": "e1add099-59da-40b6-b13f-912bfa816697"
+  }
+}
+```
 
 ### Step 3: Microsoft Teams flow to Approve / Reject subscription requests
 
