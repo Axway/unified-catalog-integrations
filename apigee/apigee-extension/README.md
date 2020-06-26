@@ -165,6 +165,20 @@ amplify central create -f=~/Desktop/APIService-swagger-petstore.yaml
 
 Axway <support@axway.com> https://axway.com
 
+---
+
 ## License
 
-This code is proprietary, closed source software licensed to you by Axway. All Rights Reserved. You may not modify Axway’s code without express written permission of Axway. You are licensed to use and distribute your services developed with the use of this software and dependencies, including distributing reasonable and appropriate portions of the Axway code and dependencies. Except as set forth above, this code MUST not be copied or otherwise redistributed without express written permission of Axway. This module is licensed as part of the Axway Platform and governed under the terms of the Axway license agreement (General Conditions) located here: [https://support.axway.com/en/auth/general-conditions](https://support.axway.com/en/auth/general-conditions); EXCEPT THAT IF YOU RECEIVED A FREE SUBSCRIPTION, LICENSE, OR SUPPORT SUBSCRIPTION FOR THIS CODE, NOTWITHSTANDING THE LANGUAGE OF THE GENERAL CONDITIONS, AXWAY HEREBY DISCLAIMS ALL SUPPORT AND MAINTENANCE OBLIGATIONS, AS WELL AS ALL EXPRESS AND IMPLIED WARRANTIES, INCLUDING BUT NOT LIMITED TO IMPLIED INFRINGEMENT WARRANTIES, WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, AND YOU ACCEPT THE PRODUCT AS-IS AND WITH ALL FAULTS, SOLELY AT YOUR OWN RISK. Your right to use this software is strictly limited to the term (if any) of the license or subscription originally granted to you.
+Copyright 2020 Axway
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
