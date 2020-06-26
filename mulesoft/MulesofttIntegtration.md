@@ -652,17 +652,11 @@ Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
 ```
 
-With the AMPLIFY Central CLI installed, run this command in the mulesoft-extension directory, assuming you have cloned/downloaded this repo at previous steps.  
+You can then install the @axway/amplify-central-mulesoft-extension:
 
 ```powershell
-yarn && yarn build
-```
-> **Note**: If you get a command not found error for yarn, please run `npm install -g yarn. 
-
-To configure this extension with the AMPLIFY Central CLI:
-
-```powershell
-amplify central config set extensions.mulesoft-extension <path_to_your_mulesoft_extension_directory>
+npm install @axway/amplify-central-mulesoft-extension
+amplify central config set extensions.mulesoft-extension <path to where you installed module>
 ```
 
 **2. Configure extension**
