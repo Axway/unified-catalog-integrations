@@ -30,30 +30,6 @@
             }
         },
         {
-            "id": 297395,
-            "onSuccess": [
-                "createSubscriptionAzureService"
-            ],
-            "onFailure": [],
-            "name": "buildDataToCreateSubscription",
-            "type": "script",
-            "properties": {
-                "body": "\nconst consumerInstance = steps.getApiServerConsumerInstance.response.body;\n\nlet resourceGroupName;\nlet serviceName;\nlet apiName;\n\nif(consumerInstance) {\n  resourceGroupName = consumerInstance.attributes.azureResourceGroupName;\n  serviceName = consumerInstance.attributes.azureServiceName;\n  apiName = consumerInstance.attributes.azureApiName;\n}\n\nconst headers = {'Authorization': `Bearer ${steps.getAzureToken.response.body.access_token}`};\nconst azureSubUrl = `https://management.azure.com/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/subscriptions/${steps.readTriggerActionAndPrepareData.subscriptionId}?api-version=2019-01-01`;\nconst azureSubBody = {\n    \"properties\": {\n        \"displayName\": \"Subscription from Unified Catalog- IB Flow for \" + steps.getConsumerEmail,\n        \"scope\": `/subscriptions/${config.subid}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${apiName}`,\n        \"state\": \"active\",\n        \"allowTracing\": false\n    }\n};\n\ndone ({headers, azureSubUrl, azureSubBody});"
-            }
-        },
-        {
-            "id": 297389,
-            "onSuccess": [
-                "deleteSubscription"
-            ],
-            "onFailure": [],
-            "name": "buildDataToDeleteSubscription",
-            "type": "script",
-            "properties": {
-                "body": "\nconst headers = {'Authorization': `Bearer ${steps.getAzureToken.response.body.access_token}`};\nconst azureSubUrl = `https://management.azure.com/subscriptions/${config.subid}/resourceGroups/${config.resourceGroupName}/providers/Microsoft.ApiManagement/service/${config.serviceName}/subscriptions/${steps.readTriggerActionAndPrepareData.subscriptionId}?api-version=2019-01-01`;\n\n\ndone ({headers, azureSubUrl});"
-            }
-        },
-        {
             "id": 297404,
             "onSuccess": [
                 "updateSubscriptionStateRejected"
@@ -154,8 +130,8 @@
             "name": "createSubscriptionAzureService",
             "type": "httpRequest",
             "properties": {
-                "body": "${steps.buildAzureSubscriptionData.azureSubBody}",
                 "method": "PUT",
+                "body": "${steps.buildAzureSubscriptionData.azureSubBody}",
                 "url": "${steps.buildAzureSubscriptionData.azureSubUrl}",
                 "headers": "${steps.buildAzureSubscriptionData.headers}"
             }
@@ -190,7 +166,7 @@
         {
             "id": 326623,
             "onSuccess": [
-                "getPlatformOrgUsers"
+                "buildAzureSubscriptionData"
             ],
             "onFailure": [
                 "end"
@@ -204,9 +180,26 @@
             }
         },
         {
-            "id": 297383,
+            "id": 346978,
             "onSuccess": [
                 "readTriggerActionAndPrepareData"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getAxwayAccessToken",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "body": "${steps.prepAxwayAccessTokenRequest.form}",
+                "url": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
+                "headers": "${steps.prepAxwayAccessTokenRequest.headers}"
+            }
+        },
+        {
+            "id": 297383,
+            "onSuccess": [
+                "prepAxwayAccessTokenRequest"
             ],
             "onFailure": [
                 "end"
@@ -216,43 +209,19 @@
             "properties": {
                 "method": "POST",
                 "url": "https://login.microsoftonline.com/${config.azureTenantId}/oauth2/token",
-                "form": "${steps.prepareAzureTokenInfo.form}",
-                "headers": "${steps.prepareAzureTokenInfo.headers}"
+                "headers": "${steps.prepareAzureTokenInfo.headers}",
+                "form": "${steps.prepareAzureTokenInfo.form}"
             }
         },
         {
-            "id": 297640,
+            "id": 346979,
             "onSuccess": [
-                "buildAzureSubscriptionData"
-            ],
-            "onFailure": [],
-            "name": "getConsumerEmail",
-            "type": "script",
-            "properties": {
-                "body": "const results = steps.getPlatformOrgUsers.response.body.result;\nconst consumerId = steps.readTriggerActionAndPrepareData.consumerUserId;\n\nlet consumerEmail = {};\n consumerEmail =  results.find(function (value) {\n     return value.guid == consumerId\n});\nconsole.log(consumerEmail);\n\ndone(consumerEmail.email);"
-            }
-        },
-        {
-            "id": 297353,
-            "onSuccess": [
-                "getUserToken"
-            ],
-            "onFailure": [],
-            "name": "getHeaders",
-            "type": "script",
-            "properties": {
-                "body": "\nconst orgId = config.axwayTenantId;\nconst tokenServiceHeaders = {'APIKey': `${config.apiCentralTokenCredentials}`};\n\ndone({\n  orgId,\n  tokenServiceHeaders\n})"
-            }
-        },
-        {
-            "id": 297636,
-            "onSuccess": [
-                "getConsumerEmail"
+                "getApiServerConsumerInstance"
             ],
             "onFailure": [
                 "end"
             ],
-            "name": "getPlatformOrgUsers",
+            "name": "getConsumerEmail",
             "type": "httpRequest",
             "properties": {
                 "method": "GET",
@@ -261,19 +230,15 @@
             }
         },
         {
-            "id": 297380,
+            "id": 297353,
             "onSuccess": [
                 "prepareAzureTokenInfo"
             ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getUserToken",
-            "type": "httpRequest",
+            "onFailure": [],
+            "name": "getHeaders",
+            "type": "script",
             "properties": {
-                "method": "GET",
-                "url": "${config.apiCentralTokenUrl}",
-                "headers": "${steps.getHeaders.tokenServiceHeaders}"
+                "body": "\nconst orgId = config.axwayTenantId;\nconst tokenServiceHeaders = {'APIKey': `${config.apiCentralTokenCredentials}`};\n\ndone({\n  orgId,\n  tokenServiceHeaders\n})"
             }
         },
         {
@@ -289,6 +254,18 @@
             }
         },
         {
+            "id": 346977,
+            "onSuccess": [
+                "getAxwayAccessToken"
+            ],
+            "onFailure": [],
+            "name": "prepAxwayAccessTokenRequest",
+            "type": "script",
+            "properties": {
+                "body": "\ndone({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.axwayClientId + ':' + config.axwayClientSecret),\n      'Content-Type': 'application/x-www-form-urlencoded'\n  },\n  form: 'grant_type=client_credentials'\n});\n"
+            }
+        },
+        {
             "id": 325551,
             "onSuccess": [
                 "sendEmail"
@@ -297,19 +274,19 @@
             "name": "prepSubscriptionEmailNotification",
             "type": "script",
             "properties": {
-                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst accesKey = steps.createSubscriptionAzureService.response.body.properties.primaryKey;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Subscription key: <b>${accesKey}</b>` ;\n\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
+                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail.response.body.result && steps.getConsumerEmail.response.body.result.email;const catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${steps.readTriggerActionAndPrepareData.apicentralUrl}/catalog/explore/${catalogItemId}`;\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst accesKey = steps.createSubscriptionAzureService.response.body.properties.primaryKey;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Subscription key: <b>${accesKey}</b>` ;\n\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
             }
         },
         {
             "id": 297392,
             "onSuccess": [
-                "getApiServerConsumerInstance"
+                "getConsumerEmail"
             ],
             "onFailure": [],
             "name": "readTriggerActionAndPrepareData",
             "type": "script",
             "properties": {
-                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getUserToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${config.apiCentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `${config.platformURL}/api/v1/org/${config.axwayTenantId}/user`;\n\nconst apiServerConsumerInstanceUrl = `${config.apiCentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl\n};\n\ndone(data);"
+                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\nconst apicentralUrl = 'https://apicentral.axway.com';\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getAxwayAccessToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${apicentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `https://platform.axway.com/api/v1/user/${consumerUserId}`;\n\nconst apiServerConsumerInstanceUrl = `${apicentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl,\n  apicentralUrl\n};\n\ndone(data);"
             }
         },
         {
@@ -319,10 +296,10 @@
             "name": "sendEmail",
             "type": "elementRequest",
             "properties": {
+                "method": "POST",
                 "elementInstanceId": "${config.outlookEmail}",
-                "api": "/messages",
                 "body": "${steps.prepSubscriptionEmailNotification.body}",
-                "method": "POST"
+                "api": "/messages"
             }
         },
         {
@@ -334,8 +311,8 @@
             "name": "updateSubscriptionFailState",
             "type": "httpRequest",
             "properties": {
-                "body": "${steps.buildSubFailData.subData}",
                 "method": "POST",
+                "body": "${steps.buildSubFailData.subData}",
                 "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
                 "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
@@ -351,8 +328,8 @@
             "name": "updateSubscriptionState",
             "type": "httpRequest",
             "properties": {
-                "body": "${steps.buildUpdateSubData.subData}",
                 "method": "POST",
+                "body": "${steps.buildUpdateSubData.subData}",
                 "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
                 "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
@@ -428,23 +405,16 @@
     "singleThreaded": false,
     "configuration": [
         {
-            "id": 64954,
-            "key": "apiCentralTokenCredentials",
-            "name": "apiCentralTokenCredentials",
+            "id": 71573,
+            "key": "axwayClientId",
+            "name": "axwayClientId",
             "type": "value",
             "required": true
         },
         {
-            "id": 64953,
-            "key": "apiCentralTokenUrl",
-            "name": "apiCentralTokenUrl",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 64971,
-            "key": "apiCentralUrl",
-            "name": "apiCentralUrl",
+            "id": 71574,
+            "key": "axwayClientSecret",
+            "name": "axwayClientSecret",
             "type": "value",
             "required": true
         },
@@ -481,13 +451,6 @@
             "key": "outlookEmail",
             "name": "outlookEmail",
             "type": "elementInstance",
-            "required": true
-        },
-        {
-            "id": 65009,
-            "key": "platformURL",
-            "name": "platformURL",
-            "type": "value",
             "required": true
         },
         {
