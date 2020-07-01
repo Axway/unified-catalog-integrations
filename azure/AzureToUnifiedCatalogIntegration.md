@@ -19,65 +19,94 @@ The technologies that were used for this project:
 * [AMPLIFY Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs. 
 * [AMPLIFY Central CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html) to fetch the APIs from Azure API Management and promote them to the Unified Catalog. 
 * [Integration Builder](https://www.axway.com/en/products/application-integration) to implement the logic for the subscription management and email notifications. 
-* API Builder service running in [ARS](https://www.axway.com/en/platform/runtime-services) to keep an authenticated user credentials green. 
 * MS Teams for notifications and approval or rejection of subscription requests. 
 * Azure API Management.
 
 Follow the steps below to use this example: 
 
-### Step 1: Configure a token provider service in API Builder
 
-***
+### Step 1: Create Amplify Central Service Account
 
-This service is used to authenticate from Integration Builder to AMPLIFY Central, and keep the authenticated user credentials green.  It will expose a `GET /token` endpoint that will return the current `access_token` for the configured credentials. This `access_token` is then used by the Integration Builder flow to allow it to call AMPLIFY Central APIs. The service was created with API Builder and deployed to AMPLIFY Runtime Services ( ARS ). 
+Save the clientId and clientSecret from the response which will be used in Integration Builder flow.
 
-**Pre-requisites**
-*  **AMPLIFY Runtime Service** enabled on your AMPLIFY platform account. To enable your ARS trial, navigate to https://platform.axway.com and select _Start Free Trial_ under the _Application Development_ tile, from "Service Offerings & Products".
-* User with **Runtime Services Admin** role.  
+##### Option 1
 
-To configure the token provider service:
+Make sure you log out from all active sessions. 
 
-1. Download the TokenProvider service from this [repo](https://github.com/Axway/unified-catalog-integrations/tree/master/tokenprovider). 
-2. Setup the acs cli (AMPLIFY Runtime Service) by running the following commands sequence:
-```poweshell
-npm install -g acs
-acs login
-acs new tokenprovider --force
-```
-3. Config the port with the following command: `acs config --set PORT=8080 tokenprovider`
-4. Build your tokenprovider image by running 
+
 ```powershell
-docker build --tag tokenprovider ./
+amplify auth logout --all
 ```
 
-5. Publish the tokenprovider image
-```powwershell
-acs publish tokenprovider --delete_oldest --force --image tokenprovider --app_version 0.1
-```
-You should get back the HOST ENDPOINT where the token provider service will be published. 
-
-6. Configure the OAuth callback 
+Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
+To run the command, you need to have jq installed. 
 ```powershell
-acs config --set CALLBACK_URI={HOST ENDPOINT}/auth/callback 
-``` 
-You will be asked to restart the service . Type `yes` when prompted to restart. 
-
-7. Initiate the access/refresh tokens from the API Builder console. 
-   * Navigate to `{HOST ENDPOINT}/console/project/credentials` and login with `username: admin `, `password: the apikey from default.js file`. We recommend updating the _default.js_ with a new unique _apikey_.  
-   * Click Authorize/Re-authorize. 
-   * Login with AxwayID. 
-8. You can Test the service by with
-```powershell
-curl -H 'APIKey: <YOUR APIKEY>' {HOST ENDPOINT}/api/token
+amplify auth login --client-id apicentral
+ORG_ID=<org_id_value> && TOKEN=$(amplify auth list --json | jq -r ".[] | select( .org.org_id == $ORG_ID ) | .tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
+--header "Authorization: Bearer ${TOKEN}" \
+--header "X-Axway-Tenant-Id: ${ORG_ID}" \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "serviceAccountType": "DOSA",
+  "serviceAccountName": "IntegrationBuilderSA",
+  "clientAuthType": "SECRET"
+}'
 ```
 
-9. To monitor your service run
-```powershell
-acs list tokenprovider
-acs logcat tokenprovider
-```
+##### Option 2
 
-To shutdown the service, run the following command: `acs unpublish tokenprovider`. 
+Use the postman **[collection](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman)**. 
+
+1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
+
+2. Import the [AMPLFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
+
+3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/PostmanAuthenticate.PNG" width="300" height="450" /> 
+ 
+4. From the new screen, go to _Authorization_ and click on _Get New Access Token_. To authenticate use: 
+* Grant Type: `Implicit`
+* Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360&redirect_uri=https://apicentral.axway.com`
+* Client ID: `apicentral`
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
+
+Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
+
+5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdow, and then click on the eye button next to the dropdown. 
+* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
+* Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/ConfigureEnvironmentPostman.PNG" width="600" height="400" /> 
+
+
+6. Run the **Create Service Account of type SECRET** POST request. In the body payload, you could change the `serviceAccountName` to a value of your choice. 
+
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/CreateServiceAccount.PNG" width="600" height="250" /> 
+
+Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
+
+```json
+{
+  "name": "amplify-integration",
+  "type": "DOSA",
+  "clientId": "DOSA_f0c4b70**********",
+  "clientAuthType": "SECRET",
+  "clientSecret": "07b*************",
+  "registrationToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NjE5OGUwZS1lNTcz******",
+  "tokenUrl": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
+  "aud": "https://login.axway.com/auth",
+  "realm": "Broker",
+  "certificate": {},
+  "metadata": {
+    "createTimestamp": "2020-07-01T20:24:02.059Z",
+    "createUserId": "e1add099-59da-40b6-b13f-912bfa816697",
+    "modifyTimestamp": "2020-07-01T20:24:02.059Z",
+    "modifyUserId": "e1add099-59da-40b6-b13f-912bfa816697"
+  }
+}
+```
 
 ### Step 2: Create a Service Principal in Azure API Management using the CLI
 ***
@@ -108,7 +137,7 @@ Note: If you have more than one subscriptions with your Azure account, run the f
 ### Step 3: Configure Integration Builder flow to update subscriptions and send email notifications
 ***
 
-This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog,  then will subscribe / unsubscribe the consumer to the APIs in Azure API Management. It will also send email notifications to the user with the key to authenticate the API calls. The flow will call the API Builder app with get a valid Bearer token, then updates the Subscription states in Unified Catalog.
+This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog, then will subscribe / unsubscribe the consumer to the APIs in Azure API Management and updates the Subscription states in Unified Catalog.. It will also send email notifications to the user with the key to authenticate the API calls.
 
 Flow these steps to configure the flow: 
 1. Download the [Azure Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/azure/Azure%20Registration%20Flow.json). 
@@ -127,10 +156,8 @@ Flow these steps to configure the flow:
 * Provide a `Name` for the instance. 
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
-  * `apiCentralTokenCredentials`: The apikey from `default.js` file in the API Builder `tokenProvider` service. Please refer to **Step 1: Configure a token provider service in API Builder.**  
-  * `apiCentralTokenUrl`: The ENDPOINT URL of the API Builder `tokenProvider` service: `{HOST ENDPOINT}/api/token`, where the {HOST_ENDPOINT} is the URL of the tokenprovider service. Please refer to **Step 1: Configure a token provider service in API Builder.**
-  * `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com. 
-  * `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com. 
+  * `axwayClientId`: The `clientId` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
+  * `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
   * `azureTenantId`: The tenant id of your Azure account. 
   * `azureClientId`: The `appId`from the Azure service principal.  
   * `azureClientSecret`: The `password` from the Azure service principal.

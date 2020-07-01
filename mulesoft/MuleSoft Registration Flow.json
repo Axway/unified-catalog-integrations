@@ -1,12 +1,12 @@
 {
-    "id": 35701,
+    "id": 36991,
     "name": "MuleSoft Registration Flow",
     "userId": 18408,
     "accountId": 7688,
-    "createdDate": "2020-05-21T15:32:51Z",
+    "createdDate": "2020-06-24T16:43:48Z",
     "steps": [
         {
-            "id": 319205,
+            "id": 344396,
             "onSuccess": [
                 "updateSubscriptionStateApproved"
             ],
@@ -18,7 +18,7 @@
             }
         },
         {
-            "id": 319204,
+            "id": 344397,
             "onSuccess": [
                 "createMuleSoftContract"
             ],
@@ -30,7 +30,7 @@
             }
         },
         {
-            "id": 319201,
+            "id": 344398,
             "onSuccess": [
                 "updateSubscriptionStateRejected"
             ],
@@ -42,7 +42,7 @@
             }
         },
         {
-            "id": 319200,
+            "id": 344399,
             "onSuccess": [
                 "deleteApp"
             ],
@@ -54,7 +54,7 @@
             }
         },
         {
-            "id": 319199,
+            "id": 344400,
             "onSuccess": [
                 "deleteAppOnUnsubscribe"
             ],
@@ -66,19 +66,7 @@
             }
         },
         {
-            "id": 322479,
-            "onSuccess": [
-                "sendUnsubscribedEmail"
-            ],
-            "onFailure": [],
-            "name": "buildUnsubscribedEmail",
-            "type": "script",
-            "properties": {
-                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\n\nlet message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\ndone({body});\n"
-            }
-        },
-        {
-            "id": 319198,
+            "id": 344402,
             "onSuccess": [
                 "updateSubscriptionState"
             ],
@@ -90,7 +78,7 @@
             }
         },
         {
-            "id": 319197,
+            "id": 344403,
             "onSuccess": [
                 "buildApproveSubData"
             ],
@@ -104,7 +92,7 @@
             }
         },
         {
-            "id": 319196,
+            "id": 344404,
             "onSuccess": [
                 "buildRejectedData"
             ],
@@ -118,7 +106,7 @@
             }
         },
         {
-            "id": 319195,
+            "id": 344405,
             "onSuccess": [
                 "getApps"
             ],
@@ -132,7 +120,7 @@
             }
         },
         {
-            "id": 319191,
+            "id": 344406,
             "onSuccess": [
                 "readTierId"
             ],
@@ -144,12 +132,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.prepareMuleSoftData.appData}",
-                "headers": "${steps.prepareMuleSoftData.headers}",
-                "url": "${steps.prepareMuleSoftData.url}"
+                "url": "${steps.prepareMuleSoftData.url}",
+                "headers": "${steps.prepareMuleSoftData.headers}"
             }
         },
         {
-            "id": 319190,
+            "id": 344407,
             "onSuccess": [
                 "buildUpdateSubData"
             ],
@@ -161,12 +149,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildDataToCreateSubscription.body}",
-                "headers": "${steps. prepareMuleSoftData.headers}",
-                "url": "${steps.buildDataToCreateSubscription.createContractUrl}"
+                "url": "${steps.buildDataToCreateSubscription.createContractUrl}",
+                "headers": "${steps. prepareMuleSoftData.headers}"
             }
         },
         {
-            "id": 319189,
+            "id": 344408,
             "onSuccess": [
                 "updateSubscriptionFailState"
             ],
@@ -177,12 +165,12 @@
             "type": "httpRequest",
             "properties": {
                 "method": "DELETE",
-                "headers": "${steps.prepareMuleSoftData.headers}",
-                "url": "${steps.buildSubFailData.deleteAppUrl}"
+                "url": "${steps.buildSubFailData.deleteAppUrl}",
+                "headers": "${steps.prepareMuleSoftData.headers}"
             }
         },
         {
-            "id": 319188,
+            "id": 344409,
             "onSuccess": [
                 "updateSubscriptionStateUnsubscribe"
             ],
@@ -193,12 +181,12 @@
             "type": "httpRequest",
             "properties": {
                 "method": "DELETE",
-                "headers": "${steps.prepareMuleSoftData.headers}",
-                "url": "${steps.buildUnsubscribeData.appUrl}"
+                "url": "${steps.buildUnsubscribeData.appUrl}",
+                "headers": "${steps.prepareMuleSoftData.headers}"
             }
         },
         {
-            "id": 319186,
+            "id": 344410,
             "onSuccess": [],
             "onFailure": [],
             "name": "end",
@@ -208,21 +196,23 @@
             }
         },
         {
-            "id": 319185,
+            "id": 344411,
             "onSuccess": [
                 "muleSoftLogin"
             ],
-            "onFailure": [],
+            "onFailure": [
+                "end"
+            ],
             "name": "getApiServerConsumerInstance",
             "type": "httpRequest",
             "properties": {
                 "method": "GET",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.apiServerConsumerInstanceUrl}"
+                "url": "${steps.readTriggerActionAndPrepareData.apiServerConsumerInstanceUrl}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319184,
+            "id": 344412,
             "onSuccess": [
                 "buildUnsubscribeData"
             ],
@@ -233,12 +223,12 @@
             "type": "httpRequest",
             "properties": {
                 "method": "GET",
-                "headers": "${steps.prepareMuleSoftData.headers}",
-                "url": "${steps.prepareMuleSoftData.url}"
+                "url": "${steps.prepareMuleSoftData.url}",
+                "headers": "${steps.prepareMuleSoftData.headers}"
             }
         },
         {
-            "id": 319183,
+            "id": 344413,
             "onSuccess": [
                 "createMuleSoftApp"
             ],
@@ -249,12 +239,30 @@
             "type": "httpRequest",
             "properties": {
                 "method": "GET",
-                "headers": "${steps.prepareDataMuleSoftTiers.headers}",
-                "url": "${steps.prepareDataMuleSoftTiers.tierUrl}"
+                "url": "${steps.prepareDataMuleSoftTiers.tierUrl}",
+                "headers": "${steps.prepareDataMuleSoftTiers.headers}"
             }
         },
         {
-            "id": 319181,
+            "id": 345731,
+            "onSuccess": [
+                "readTriggerActionAndPrepareData"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "getAxwayAccessToken",
+            "type": "httpRequest",
+            "properties": {
+                "method": "POST",
+                "body": "${steps.prepAxwayAccessTokenRequest.form}",
+                "url": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
+                "headers": "${steps.prepAxwayAccessTokenRequest.headers}",
+                "form": ""
+            }
+        },
+        {
+            "id": 345732,
             "onSuccess": [
                 "checkActionApprove"
             ],
@@ -262,15 +270,17 @@
                 "end"
             ],
             "name": "getConsumerEmail",
-            "type": "script",
+            "type": "httpRequest",
             "properties": {
-                "body": "const results = steps.getPlatformOrgUsers.response.body.result;\nconst consumerId = steps.readTriggerActionAndPrepareData.consumerUserId;\n\nlet consumer = {};\n consumer =  results.find(function (value) {\n     return value.guid == consumerId\n});\nif(consumer === null) {\n  done(false);\n}\ndone(consumer.email);"
+                "method": "GET",
+                "url": "${steps.readTriggerActionAndPrepareData.platformGetUserUrl}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319180,
+            "id": 344415,
             "onSuccess": [
-                "getUserToken"
+                "prepareMuleSoftData"
             ],
             "onFailure": [],
             "name": "getHeaders",
@@ -280,39 +290,7 @@
             }
         },
         {
-            "id": 319179,
-            "onSuccess": [
-                "getConsumerEmail"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getPlatformOrgUsers",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.platformGetUserUrl}"
-            }
-        },
-        {
-            "id": 319178,
-            "onSuccess": [
-                "prepareMuleSoftData"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getUserToken",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "headers": "${steps.getHeaders.tokenServiceHeaders}",
-                "url": "${config.apiCentralTokenUrl}"
-            }
-        },
-        {
-            "id": 319177,
+            "id": 344418,
             "onSuccess": [
                 "prepareDataMuleSoftTiers"
             ],
@@ -328,19 +306,7 @@
             }
         },
         {
-            "id": 319176,
-            "onSuccess": [
-                "readTriggerActionAndPrepareData"
-            ],
-            "onFailure": [],
-            "name": "prepAccessTokenRequest",
-            "type": "script",
-            "properties": {
-                "body": "\ndone({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.openid_clientid + ':' + config.openid_client_secret),\n      'Content-Type': 'application/x-www-form-urlencoded'\n  },\n  form: 'grant_type=client_credentials'\n});\n"
-            }
-        },
-        {
-            "id": 319174,
+            "id": 344420,
             "onSuccess": [
                 "getAvailableTiers"
             ],
@@ -352,9 +318,9 @@
             }
         },
         {
-            "id": 319173,
+            "id": 344421,
             "onSuccess": [
-                "readTriggerActionAndPrepareData"
+                "prepAxwayAccessTokenRequest"
             ],
             "onFailure": [],
             "name": "prepareMuleSoftData",
@@ -364,7 +330,21 @@
             }
         },
         {
-            "id": 319158,
+            "id": 345730,
+            "onSuccess": [
+                "getAxwayAccessToken"
+            ],
+            "onFailure": [
+                "end"
+            ],
+            "name": "prepAxwayAccessTokenRequest",
+            "type": "script",
+            "properties": {
+                "body": "\ndone({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.axwayClientId + ':' + config.axwayClientSecret),\n      'Content-Type': 'application/x-www-form-urlencoded'\n  },\n  form: 'grant_type=client_credentials'\n});\n"
+            }
+        },
+        {
+            "id": 344422,
             "onSuccess": [
                 "sendEmail"
             ],
@@ -372,11 +352,11 @@
             "name": "prepSubscriptionEmailNotification",
             "type": "script",
             "properties": {
-                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst clientId = steps.createMuleSoftContract.response.body.clientId;\nconst clientSecret = steps.createMuleSoftContract.response.body.clientSecret;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Client Id: <b>${clientId}</b>` ;\n\tmessage += `<br>Client Secret: <b>${clientSecret}</b>` ;\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
+                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail.response.body.result && steps.getConsumerEmail.response.body.result.email;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${steps.readTriggerActionAndPrepareData.apicentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst clientId = steps.createMuleSoftContract.response.body.clientId;\nconst clientSecret = steps.createMuleSoftContract.response.body.clientSecret;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Client Id: <b>${clientId}</b>` ;\n\tmessage += `<br>Client Secret: <b>${clientSecret}</b>` ;\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
             }
         },
         {
-            "id": 319172,
+            "id": 344423,
             "onSuccess": [
                 "buildDataToCreateSubscription"
             ],
@@ -390,52 +370,32 @@
             }
         },
         {
-            "id": 319171,
+            "id": 344424,
             "onSuccess": [
-                "getPlatformOrgUsers"
+                "getConsumerEmail"
             ],
             "onFailure": [],
             "name": "readTriggerActionAndPrepareData",
             "type": "script",
             "properties": {
-                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getUserToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${config.apiCentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `${config.platformURL}/api/v1/org/${config.axwayTenantId}/user`;\n\nconst apiServerConsumerInstanceUrl = `${config.apiCentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl\n\n};\n\ndone(data);"
+                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\nconst apicentralUrl = 'https://apicentral.axway.com';\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getAxwayAccessToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${apicentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `https://platform.axway.com/api/v1/user/${consumerUserId}`;\n\nconst apiServerConsumerInstanceUrl = `${apicentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl,\n  apicentralUrl\n\n};\n\ndone(data);"
             }
         },
         {
-            "id": 319159,
+            "id": 344425,
             "onSuccess": [],
             "onFailure": [],
             "name": "sendEmail",
             "type": "elementRequest",
             "properties": {
-                "elementInstanceId": "${config.outlookEmail}",
                 "method": "POST",
+                "elementInstanceId": "${config.outlookEmail}",
                 "body": "${steps.prepSubscriptionEmailNotification.body}",
                 "api": "/messages"
             }
         },
         {
-            "id": 319169,
-            "onSuccess": [],
-            "onFailure": [],
-            "name": "sendRejectedEmail",
-            "type": "script",
-            "properties": {
-                "body": "// Configure these three params\nconst subject = 'Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\n\n\ndone(notification(subject, recipient, catalogItemLink, catalogItemName));\n\n\n/**\n * Sends an email with the given message to the user's email-address.\n * @param errorMessage The message to be appended to the email\n * @param prevStep The data from previous step, used to populate the errorMessage\n * @param prevStepName The name of the step where the formula was before failure.\n * @param noEmail Optional boolean parameter that's set to false by default. Set the value to true to avoid sending emails \n * @return The message and body to be displayed in the execution.\n */\nfunction notification(subject, recipient, catalogItemLink, catalogItemName) {\n\tlet returnObj = {};\n\n\treturnObj.subject = `RE: ${subject}`;\n\treturnObj.msg = `<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`;\n\tnotify.email(recipient, returnObj.subject, returnObj.msg);\n\n\treturn returnObj;\n}\n"
-            }
-        },
-        {
-            "id": 319166,
-            "onSuccess": [],
-            "onFailure": [],
-            "name": "sendUnsubscribedEmail",
-            "type": "script",
-            "properties": {
-                "body": "// Configure these three params\nconst subject = 'Subscription Notification';\nconst recipient = steps.getConsumerEmail;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\n\nconst catalogItemLink = `${config.apiCentralUrl}/catalog/explore/${catalogItemId}`;\n\n\ndone(notification(subject, recipient, catalogItemLink, catalogItemName));\n\n\n/**\n * Sends an email with the given message to the user's email-address.\n * @param errorMessage The message to be appended to the email\n * @param prevStep The data from previous step, used to populate the errorMessage\n * @param prevStepName The name of the step where the formula was before failure.\n * @param noEmail Optional boolean parameter that's set to false by default. Set the value to true to avoid sending emails \n * @return The message and body to be displayed in the execution.\n */\nfunction notification(subject, recipient, catalogItemLink, catalogItemName) {\n\tlet returnObj = {};\n\n\treturnObj.subject = `RE: ${subject}`;\n\treturnObj.msg = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n\tnotify.email(recipient, returnObj.subject, returnObj.msg);\n\n\treturn returnObj;\n}\n"
-            }
-        },
-        {
-            "id": 319165,
+            "id": 344428,
             "onSuccess": [],
             "onFailure": [
                 "end"
@@ -445,12 +405,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildSubFailData.subData}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319160,
+            "id": 344429,
             "onSuccess": [
                 "prepSubscriptionEmailNotification"
             ],
@@ -462,12 +422,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildUpdateSubData.subData}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319164,
+            "id": 344430,
             "onSuccess": [
                 "getApiServerConsumerInstance"
             ],
@@ -479,12 +439,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildApproveSubData.subData}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319163,
+            "id": 344431,
             "onSuccess": [
                 "prepSubscriptionEmailNotification"
             ],
@@ -496,12 +456,12 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildRejectedData.subData}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         },
         {
-            "id": 319161,
+            "id": 344432,
             "onSuccess": [
                 "prepSubscriptionEmailNotification"
             ],
@@ -513,14 +473,14 @@
             "properties": {
                 "method": "POST",
                 "body": "${steps.buildUnsubscribeData.subData}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
+                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
             }
         }
     ],
     "triggers": [
         {
-            "id": 31781,
+            "id": 32981,
             "onSuccess": [
                 "getHeaders"
             ],
@@ -537,66 +497,52 @@
     "singleThreaded": false,
     "configuration": [
         {
-            "id": 68011,
-            "key": "apiCentralTokenCredentials",
-            "name": "apiCentralTokenCredentials",
+            "id": 71369,
+            "key": "axwayClientId",
+            "name": "axwayClientId",
             "type": "value",
             "required": true
         },
         {
-            "id": 68012,
-            "key": "apiCentralTokenUrl",
-            "name": "apiCentralTokenUrl",
+            "id": 71368,
+            "key": "axwayClientSecret",
+            "name": "axwayClientSecret",
             "type": "value",
             "required": true
         },
         {
-            "id": 68013,
-            "key": "apiCentralUrl",
-            "name": "apiCentralUrl",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 68014,
+            "id": 71296,
             "key": "axwayTenantId",
             "name": "axwayTenantId",
             "type": "value",
             "required": true
         },
         {
-            "id": 68015,
+            "id": 71297,
             "key": "muleSoftOrgId",
             "name": "muleSoftOrgId",
             "type": "value",
             "required": true
         },
         {
-            "id": 68016,
+            "id": 71298,
             "key": "muleSoftPassword",
             "name": "muleSoftPassword",
             "type": "value",
             "required": true
         },
         {
-            "id": 68017,
+            "id": 71299,
             "key": "muleSoftUserName",
             "name": "muleSoftUserName",
             "type": "value",
             "required": true
         },
         {
-            "id": 68018,
+            "id": 71300,
             "key": "outlookEmail",
             "name": "outlookEmail",
             "type": "elementInstance",
-            "required": true
-        },
-        {
-            "id": 68019,
-            "key": "platformURL",
-            "name": "platformURL",
-            "type": "value",
             "required": true
         }
     ]
