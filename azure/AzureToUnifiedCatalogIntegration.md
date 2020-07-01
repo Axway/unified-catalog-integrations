@@ -722,68 +722,68 @@ Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da -
  
 * Set the output directory where you want the resources to be generated. 
 ```powershell
-amplify central azure-extension config set --output-dir <directory_name>
+amplify central azure-extension config set --output-dir=<directory_name>
 ```
-Example: `amplify central azure-extension config set --output-dir ./azure-resources`.
+Example: `amplify central azure-extension config set --output-dir="./azure-resources"`.
 
 * Set the environment name: 
 ```powershell
-amplify central azure-extension config set --environment-name <env_name>
+amplify central azure-extension config set --environment-name=<env_name>
 ```
-Example: `amplify central azure-extension config set --environment-name azure-env`
+Example: `amplify central azure-extension config set --environment-name=azure-env`
 
 * Set the image for the environment
 ```powershell
-amplify central azure-extension config set --icon <path_to_your_image>
+amplify central azure-extension config set --icon=<path_to_your_image>
 ```
 
 * Set to publish your Azure assets to the Unified Catalog. By default, it is set to `false`. 
 ```powershell
-amplify central azure-extension config set --generate-consumer-instances true
+amplify central azure-extension config set --generate-consumer-instances=true
 ```
 
 * Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
 ```powershell
-amplify central azure-extension config set --filter tags=<tag_value>
+amplify central azure-extension config set --filter="tags=<tag_value>
 ```
-Example: `amplify central azure-extension config set --filter tags=unifiedcatalog`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
+Example: `amplify central azure-extension config set --filter="tags=unifiedcatalog"`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
 
 ![Set API tags](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPISetTags.png)
 
 
 * Set the Webhook URL to send the HTTP POST request for a subcription update event.
 ```powershell
-amplify central azure-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
+amplify central azure-extension config set --webhook-url=MS_FLOW_HTTP_POST_URL
 ```
   
 * Set your Azure Subcription Id. This will be the value of the subscription id from you service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
-amplify central azure-extension config set --subscription-id <your_azure_subscription_id>
+amplify central azure-extension config set --subscription-id=<your_azure_subscription_id>
 ```
 
 * Set the Azure Client Id. This should be the `appId` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
-amplify central azure-extension config set --client-id <your_azure_client_id>
+amplify central azure-extension config set --client-id=<your_azure_client_id>
 ```
   
 * Set the Azure Client Secret. This should be the `password'`from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
-amplify central azure-extension config set --client-secret <your_azure_client_secret>
+amplify central azure-extension config set --client-secret=<your_azure_client_secret>
 ```
 
 * Set the Azure Tenant Id. This will be the `tenant id` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
 ```powershell
-amplify central azure-extension config set  --tenant-id <your_azure_tenant_id>
+amplify central azure-extension config set --tenant-id=<your_azure_tenant_id>
 ```
 
 * Set the Azure Service name. The `service name` of your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
-amplify central azure-extension config set --service-name <your_azure_service_name>
+amplify central azure-extension config set --service-name=<your_azure_service_name>
 ```
 
 * Set the Azure Resource Group name. The `resource group name` under your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
-amplify central azure-extension config set --resource-group-name <your_azure_resource_group_name>
+amplify central azure-extension config set --resource-group-name=<your_azure_resource_group_name>
 ```
 
 

@@ -658,54 +658,54 @@ Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da -
 Set the output directory where you want the resources to be generated.
 
 ```powershell
-amplify central mulesoft-extension config set --output-dir <directory_name>
+amplify central mulesoft-extension config set --output-dir=<directory_name>
 ```
 
-Example: `amplify central mulesoft-extension config set --output-dir ./mulesoft-resources`.
+Example: `amplify central mulesoft-extension config set --output-dir="./mulesoft-resources"`.
 
 Set the environment name:
 
 ```powershell
-amplify central mulesoft-extension config set --environment-name <env_name>
+amplify central mulesoft-extension config set --environment-name=<env_name>
 ```
 
-Example: `amplify central mulesoft-extension config set --environment-name mulesoft-env`
+Example: `amplify central mulesoft-extension config set --environment-name=mulesoft-env`
 
 Set the organization id for your Mulesoft account:
 
 ```powershell
-amplify central mulesoft-extension config set --master-organization-id <mulesoft_org_id>
+amplify central mulesoft-extension config set --master-organization-id=<mulesoft_org_id>
 ```
 
 Choose to fetch the mock endpoints with the APIs in Mulesoft. Set to `false`, you don't want to include the mock endpoints.
 
 ```powershell
-amplify central mulesoft-extension config set --include-mock-endpoints true
+amplify central mulesoft-extension config set --include-mock-endpoints=true
 ```
 
 Set the Mulesoft username and password:
 
 ```powershell
-amplify central mulesoft-extension config set --username <mulesoft_username>
-amplify central mulesoft-extension config set --password <mulesoft_password>
+amplify central mulesoft-extension config set --username=<mulesoft_username>
+amplify central mulesoft-extension config set --password=<mulesoft_password>
 ```
 
 Set the image for the environment
 
 ```powershell
-amplify central mulesoft-extension config set --icon <path_to_your_image>
+amplify central mulesoft-extension config set --icon=<path_to_your_image>
 ```
 
 Set to publish your Mulesoft assets to the Unified Catalog. By default, it is set to `false`.
 
 ```powershell
-amplify central mulesoft-extension config set --generate-consumer-instances true
+amplify central mulesoft-extension config set --generate-consumer-instances=true
 ```
 
 Set the Webhook URL to send the HTTP POST request for a subcription update event.
 
 ```powershell
-amplify central mulesoft-extension config set --webhook-url MS_FLOW_HTTP_POST_URL
+amplify central mulesoft-extension config set --webhook-url=MS_FLOW_HTTP_POST_URL
 ```
 
 > **Note**: If you skipped the MF FLow Step, set the webhook-url to the Integration Builder execution url: `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
@@ -713,7 +713,7 @@ amplify central mulesoft-extension config set --webhook-url MS_FLOW_HTTP_POST_UR
 (Optional) Set the secret if the webhook is secure and needs a key to invoke. Skip this step if you have configured the MS flow.
 
 ```powershell
-amplify central mulesoft-extension config set --webhook-secret ${SECRET}
+amplify central mulesoft-extension config set --webhook-secret=${SECRET}
 ```
 
 > **Note**: If you skipped the MF FLow Step, the webhook secret will be Integration Builder credentials: User \***\*, Organization \*\***
