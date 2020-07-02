@@ -142,22 +142,23 @@ This Integration Builder flow will receive the approve or reject requests from M
 Flow these steps to configure the flow: 
 1. Download the [Azure Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/azure/Azure%20Registration%20Flow.json). 
 2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).  
-3. Import the flow as a Flow template. 
-   * Go to `Flows`, click on `Build new flow template`. 
+3. Import the flow as a **Flow template**. 
+   * Go to `Flows`, click on `Build New Flow`. 
    * Select `Import` and choose the flow that you downloaded in the previous step.  
    * Provide a `Name` and click on `Create' to save your flow template. 
-4. Configure a flow instance to send email notifications to Outlook. 
+4. Configure a **Connector instance** to send email notifications to Outlook. 
    * From `Connectors`, search for `Outlook Email` connector in the search box.
    * Select the `Outlook Email` connector and click `Authenticate`. 
    * Provide a `Name` and click on `Create instance`. You will be redirected to authenticate with your Outlook credentials.
    * Go to `Instances` and look for the connector instance that you just created. 
-5. Create a flow instance to replace the Value variables in the template with specific values to connect to your AZURE API Management environment and platform tenant. 
+5. Create a **flow instance** to replace the Value variables in the template with specific values to connect to your AZURE API Management environment and platform tenant. 
 * Navigate to `Flows`, select your flow template and click `Create Instance'. 
 * Provide a `Name` for the instance. 
 * Select the `outlookEmail` connector instance that you created at Step 4. 
 * Provide values for all required Variables:
-  * `axwayClientId`: The `clientId` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
-  * `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to **Step 1: Create Amplify Central Service Account**.
+  * `axwayClientId`: The `clientId` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
+  * `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
+  * `axwayTenantId`: The organization id of your AMPLIFY account.
   * `azureTenantId`: The tenant id of your Azure account. 
   * `azureClientId`: The `appId`from the Azure service principal.  
   * `azureClientSecret`: The `password` from the Azure service principal.
@@ -175,7 +176,7 @@ Flow these steps to configure the flow:
    }
    ```
    
-Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.
+**Watch the [demo video](https://youtu.be/1XoxMYIj98M) as we break down and explain how to import and configure the flow template.**
 
 ### Step 4: Configure Microsoft Teams flow to Approve / Reject subscription requests
 ***
@@ -670,7 +671,7 @@ Watch the [demo video](https://youtu.be/yGwK9_y-GCU) as we break down and explai
 
 
 ### Step 5: Install and configure the @axway/amplify-central-azure-extension 
-***
+___
 
 CLI extension that fetches the APIs from Azure API Management and builds the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
 
@@ -687,6 +688,7 @@ The above resources structure map to the API Server REST API resources as define
 
 <img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png" width="560" height="200" />
 
+Before you proceed, you can check the full list of supported commands [here](https://github.com/Axway/unified-catalog-integrations/tree/1b598aaf57c4b51af1129edf597b254efc8c035a/azure/azure-extension/README.md).
 
 **1. Install @axway/azure-extension**
 
@@ -708,10 +710,11 @@ You can then install the @axway/amplify-central-azure-extension:
 npm install @axway/amplify-central-azure-extension
 amplify central config set extensions.azure-extension <path to where you installed module>
 ```
+To verify if the CLI extension was successfully set, you can run: `amplify central azure-extension config -h`.
 
 **2. Configure extension**
 
-Configure the extensions prior to generating the resources. 
+Configure the extension prior to generating the resources. 
 You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one, visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). 
 
 * Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
@@ -744,7 +747,7 @@ amplify central azure-extension config set --generate-consumer-instances=true
 
 * Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 
 ```powershell
-amplify central azure-extension config set --filter="tags=<tag_value>
+amplify central azure-extension config set --filter="tags=<tag_value>"
 ```
 Example: `amplify central azure-extension config set --filter="tags=unifiedcatalog"`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
 
@@ -753,41 +756,42 @@ Example: `amplify central azure-extension config set --filter="tags=unifiedcatal
 
 * Set the Webhook URL to send the HTTP POST request for a subcription update event.
 ```powershell
-amplify central azure-extension config set --webhook-url=MS_FLOW_HTTP_POST_URL
+amplify central azure-extension config set --webhook-url="MS_FLOW_HTTP_POST_URL"
 ```
   
-* Set your Azure Subcription Id. This will be the value of the subscription id from you service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set your Azure Subcription Id. This will be the value of the **subscription id** from you service principal account configured at _Step 2: Create a Service Principal in Azure API Management using the CLI_
 ```powershell
 amplify central azure-extension config set --subscription-id=<your_azure_subscription_id>
 ```
 
-* Set the Azure Client Id. This should be the `appId` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Client Id. This should be the **appId** from the service principal account configured at _Step 2: Create a Service Principal in Azure API Management using the CLI_.
+
 ```powershell
 amplify central azure-extension config set --client-id=<your_azure_client_id>
 ```
   
-* Set the Azure Client Secret. This should be the `password'`from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Client Secret. This should be the **password** from the service principal account configured at _Step 2: Create a Service Principal in Azure API Management using the CLI_.
 ```powershell
 amplify central azure-extension config set --client-secret=<your_azure_client_secret>
 ```
 
-* Set the Azure Tenant Id. This will be the `tenant id` from the service principal account configured at **Step 2: Create a Service Principal in Azure API Management using the CLI**
+* Set the Azure Tenant Id. This will be the **tenant id** from the service principal account configured at _Step 2: Create a Service Principal in Azure API Management using the CLI_.
 ```powershell
 amplify central azure-extension config set --tenant-id=<your_azure_tenant_id>
 ```
 
-* Set the Azure Service name. The `service name` of your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
+* Set the Azure Service name. The **service name** of your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
 amplify central azure-extension config set --service-name=<your_azure_service_name>
 ```
 
-* Set the Azure Resource Group name. The `resource group name` under your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
+* Set the Azure Resource Group name. The **resource group name** under your API Management service in Azure Portal. Please refer to [Azure API Management service](https://docs.microsoft.com/en-us/azure/api-management/get-started-create-service-instance).
 ```powershell
 amplify central azure-extension config set --resource-group-name=<your_azure_resource_group_name>
 ```
 
-
 ![Azure API Management Service](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPIManagementService.png).
+
   
 **3. Generate AMPLIFY Central resources**`
 
@@ -797,17 +801,25 @@ The generate command will create AMPLIFY Central resource files for your configu
 amplify central azure-extension resources generate
 ```
 
-**4. Fetch the APIs in Mulesoft and publish to Catalog**
+**4. Publish to Unified Catalog**
 
 After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
+
+Create the Environment in AMPLIFY Central.
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
 amplify central create --file=<path_to_environment_file>
+```
+Import the APIs in AMPLIFY Central and publish them to the Unified Catalog. You need to run this command for each _service_yaml_ file. 
+
+```powershell
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
 amplify central create -f=~<path_to_service_yaml_file>
 ```
-Example:
+
+**Example**
+
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
 amplify central create -f=~/Desktop/Environment.yaml
@@ -816,8 +828,4 @@ amplify central create -f=~/Desktop/APIService-swagger-petstore.yaml
 ```
 
 For full list of supported commands, please refer to [here](https://github.com/Axway/unified-catalog-integrations/blob/master/azure/azure-extension/README.md). 
- 
-
-
-
 
