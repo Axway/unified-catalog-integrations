@@ -29,6 +29,7 @@ Follow the steps bellow to use this example:
 
 
 ### Step 1: Create Amplify Central Service Account
+***
 
 Save the clientId and clientSecret from the response which will be used in Integration Builder flow.
 
@@ -69,17 +70,17 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/PostmanAuthenticate.PNG" width="300" height="450" /> 
  
 4. From the new screen, go to _Authorization_ and click on _Get New Access Token_. To authenticate use: 
-* Grant Type: `Implicit`
-* Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360&redirect_uri=https://apicentral.axway.com`
-* Client ID: `apicentral`
+   - Grant Type: `Implicit`
+   - Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360&redirect_uri=https://apicentral.axway.com`
+   - Client ID: `apicentral`.
 
-<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
+ <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
 
-Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
+5. Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
 
-5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdow, and then click on the eye button next to the dropdown. 
-* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
-* Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
+6. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdow, and then click on the eye button next to the dropdown. 
+   - Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
+   - Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
 
 <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/ConfigureEnvironmentPostman.PNG" width="600" height="400" /> 
 
@@ -88,7 +89,7 @@ Copy the access token. You will use this to set the AMPLIFY Central Production e
 
 <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/CreateServiceAccount.PNG" width="600" height="250" /> 
 
-Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
+7. Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
 
 ```json
 {
@@ -111,8 +112,43 @@ Save the **clientId** and **clientSecret** from the response which will be used 
 }
 ```
 
-### Step 3: Microsoft Teams flow to Approve / Reject subscription requests
+### Step 2: Configure Integration Builder flow to update subscriptions and send email notifications
+---
+This Integration Builder flow will receive the approve or reject requests from Microsoft Teams and unsubscribe requests from Unified Catalog, then will subscribe / unsubscribe the consumer to the APIs in Mulesoft and updates the Subscription states in Unified Catalog. It will also send email notifications to the user with the key to authenticate the API calls.
 
+> Note: If you don't want or cannot use Microsoft Teams for subscription notifications, use this flow **[MuleSoft_Registration_Flow_No_MSTeams.json](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/MuleSoft_Registration_Flow_No_MSTeams.json)** and skip _Step 3: Microsoft Teams flow to Approve / Reject subscription requests_.
+
+To configure the Integration Builder flow, follow this steps:
+
+1. Download the Integration Builder flow **[MuleSoft Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/integrationbuilder/MuleSoft%20Registration%20Flow.json)** from this repo.
+2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).
+3. Import the flow as a **Flow template**.
+   - Go to `Flows`, click on `Build New Flow`.
+   - Select `Import` and choose the flow that you downloaded in the previous step.
+   - Provide a `Name` and click on `Create' to save your flow template.
+4. Configure a **Connector instance** to send email notifications to Outlook.
+   - From `Connectors`, search for `Outlook Email` connector in the search box.
+   - Select the `Outlook Email` connector and click `Authenticate`.
+   - Provide a `Name` and click on `Create instance`. You will be redirected to authenticate with your Outlook credentials.
+   - Go to `Instances` and look for the connector instance that you just created.
+5. Create a flow instance to replace the Value variables in the template with specific values to connect to your Mulesoft environment and AMPLIFY platform tenant.
+- Navigate to `Flows`, select your flow template and click `Create Instance'.
+- Provide a `Name` for the instance.
+- Select the `outlookEmail` connector instance that you created at _Step 4_.
+- Provide values for all required Variables:
+  - `axwayClientId`: The `clientId` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
+  - `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
+  - `axwayTenantId`: The organization id of your AMPLIFY account. 
+  - `muleSoftOrgID`: The organization id of your Mulesoft Anypoint account.
+  - `muleSoftUserName`: The username for your Mulesoft Anypoint account.
+  - `muleSoftPassword`:The password for your Mulesfot Anypoint account.
+  - `apiCentralUrl`: The link to your AMPLIFY Central environment. For production use https://apicentral.axway.com.
+  - `platformUrl`: Set the url to your AMPLIFY platform account. For production use: https://platform.axway.com.
+- Select `Create instance`. Please make sure to save the instance id. You will need it later.
+  
+ **Watch the [demo video](https://youtu.be/0mJXeD_zJhI) as we break down and explain how to import and configure the flow template.**
+
+### Step 3: Microsoft Teams flow to Approve / Reject subscription requests
 ---
 
 **AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions. This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step.
@@ -617,11 +653,10 @@ The above resources structure map to the API Server REST API resources as define
 
 <img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/APIServerResourcesDataModel.png" width="560" height="200" />
 
-Learn how to install, configure and run the CLI extenstion [here](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/mulesoft-extension/README.md).
+Before you proceed, you can check the full list of supported commands [here](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/mulesoft-extension/README.md).
 
-Follow these steps to download and configure the AMPLIFY Centra resources to publish from Mulesoft to Unified Catalog.
 
-**1. Install @axway/mulesoft-extension**
+#### 1. Install @axway/mulesoft-extension
 
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central.
 
@@ -642,9 +677,11 @@ npm install @axway/amplify-central-mulesoft-extension
 amplify central config set extensions.mulesoft-extension <path to where you installed module>
 ```
 
-**2. Configure extension**
+To verify if the CLI extension was successfully set, you can run: `amplify central mulesoft-extension config -h`.
 
-Configure the extentions prior to generating the resources.
+#### 2. Configure extension
+
+Configure the extension prior to generating the resources.
 You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one, visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html).
 
 Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
@@ -653,7 +690,7 @@ Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify
 amplify auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
 ```
 
-Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
+**Example**: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
 
 Set the output directory where you want the resources to be generated.
 
@@ -661,42 +698,42 @@ Set the output directory where you want the resources to be generated.
 amplify central mulesoft-extension config set --output-dir=<directory_name>
 ```
 
-Example: `amplify central mulesoft-extension config set --output-dir="./mulesoft-resources"`.
+**Example**: `amplify central mulesoft-extension config set --output-dir="./mulesoft-resources"`.
 
-Set the environment name:
+Set the environment name.
 
 ```powershell
 amplify central mulesoft-extension config set --environment-name=<env_name>
 ```
 
-Example: `amplify central mulesoft-extension config set --environment-name=mulesoft-env`
+**Example**: `amplify central mulesoft-extension config set --environment-name=mulesoft-env`
 
-Set the organization id for your Mulesoft account:
+Set the organization id for your Mulesoft account.
 
 ```powershell
 amplify central mulesoft-extension config set --master-organization-id=<mulesoft_org_id>
 ```
 
-Choose to fetch the mock endpoints with the APIs in Mulesoft. Set to `false`, you don't want to include the mock endpoints.
+Choose to fetch the mock endpoints with the APIs in Mulesoft. Set to `false`, if you don't want to include the mock endpoints.
 
 ```powershell
 amplify central mulesoft-extension config set --include-mock-endpoints=true
 ```
 
-Set the Mulesoft username and password:
+Set the Mulesoft username and password.
 
 ```powershell
 amplify central mulesoft-extension config set --username=<mulesoft_username>
 amplify central mulesoft-extension config set --password=<mulesoft_password>
 ```
 
-Set the image for the environment
+Set the image for the environment.
 
 ```powershell
 amplify central mulesoft-extension config set --icon=<path_to_your_image>
 ```
 
-Set to publish your Mulesoft assets to the Unified Catalog. By default, it is set to `false`.
+Choose to publish your Mulesoft assets to the Unified Catalog. By default, it is set to `false`.
 
 ```powershell
 amplify central mulesoft-extension config set --generate-consumer-instances=true
@@ -705,7 +742,7 @@ amplify central mulesoft-extension config set --generate-consumer-instances=true
 Set the Webhook URL to send the HTTP POST request for a subcription update event.
 
 ```powershell
-amplify central mulesoft-extension config set --webhook-url=MS_FLOW_HTTP_POST_URL
+amplify central mulesoft-extension config set --webhook-url="MS_FLOW_HTTP_POST_URL"
 ```
 
 > **Note**: If you skipped the MF FLow Step, set the webhook-url to the Integration Builder execution url: `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`
@@ -718,26 +755,38 @@ amplify central mulesoft-extension config set --webhook-secret=${SECRET}
 
 > **Note**: If you skipped the MF FLow Step, the webhook secret will be Integration Builder credentials: User \***\*, Organization \*\***
 
-**3. Generate AMPLIFY Central resources**`
+You can run `amplify central mulesoft-extension config` to see mulesoft-extension configuration.  
 
-The generate command will create AMPLIFY Central resource files for your configured Mulesoft instance. These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
+
+#### 3. Generate AMPLIFY Central resources
+
+The `generate` command will create AMPLIFY Central resource files for your configured Mulesoft instance. These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
+
+**Important**: Only the APIs in Mulesoft that have an SLA assigned will be imported in AMPLIFY Central. 
 
 ```
 amplify central mulesoft-extension resources generate
 ```
 
-**4. Fetch the APIs in Mulesoft and publish to Catalog**
+**4.  Publish APIs to Unified Catalog**
 
 After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
+
+Create the Environment in AMPLIFY Central.
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
 amplify central create --file=<path_to_environment_file>
+```
+
+Import the APIs in AMPLIFY Central and publish them to the Unified Catalog. You need to run this command for each _service_yaml_ file. 
+
+```powershell
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
 amplify central create -f=~<path_to_service_yaml_file>
 ```
 
-Example:
+**Example**
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
