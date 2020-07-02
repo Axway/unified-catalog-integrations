@@ -635,7 +635,6 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 Watch the [demo video](https://youtu.be/yGwK9_y-GCU) as we break down and explain how to import and configure the flow template.
 
 ### Step 4: Install and configure @axway/mulesoft-extension
-
 ---
 
 AMPLIFY Central CLI extension to fetch the APIs from Mulesoft Anypoint Exchange and build the resources needed to publish to the AMPLIFY Unified Catalog. The following set of resources were configured.
