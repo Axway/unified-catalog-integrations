@@ -792,7 +792,8 @@ amplify central azure-extension config set --resource-group-name=<your_azure_res
 
 ![Azure API Management Service](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPIManagementService.png).
 
-  
+ You can run `amplify central azure-extension config` to see the azure-extension configuration.  
+ 
 **3. Generate AMPLIFY Central resources**`
 
 The generate command will create AMPLIFY Central resource files for your configured Azure instances. These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
