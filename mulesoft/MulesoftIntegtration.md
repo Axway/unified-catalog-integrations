@@ -120,7 +120,7 @@ This Integration Builder flow will receive the approve or reject requests from M
 
 To configure the Integration Builder flow, follow this steps:
 
-1. Download the Integration Builder flow **[MuleSoft Registration Flow.json](https://github.com/Axway/mulesoft-catalog-integration/blob/master/integrationbuilder/MuleSoft%20Registration%20Flow.json)** from this repo.
+1. Download the Integration Builder flow **[MuleSoft Registration Flow.json](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/MuleSoft%20Registration%20Flow.json)** from this repo.
 2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).
 3. Import the flow as a **Flow template**.
    - Go to `Flows`, click on `Build New Flow`.
