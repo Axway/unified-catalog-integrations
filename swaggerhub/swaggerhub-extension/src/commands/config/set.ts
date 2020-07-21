@@ -14,17 +14,19 @@ const { log } = snooplogg("swaggerhub-extension: config: set");
 export const set = {
   action: ({ argv }: args) => {
     log("Setting config");
-    const config: Partial<Config> = readJsonSync(configFilePath);
-    (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
-      if (Object.values(ConfigKeys).includes(k)) {
-        log(`Overriding config for ${k}`);
-        log(`Current: ${config[k]}. New: ${argv[k]}`);
-        config[k] = argv[k];
-      }
-    });
+    if (Object.values(ConfigKeys).some((k) => (Object.keys(argv) as Array<keyof Config>).includes(k))) {
+      const config: Partial<Config> = readJsonSync(configFilePath);
+      (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
+        if (Object.values(ConfigKeys).includes(k)) {
+          log(`Overriding config for ${k}`);
+          log(`Current: ${config[k]}. New: ${argv[k]}`);
+          config[k] = argv[k];
+        }
+      });
 
-    log(`Writing updated config file: ${configFilePath}`);
-    outputJsonSync(configFilePath, config);
+      log(`Writing updated config file: ${configFilePath}`);
+      outputJsonSync(configFilePath, config);
+    } else throw new Error("Missing required configuration properties to set");
   },
   desc: "Set AMPLIFY Central swaggerhub-extension configuration",
   aliases: ["set"],
