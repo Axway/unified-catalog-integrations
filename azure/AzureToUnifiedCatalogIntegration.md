@@ -111,7 +111,7 @@ Save the **clientId** and **clientSecret** from the response which will be used 
 ### Step 2: Create a Service Principal in Azure API Management using the CLI
 ***
 
-This will be used to authenticate to Azure API Managemement. 
+This will be used to authenticate to Azure API Management. 
 
 1. Install the CLI: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest. 
 2. After you install the CLI, run `az login` command. You will be redirected to login with to your Azure account. 
@@ -708,8 +708,14 @@ You can then install the @axway/amplify-central-azure-extension:
 
 ```powershell
 npm install @axway/amplify-central-azure-extension
-amplify central config set extensions.azure-extension <path to where you installed module>
 ```
+
+The installation would present the command to add this extension to the AMPLIFY Central CLI following this template:
+
+```powershell
+amplify central config set extensions.azure-extension <path to where you installed the extension>
+```
+
 To verify if the CLI extension was successfully set, you can run: `amplify central azure-extension config -h`.
 
 **2. Configure extension**
@@ -738,11 +744,6 @@ Example: `amplify central azure-extension config set --environment-name=azure-en
 * Set the image for the environment
 ```powershell
 amplify central azure-extension config set --icon=<path_to_your_image>
-```
-
-* Set to publish your Azure assets to the Unified Catalog. By default, it is set to `false`. 
-```powershell
-amplify central azure-extension config set --generate-consumer-instances=true
 ```
 
 * Set the filtering option. Only APIs with this tag will be fetched from Azure. if there is no filter set, then all the apis will be fetched. 

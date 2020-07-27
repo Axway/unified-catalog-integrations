@@ -24,5 +24,5 @@ const info = (header, example) => {
 };
 info(
 	'Extension Installed: You may now add it to the Central CLI\n',
-	`$ amplify central config set extensions.azure .${path.sep}node_modules${path.sep}@axway${path.sep}amplify-central-azure-extension`
+	`$ amplify central config set extensions.azure-extension ${process.cwd()}${path.sep}node_modules${path.sep}@axway${path.sep}amplify-central-azure-extension`
 );
