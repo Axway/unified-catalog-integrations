@@ -671,7 +671,12 @@ You can then install the @axway/amplify-central-mulesoft-extension:
 
 ```powershell
 npm install @axway/amplify-central-mulesoft-extension
-amplify central config set extensions.mulesoft-extension <path to where you installed module>
+```
+
+The installation would present the command to add this extension to the AMPLIFY Central CLI following this template:
+
+```powershell
+amplify central config set extensions.mulesoft-extension <path to where you installed the extension>
 ```
 
 To verify if the CLI extension was successfully set, you can run: `amplify central mulesoft-extension config -h`.
