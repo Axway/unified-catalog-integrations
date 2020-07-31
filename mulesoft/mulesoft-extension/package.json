@@ -1,6 +1,6 @@
 {
   "name": "@axway/amplify-central-mulesoft-extension",
-  "version": "0.0.1",
+  "version": "0.0.3-dev.0",
   "description": "Create AMPLIFY Central resources from Mulesoft API Management APIs",
   "author": {
     "email": "support@axway.com",
