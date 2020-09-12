@@ -72,7 +72,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
  
 4. From the new screen, go to _Authorization_ and click on _Get New Access Token_. To authenticate use: 
 * Grant Type: `Implicit`
-* Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360&redirect_uri=https://apicentral.axway.com`
+* Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360`
 * Client ID: `apicentral`
 
 ![postman image](../images/GetAccessTokenPostman.PNG) 
