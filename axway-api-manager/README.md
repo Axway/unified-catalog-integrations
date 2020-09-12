@@ -127,86 +127,103 @@ The MS flow will also post notifications in the channel for any subscription upd
 **To configure the flow:**
 
 #### 1. Navigate to [Microsoft Flow](https://flow.microsoft.com).
-#### 2. Create the Webhook entry point that Unified Catalog will send the events to. 
-        * Go to "My flows". 
-        * Create an `Instant flow`, provide a `name` and select `When an HTTP request is received` as an entry point.
-        * In the request json body schema, copy and paste the Subscription Updated Event schema below: 
-    
-    ```json
-    {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "time": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                },
-                "product": {
-                    "type": "string"
-                },
-                "correlationId": {
-                    "type": "string"
-                },
-                "organization": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string"
-                        }
+#### 2. Create the Webhook entry point that Unified Catalog will send the events to.
+
+* Go to "My flows". 
+* Create an `Instant flow`, provide a `name` and select `When an HTTP request is received` as an entry point.
+* In the request json body schema, copy and paste the Subscription Updated Event schema below: 
+
+```json
+{
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string"
+            },
+            "time": {
+                "type": "string"
+            },
+            "version": {
+                "type": "string"
+            },
+            "product": {
+                "type": "string"
+            },
+            "correlationId": {
+                "type": "string"
+            },
+            "organization": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
                     }
-                },
-                "type": {
-                    "type": "string"
-                },
-                "payload": {
-                    "type": "object",
-                    "properties": {
-                        "consumerInstance": {
-                            "type": "object",
-                            "properties": {
-                                "kind": {
+                }
+            },
+            "type": {
+                "type": "string"
+            },
+            "payload": {
+                "type": "object",
+                "properties": {
+                    "consumerInstance": {
+                        "type": "object",
+                        "properties": {
+                            "kind": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "tags": {
+                                "type": "array",
+                                "items": {
                                     "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "tags": {
-                                    "type": "array",
-                                    "items": {
+                                }
+                            },
+                            "group": {
+                                "type": "string"
+                            },
+                            "metadata": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
                                         "type": "string"
-                                    }
-                                },
-                                "group": {
-                                    "type": "string"
-                                },
-                                "metadata": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "audit": {
-                                            "type": "object",
-                                            "properties": {
-                                                "createUserId": {
-                                                    "type": "string"
-                                                },
-                                                "modifyUserId": {
-                                                    "type": "string"
-                                                },
-                                                "createTimestamp": {
-                                                    "type": "string"
-                                                },
-                                                "modifyTimestamp": {
-                                                    "type": "string"
-                                                }
+                                    },
+                                    "audit": {
+                                        "type": "object",
+                                        "properties": {
+                                            "createUserId": {
+                                                "type": "string"
+                                            },
+                                            "modifyUserId": {
+                                                "type": "string"
+                                            },
+                                            "createTimestamp": {
+                                                "type": "string"
+                                            },
+                                            "modifyTimestamp": {
+                                                "type": "string"
                                             }
-                                        },
-                                        "scope": {
+                                        }
+                                    },
+                                    "scope": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "kind": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "references": {
+                                        "type": "array",
+                                        "items": {
                                             "type": "object",
                                             "properties": {
                                                 "id": {
@@ -217,162 +234,145 @@ The MS flow will also post notifications in the channel for any subscription upd
                                                 },
                                                 "name": {
                                                     "type": "string"
-                                                }
-                                            }
-                                        },
-                                        "references": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "string"
-                                                    },
-                                                    "kind": {
-                                                        "type": "string"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    },
-                                                    "type": {
-                                                        "type": "string"
-                                                    }
                                                 },
-                                                "required": [
-                                                    "id",
-                                                    "kind",
-                                                    "name",
-                                                    "type"
-                                                ]
-                                            }
-                                        },
-                                        "resourceVersion": {
-                                            "type": "string"
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "kind",
+                                                "name",
+                                                "type"
+                                            ]
                                         }
-                                    }
-                                },
-                                "apiVersion": {
-                                    "type": "string"
-                                },
-                                "attributes": {
-                                    "type": "object",
-                                    "properties": {
-                                        "release": {
-                                            "type": "string"
-                                        }
+                                    },
+                                    "resourceVersion": {
+                                        "type": "string"
                                     }
                                 }
-                            }
-                        },
-                        "subscription": {
-                            "type": "object",
-                            "properties": {
-                                "id": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "userId": {
-                                    "type": "string"
-                                },
+                            },
+                            "apiVersion": {
+                                "type": "string"
+                            },
+                            "attributes": {
+                                "type": "object",
                                 "properties": {
-                                    "type": "object",
-                                    "additionalProperties": true
-                                },
-                                "metadata": {
-                                    "type": "object",
-                                    "properties": {
-                                        "createUserId": {
-                                            "type": "string"
-                                        }
+                                    "release": {
+                                        "type": "string"
                                     }
-                                },
-                                "currentState": {
-                                    "type": "string"
-                                },
-                                "owningTeamId": {
-                                    "type": "string"
-                                },
-                                "relationships": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "path": {
-                                                "type": "string"
-                                            },
-                                            "spec": {
-                                                "type": "string"
-                                            },
-                                            "type": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "key",
-                                            "path",
-                                            "spec",
-                                            "type",
-                                            "value"
-                                        ]
-                                    }
-                                },
-                                "nextPossibleStates": {
-                                    "type": "array"
-                                },
-                                "currentStateDescription": {
-                                    "type": "string"
                                 }
                             }
-                        },
-                        "catalogItem": {
-                            "type": "object",
+                        }
+                    },
+                    "subscription": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "userId": {
+                                "type": "string"
+                            },
                             "properties": {
-                                "id": {
-                                    "type": "string"
-                                },
-                                "name": {
-                                    "type": "string"
-                                },
-                                "owningTeamId": {
-                                    "type": "string"
-                                },
-                                "relationships": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {
-                                                "type": "string"
-                                            },
-                                            "path": {
-                                                "type": "string"
-                                            },
-                                            "spec": {
-                                                "type": "string"
-                                            },
-                                            "type": {
-                                                "type": "string"
-                                            },
-                                            "value": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "required": [
-                                            "key",
-                                            "path",
-                                            "spec",
-                                            "type",
-                                            "value"
-                                        ]
+                                "type": "object",
+                                "additionalProperties": true
+                            },
+                            "metadata": {
+                                "type": "object",
+                                "properties": {
+                                    "createUserId": {
+                                        "type": "string"
                                     }
+                                }
+                            },
+                            "currentState": {
+                                "type": "string"
+                            },
+                            "owningTeamId": {
+                                "type": "string"
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        },
+                                        "spec": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "path",
+                                        "spec",
+                                        "type",
+                                        "value"
+                                    ]
+                                }
+                            },
+                            "nextPossibleStates": {
+                                "type": "array"
+                            },
+                            "currentStateDescription": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "catalogItem": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "owningTeamId": {
+                                "type": "string"
+                            },
+                            "relationships": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        },
+                                        "spec": {
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "type": "string"
+                                        },
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": [
+                                        "key",
+                                        "path",
+                                        "spec",
+                                        "type",
+                                        "value"
+                                    ]
                                 }
                             }
                         }
@@ -380,7 +380,8 @@ The MS flow will also post notifications in the channel for any subscription upd
                 }
             }
         }
-    ```
+    }
+```
 
 ![](../images/MSFlow-Step1.PNG)
 
