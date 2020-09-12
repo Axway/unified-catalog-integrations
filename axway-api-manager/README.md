@@ -613,4 +613,25 @@ For Default switch branch, we will add a `Terminate` action with `"@{triggerBody
 
 ![](./images/UpdateSubscriptionResults.png)
 
+
 #### 9. Save the flow
+
+#### 10. Configure the API Manager Subscriptions Approval Webhook settings
+
+Configure the API Manager agent subscriptions approval webhook as specified in the 
+[docs](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/agent-variables/index.html).
+
+Set `CENTRAL_SUBSCRIPTIONS_APPROVAL_MODE` to `manual`
+
+Set `CENTRAL_SUBSCRIPTIONS_APPROVAL_WEBHOOK_HEADERS` to `Header=contentType,Value=application/json`
+
+Copy the `HTTP POST URL` from the initial MS flow step:
+
+![](./images/InitialStepURL.png)
+
+Example: 
+`https://prod-19.westeurope.logic.azure.com:443/workflows/7dec70fd23a44bc8ad6d7b14e5ea78ec/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=N8eW1VYHzhGiMB9l4_AohLui0kG1C4JTKR6Zc2kZeFs`
+
+Set `CENTRAL_SUBSCRIPTIONS_APPROVAL_WEBHOOK_URL` to the copied value.
+
+Restart the agent.
