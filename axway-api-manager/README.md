@@ -4,12 +4,12 @@
 The basic use case is as follows:
 
 **API Provider**
-* Will publish APIs from Axway API Manager into the Unified Catalog via the agents.  Those APIs will require manual approval of subscription requests from consumers.
+* Will publish APIs from **Axway API Manager** into the AMPLIFY Unified Catalog via the agents.  Those APIs will require manual approval of subscription requests from consumers.
 * Is notified in Microsoft Teams when there is a new subscription requests, and will approve or reject the request. 
 
 **API Consumer**
 * Discovers the API in the Unified Catalog and request access by subscribing.
-* On approval, a subscription key will be created in Axway API Manager by the agent and the keys will be sent to the API Consumer's email. 
+* On approval, a subscription key will be created in **Axway API Manager** by the agent and the keys will be sent to the API Consumer's email. 
 After the key has been sent, the state of the Subscription in Unified Catalog gets updated by the agent to Active and the Consumer can now use the API with the keys that were received over email. 
 * Can cancel the subscription from the Unified Catalog. When cancelled, the subscription in Axway API Manager will be removed and the state of the Unified Catalog subscription will be updated to unsubscribed, indicating the consumer will no longer be able to use the API. 
  
@@ -518,7 +518,8 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 ![](../images/MSFlow-Step4.PNG)
 
 For easier access to the Adaptive card data, rename it to *card*.
-On the top right corner of the card, click the ellipsis (...), then pick *Rename* to *card* 
+On the top right corner of the card, click the ellipsis (...), then pick *Rename* to *card*.
+ 
 ![](./images/rename_action.png)
  
 
@@ -539,7 +540,7 @@ Add an action of type `HTTP` to configure calling to Integration Builder
 ![](./images/GetToken.png)
 
 
-#### 6. Add a *Control* action of type *Switch* to check the response of the *GetToken* http call
+#### 6. Add a `Control` action of type `Switch` to check the response of the `GetToken` http call
 Click on the `On` input and on the `Add dynamic content` link. Select `Status code` from the `GetToken` action.
 ![](./images/PickStatusCodeGetToken.png)
 Click on the ellipsis (...) of the Switch action and select *Configure run after*. 
@@ -565,12 +566,12 @@ Add an action of type `HTTP`
    * Rename the action to CheckSubscription
    ![](./images/CheckSubscription.png)
 
-#### 7. Now similar to GetToken, we nee to take care of the errors. So we'll add a new action of type Switch
+#### 7. Now similar to `GetToken`, we need to take care of the errors. So we'll add a new action of type `Switch`
 
-For `On` value, we pick the status code for the CheckSubscription step.
+For `On` value, we pick the status code for the `CheckSubscription` step.
 [](./images/CheckSubscriptionSwitch.png)
 
-Update the switch step so it runs for errors in the CheckSubscription spec.
+Update the switch step so it runs for errors in the `CheckSubscription` spec.
 ![](./images/CheckSubscriptionsSwitchRunOnErros.png)
 
 We now have to check if the catalog item or subscriptions are not present in Amplify Central, so we check if the call return 404.
@@ -601,12 +602,14 @@ Create an HTTP action with:
    * Click on `Show advanced options` and set `Authorization` to `Raw` and for value `Bearer @{body('GetToken')?['access_token']}`
 ![](./images/UpdateSubscriptionPOST.png)
 
-Add a action of type Switch to check the response and handle the errors (set it to run for after HTTP post Errors as well).
+Add a action of type `Switch` to check the response and handle the errors (set it to run for after HTTP post Errors as well).
 
 For `201`, we send back a teams channel notification that the operation was executed.
+
 For `400`, we notify that the subscription state has been changed from REQUESTED since the card was posted. We send a message to a teams channel with the current state.
 `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" was not "@{if(equals(body('card').data.action,'approved'), 'APPROVED','REJECTED')}" as it was already in @{body('CheckSubscription')?['state']} state` 
-For Default switch branch, we will add a Terminate action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
+
+For Default switch branch, we will add a `Terminate` action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
 
 ![](./images/UpdateSubscriptionResults.png)
 
