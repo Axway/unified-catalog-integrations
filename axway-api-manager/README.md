@@ -604,12 +604,14 @@ Create an HTTP action with:
 
 Add a action of type `Switch` to check the response and handle the errors (set it to run for after HTTP post Errors as well).
 
+![](./images/SubscriptionUpdateErrorCheck.png)
+
 For `201`, we send back a teams channel notification that the operation was executed.
 
 For `400`, we notify that the subscription state has been changed from REQUESTED since the card was posted. We send a message to a teams channel with the current state.
 `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" was not "@{if(equals(body('card').data.action,'approved'), 'APPROVED','REJECTED')}" as it was already in @{body('CheckSubscription')?['state']} state` 
 
-For Default switch branch, we will add a `Terminate` action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
+For Default `Switch` branch, we will add a `Terminate` action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
 
 ![](./images/UpdateSubscriptionResults.png)
 
