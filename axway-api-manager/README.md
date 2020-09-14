@@ -53,7 +53,7 @@ ORG_ID=<org_id_value> && TOKEN=$(amplify auth list --json | jq -r ".[] | select(
 --header 'Content-Type: application/json' \
 --data-raw '{
   "serviceAccountType": "DOSA",
-  "serviceAccountName": "IntegrationBuilderSA",
+  "serviceAccountName": "catalog-integration",
   "clientAuthType": "SECRET"
 }'
 ```
@@ -64,7 +64,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
 
-2. Import the [AMPLFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
+2. Import the [AMPLIFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
 
 3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
 
@@ -77,7 +77,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 ![postman image](../images/GetAccessTokenPostman.PNG) 
 
-Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
+Copy the access token. You will use this to set the AMPLIFY Central Production environment variables. 
 
 5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
 * Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
