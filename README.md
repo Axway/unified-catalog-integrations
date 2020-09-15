@@ -1,5 +1,5 @@
 ### Unified Catalog integrations
-This repo provides a set of assets that can help you automate the discovery of all integration assets and APIs, from across multiple environments, such as Azure, and publish them in a centralized catalog to drive consumption and reuse of your existing APIs. These environmments can alse be repositories such as GitHub, SwaggerHub.
+This repo provides a set of assets that can help you automate the discovery of all integration assets and APIs, from across multiple environments, such as Azure, and publish them in a centralized catalog to drive consumption and reuse of your existing APIs. These environments can also be repositories such as GitHub, SwaggerHub.
 
 AMPLIFY Unified Catalog  provides event-driven subscription management capabilities, that can enable you to create custom subscription flows for each registered environment, enabling complex approval flows and integration with existing systems to streamline experience and reduce time for approval. The full capabilities of the Unified Catalog are available through CLI to automate the discovery and management of your APIs in the Catalog. 
 
@@ -26,3 +26,6 @@ Check our [readme](https://github.com/Axway/unified-catalog-integrations/blob/ma
 
 ### Integration with Apigee
 Check our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/apigee/apigee-extension/README.md) to learn how to fetch your API definitions from Apigee and publish them to the Unified Catalog. 
+
+### Integration with Axway API Manager
+Check our [readme](./axway-api-manager/README.md) to learn how set up a Subscription Approval flow for Axway API Manager.
