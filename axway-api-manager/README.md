@@ -621,7 +621,7 @@ Create a `Post a message as the Flow bot to a channel` action with message that 
 
 ![](./images/ChangeSubscriptionState400.png)
 
-For Default `Switch` branch, we will add a `Terminate` action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
+For Default `Switch` branch, we will add a `Terminate` action with `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" state for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" was not updated. Received status code @{outputs('HTTP')['statusCode']}"`
 ![](./images/ChangeSubscriptionStateDefault.png)
 
 
