@@ -533,7 +533,7 @@ Add an action of type `HTTP` to configure doing REST API Calls to AMPLIFY Centra
    * Set `URI`to `https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token` 
    * Add a `Header` with key `Content-Type` and value `application/x-www-form-urlencoded`
    * Set the `Body`to `grant_type=client_credentials` 
-   * Click on `Show advanced options` and set `Authorization` to `Basic`. 
+   * Click on `Show advanced options` and set `Authentication` to `Basic`. 
    For username, set the value of the **clientId**
    For password, set the value of the **clientSecret**
    * Rename the action to GetToken
@@ -563,14 +563,14 @@ Add an action of type `HTTP`
    * Set `Method`to `GET`
    * Set `URI`to `https://apicentral.axway.com/api/unifiedCatalog/v1/catalogItems/@{triggerBody()?['payload']?['catalogItem']?['id']}/subscriptions/@{triggerBody()?['payload']?['subscription']?['id']}` 
    * Add a `Header` with key `Content-Type` and value `application/json` and another one with `Accept` key and value `application/json`
-   * Click on `Show advanced options` and set `Authorization` to `Raw` and for value `Bearer @{body('GetToken')?['access_token']}`
+   * Click on `Show advanced options` and set `Authentication` to `Raw` and for value `Bearer @{body('GetToken')?['access_token']}`
    * Rename the action to CheckSubscription
    ![](./images/CheckSubscription.png)
 
 #### 7. Now similar to `GetToken`, we need to take care of the errors. So we'll add a new action of type `Switch`
 
 For `On` value, we pick the status code for the `CheckSubscription` step.
-[](./images/CheckSubscriptionSwitch.png)
+![](./images/CheckSubscriptionSwitch.png)
 
 Update the switch step so it runs for errors in the `CheckSubscription` spec.
 ![](./images/CheckSubscriptionsSwitchRunOnErros.png)
@@ -578,7 +578,7 @@ Update the switch step so it runs for errors in the `CheckSubscription` spec.
 We now have to check if the catalog item or subscriptions are not present in Amplify Central, so we check if the call return 404.
 On the 404, we will send an update to the same teams channel that the data is not there anymore.
 
-Create a Post a message as the Flow bot to a channel and set the message to:
+Create a `Post a message as the Flow bot to a channel` and set the message to:
 `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" does not exist anymore.`
 
 On the `Default` case we will fail the execution as in the previous step.
@@ -600,7 +600,7 @@ Create an HTTP action with:
      "description": "@{body('card')?['data']?['comment']}"
    }
    `
-   * Click on `Show advanced options` and set `Authorization` to `Raw` and for value `Bearer @{body('GetToken')?['access_token']}`
+   * Click on `Show advanced options` and set `Authentication` to `Raw` and for value `Bearer @{body('GetToken')?['access_token']}`
 ![](./images/UpdateSubscriptionPOST.png)
 
 Add a action of type `Switch` to check the response and handle the errors (set it to run for after HTTP post Errors as well).
@@ -609,10 +609,23 @@ Add a action of type `Switch` to check the response and handle the errors (set i
 
 For `201`, we send back a teams channel notification that the operation was executed.
 
-For `400`, we notify that the subscription state has been changed from REQUESTED since the card was posted. We send a message to a teams channel with the current state.
+Create a `Post a message as the Flow bot to a channel` action with message: `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" was "@{if(equals(body('card').data.action,'approved'), 'APPROVED','REJECTED')}"`
+![](./images/ChangeSubscriptionState201.png)
+
+
+For `400`, we notify that the subscription state has been changed from REQUESTED since the card was posted. 
+
+Create a `Post a message as the Flow bot to a channel` action with message that includes the current state of the subscription:
+
 `Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}" was not "@{if(equals(body('card').data.action,'approved'), 'APPROVED','REJECTED')}" as it was already in @{body('CheckSubscription')?['state']} state` 
 
+![](./images/ChangeSubscriptionState400.png)
+
 For Default `Switch` branch, we will add a `Terminate` action with `"@{triggerBody()?['payload']?['subscription']?['name']}" for catalog item "@{triggerBody()?['payload']?['catalogItem']?['name']}"`
+![](./images/ChangeSubscriptionStateDefault.png)
+
+
+Combining the above cases, the update subscription switch should have those conditions now:
 
 ![](./images/UpdateSubscriptionResults.png)
 
