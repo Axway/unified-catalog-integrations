@@ -22,7 +22,7 @@ to discover the APIs and publish them to Unified AMPLIFY Unified Catalog
 Follow the steps below to use this example: 
 
 ### Prerequisites: Configure the Axway V7 agent to discover and publish the APIs from Axway API Manager
-Documentation available [here](https://www.microsoft.com/en-us/microsoft-365/microsoft-teams)
+Documentation available [here](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/filtering-apis-to-be-discovered/index.html)
 
 ### Step 1: Create Amplify Central Service Account
 
