@@ -64,7 +64,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
 
-2. Import the [AMPLIFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
+2. Import the [AMPLIFY Environment configuration file](httconfigure calling to Integration Builderps://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
 
 3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
 
@@ -527,7 +527,7 @@ On the top right corner of the card, click the ellipsis (...), then pick *Rename
 #### 5. Get a Bearer token from platform using the **clientId** and **clientSecret** from **Step 1**
 
 
-Add an action of type `HTTP` to configure calling to Integration Builder
+Add an action of type `HTTP` to configure doing REST API Calls to AMPLIFY Central.
 
    * Set `Method`to `POST`
    * Set `URI`to `https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token` 
@@ -545,7 +545,7 @@ Add an action of type `HTTP` to configure calling to Integration Builder
 Click on the `On` input and on the `Add dynamic content` link. Select `Status code` from the `GetToken` action.
 ![](./images/PickStatusCodeGetToken.png)
 Click on the ellipsis (...) of the Switch action and select *Configure run after*. 
-Pick all options beside `has timed out`: ![](./images/SwitchRunOnFailuresAsWell.png)
+Pick all options beside `is skipped`: ![](./images/SwitchRunOnFailuresAsWell.png)
 
 On the right side, for the Default behaviour, is where we will treat the error. 
 For this, we will just fail the formula execution, but it can be configured to post back to the channel to inform the 
