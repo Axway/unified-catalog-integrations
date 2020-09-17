@@ -633,8 +633,8 @@ Combining the above cases, the update subscription switch should have those cond
 
 #### 9. Post on Microsoft Teams all subscription state changes
 
-If the provider also wants to track subscription state changes in its Microsoft Teams channel, then on the top `If no` 
-branch on the main top `Condition` set after the trigger, an extra action can be added.
+If the provider also wants to track subscription state changes in its Microsoft Teams channel, then on the `If no` 
+branch on the main top `Condition` added in step 3, an extra action can be added.
 
 Top `if no` branch:
 
