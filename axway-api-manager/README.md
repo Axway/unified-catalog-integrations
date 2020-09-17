@@ -631,9 +631,24 @@ Combining the above cases, the update subscription switch should have those cond
 ![](./images/UpdateSubscriptionResults.png)
 
 
-#### 9. Save the flow
+#### 9. Post on Microsoft Teams all subscription state changes
 
-#### 10. Configure the API Manager Subscriptions Approval Webhook settings
+If the provider also wants to track subscription state changes in its Microsoft Teams channel, then on the top `If no` 
+branch on the main top `Condition` set after the trigger, an extra action can be added.
+
+Top `if no` branch:
+
+![](./images/EventTriggerIfNoCondition.png)
+
+Add a new action as `Post a message as a Flow bot to a channel` with `Message` set to `Subscription ["@{triggerBody()?['payload']?['subscription']?['name']}"](https://apicentral.axway.com/catalog/@{triggerBody()?['payload']?['catalogItem']?['id']}/subscriptions/@{triggerBody()?['payload']?['subscription']?['id']}) for catalog item ["@{triggerBody()?['payload']?['catalogItem']?['name']}"](https://apicentral.axway.com/catalog/@{triggerBody()?['payload']?['catalogItem']?['id']}) state changed to @{triggerBody()?['payload']?['subscription']?['currentState']}`
+
+![](./images/TriggerIfNoConditionPostStateChanges.png)
+
+Now provides will get all the subscriptions state changes updates besides of REQUESTED for which they will receive the Adaptive card.
+
+#### 10. Save the flow
+
+#### 11. Configure the API Manager Subscriptions Approval Webhook settings
 
 Configure the API Manager agent subscriptions approval webhook as specified in the 
 [docs](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/agent-variables/index.html).
