@@ -9,7 +9,8 @@ export enum ConfigKeys {
   PASSWORD = "password",
   MASTER_ORGANIZATION_ID = "masterOrganizationId",
   INCLUDE_MOCK_ENDPOINTS = "includeMockEndpoints",
-  GENERATE_CONSUMER_INSTANCES = "generateConsumerInstances"
+  GENERATE_CONSUMER_INSTANCES = "generateConsumerInstances",
+  ANYPOINT_EXCHANGE_URL = "anypointExchangeUrl"
 }
 
 export type Config = {

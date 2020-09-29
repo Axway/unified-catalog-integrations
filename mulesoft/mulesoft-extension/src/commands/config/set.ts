@@ -14,19 +14,17 @@ const { log } = snooplogg("mulesoft-extension: config: set");
 export const set = {
   action: ({ argv }: args) => {
     log("Setting config");
-    if (Object.values(ConfigKeys).some((k) => (Object.keys(argv) as Array<keyof Config>).includes(k))) {
-      const config: Partial<Config> = readJsonSync(configFilePath);
-      (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
-        if (Object.values(ConfigKeys).includes(k)) {
-          log(`Overriding config for ${k}`);
-          log(`Current: ${config[k]}. New: ${argv[k]}`);
-          config[k] = argv[k];
-        }
-      });
+    const config: Partial<Config> = readJsonSync(configFilePath);
+    (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
+      if (Object.values(ConfigKeys).includes(k)) {
+        log(`Overriding config for ${k}`);
+        log(`Current: ${config[k]}. New: ${argv[k]}`);
+        config[k] = argv[k];
+      }
+    });
 
-      log(`Writing updated config file: ${configFilePath}`);
-      outputJsonSync(configFilePath, config);
-    } else throw new Error("Missing required configuration properties to set");
+    log(`Writing updated config file: ${configFilePath}`);
+    outputJsonSync(configFilePath, config);
   },
   desc: "Set AMPLIFY Central mulesoft-extension configuration",
   aliases: ["set"],
@@ -42,5 +40,6 @@ export const set = {
     "--master-organization-id [value]": "Required: Set your Mulesoft Master Organizatoin Id",
     "--include-mock-endpoints [value]": "Bool to include mock endpoints",
     "--generate-consumer-instances [value]": "Bool to generate consumer instances",
+    "--anypoint-exchange-url [value]" : "Anypoint Exchange URL. Defaults to https://anypoint.mulesoft.com"
   },
 };

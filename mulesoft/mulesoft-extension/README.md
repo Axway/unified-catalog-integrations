@@ -100,6 +100,7 @@ SET OPTIONS:
   --username=<value>  Required: Set your Mulesoft username
   --webhook-secret=<value>  Set secret to invoke webhook
   --webhook-url=<value>  Set webhook url to use
+  --anypoint-exchange-url=<value> Set to change the Mulesoft AnyPoint Exchange URL. Default value is https://anypoint.mulesoft.com
 ```
 
 ---

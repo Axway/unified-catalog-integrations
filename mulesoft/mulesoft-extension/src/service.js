@@ -34,6 +34,10 @@ module.exports = class MulesoftService {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central mulesoft-extension config set -h' to see a list of params`);
 			process.exit(1);
 		}
+
+		if (!this.config.anypointExchangeUrl) {
+			this.config.anypointExchangeUrl = 'https://anypoint.mulesoft.com'
+		}
 	}
 
 	async generateResources () {
@@ -45,7 +49,8 @@ module.exports = class MulesoftService {
 			includeMockEndpoints,
 			generateConsumerInstances,
 			environmentName,
-			outputDir = './resources'
+			outputDir = './resources',
+			anypointExchangeUrl
 		} = this.config;
 	
 		const token = Buffer.from(username + ':' + password).toString('base64');
@@ -56,12 +61,12 @@ module.exports = class MulesoftService {
 		const pageSize = 100;
 		let offset = 0;
 		let entriesLeft = true;
-		console.log('Building Resources');
+		console.log(`Building Resources using AnyPoint Exchange URL ${this.config.anypointExchangeUrl} and master organization id ${masterOrganizationId}`);
 		while (entriesLeft) {
 			const apis = JSON.parse(await this.listAPIs(token, pageSize, offset, masterOrganizationId));
 			entriesLeft = apis.length == pageSize;
 			offset += pageSize;
-	
+			
 			for (let api of apis) {
 				resources = [];
 				try {
@@ -97,7 +102,7 @@ module.exports = class MulesoftService {
 						groupId: api.groupId,
 						assetId: api.assetId
 					};
-					if (generateConsumerInstances && !(type === 'oas3' || type == 'wsdl' || type === 'oas2' || type === 'raml')) {
+					if (generateConsumerInstances && !(type === 'oas3' || type === 'wsdl' || type === 'oas2' || type === 'raml')) {
 						const docs = await this.getAssetHomePage(
 							access_token,
 							api.organization.id,
@@ -204,31 +209,13 @@ module.exports = class MulesoftService {
 					};
 					resources.push(apiServiceRevision);
 	
-					const apiServiceInstance = {
-						apiVersion: 'v1alpha1',
-						kind: 'APIServiceInstance',
-						name: apiServiceName,
-						attributes: attributes,
-						metadata: {
-							scope: {
-								kind: 'Environment',
-								name: environmentName
-							}
-						},
-						spec: {
-							apiServiceRevision: apiServiceRevisionName,
-							endpoint: []
-						}
-					};
-	
+					
 					//add in a default instance, so we can create the apiservice instance and the consumer instance
 					if (
 						apiDetails.instances.filter(
 							instance =>
-								includeMockEndpoints ||
-								(instance.endpointUri &&
-									!instance.endpointUri.startsWith('https://anypoint.mulesoft.com/mocking'))
-						).length == 0
+							includeMockEndpoints === 'true' ||
+								instance.type !== 'mocked').length === 0
 					) {
 						apiDetails.instances.push({ id: '' });
 					}
@@ -237,13 +224,28 @@ module.exports = class MulesoftService {
 						if (!instance) {
 							continue;
 						}
-						if (
-							!includeMockEndpoints &&
-							instance.endpointUri &&
-							instance.endpointUri.startsWith('https://anypoint.mulesoft.com/mocking')
-						) {
+						
+						if (includeMockEndpoints === 'false' && instance.type === 'mocked') {
 							continue;
 						}
+
+						const apiServiceInstance = {
+							apiVersion: 'v1alpha1',
+							kind: 'APIServiceInstance',
+							name: apiServiceName,
+							attributes: attributes,
+							metadata: {
+								scope: {
+									kind: 'Environment',
+									name: environmentName
+								}
+							},
+							spec: {
+								apiServiceRevision: apiServiceRevisionName,
+								endpoint: []
+							}
+						};
+
 						apiServiceInstance.name = apiServiceName + instance.id;
 	
 						if (instance.endpointUri) {
@@ -313,7 +315,7 @@ module.exports = class MulesoftService {
 								spec: {
 									apiServiceInstance: apiServiceInstance.name,
 									state: 'PUBLISHED',
-									name: `${api.name} ` + (attributes.apiId ? `for endpoint ${instance.endpointUri}` : ''),
+									name: `${api.name}` + (attributes.apiId ? ` for endpoint ${instance.endpointUri}` : ''),
 									documentation: docs,
 									subscription: {
 										enabled: attributes.apiId ? true : false,
@@ -348,7 +350,7 @@ module.exports = class MulesoftService {
 	async listAPIs (token, pageSize, offset, orgId) {
 		return requestPromise({
 			method: 'GET',
-			url: `https://anypoint.mulesoft.com/exchange/api/v2/assets?offset=${offset}&limit=${pageSize}&masterOrganizationId=${orgId}`,
+			url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets?offset=${offset}&limit=${pageSize}&masterOrganizationId=${orgId}`,
 			headers: { Authorization: `Basic ${token}` }
 		});
 	}
@@ -357,7 +359,7 @@ module.exports = class MulesoftService {
 		console.log('Logging into Mulesoft');
 		return requestPromise({
 			method: 'POST',
-			url: 'https://anypoint.mulesoft.com/accounts/login',
+			url: `${this.config.anypointExchangeUrl}/accounts/login`,
 			json: {
 				username,
 				password
@@ -368,7 +370,7 @@ module.exports = class MulesoftService {
 	async assetLinkedAPI (token, organizationId, environmentId, assetId) {
 		return requestPromise({
 			method: 'GET',
-			url: `https://anypoint.mulesoft.com/apimanager/api/v1/organizations/${organizationId}/environments/${environmentId}/apis?assetId=${assetId}`,
+			url: `${this.config.anypointExchangeUrl}/apimanager/api/v1/organizations/${organizationId}/environments/${environmentId}/apis?assetId=${assetId}`,
 			headers: { Authorization: `Bearer ${token}` }
 		});
 	}
@@ -376,7 +378,7 @@ module.exports = class MulesoftService {
 	async getAssetHomePage(token, organizationId, groupId, assetId, version) {
 		return requestPromise({
 			method: 'GET',
-			url: `https://anypoint.mulesoft.com/exchange/api/v1/organizations/${organizationId}/assets/${groupId}/${assetId}/${version}/pages/home`,
+			url: `${this.config.anypointExchangeUrl}/exchange/api/v1/organizations/${organizationId}/assets/${groupId}/${assetId}/${version}/pages/home`,
 			headers: { Authorization: `Bearer ${token}` }
 		});
 	}
@@ -462,7 +464,7 @@ module.exports = class MulesoftService {
 		let assetDetails = JSON.parse(
 			await requestPromise({
 				method: 'GET',
-				url: `https://anypoint.mulesoft.com/exchange/api/v2/assets/${api.id}`,
+				url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets/${api.id}`,
 				headers: { Authorization: `Basic ${token}` }
 			})
 		);
