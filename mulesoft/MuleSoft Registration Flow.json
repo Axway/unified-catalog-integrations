@@ -1,549 +1,557 @@
 {
-    "id": 36991,
-    "name": "MuleSoft Registration Flow",
-    "userId": 18408,
-    "accountId": 7688,
-    "createdDate": "2020-06-24T16:43:48Z",
-    "steps": [
-        {
-            "id": 344396,
-            "onSuccess": [
-                "updateSubscriptionStateApproved"
-            ],
-            "onFailure": [],
-            "name": "buildApproveSubData",
-            "type": "script",
-            "properties": {
-                "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'APPROVED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
-            }
-        },
-        {
-            "id": 344397,
-            "onSuccess": [
-                "createMuleSoftContract"
-            ],
-            "onFailure": [],
-            "name": "buildDataToCreateSubscription",
-            "type": "script",
-            "properties": {
-                "body": "const consumerInstance = steps.getApiServerConsumerInstance.response.body;\n\nconst createContractUrl = `${steps.prepareMuleSoftData.url}/${steps.createMuleSoftApp.response.body.id}/contracts`;\n\nconst body = {\n  ...consumerInstance.attributes,\n  'requestedTierId' : steps.readTierId,\n  'version' : '1.0.0',\n  'versionGroup': 'v1'\n}\ndone ({body, createContractUrl});"
-            }
-        },
-        {
-            "id": 344398,
-            "onSuccess": [
-                "updateSubscriptionStateRejected"
-            ],
-            "onFailure": [],
-            "name": "buildRejectedData",
-            "type": "script",
-            "properties": {
-                "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'REJECTED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
-            }
-        },
-        {
-            "id": 344399,
-            "onSuccess": [
-                "deleteApp"
-            ],
-            "onFailure": [],
-            "name": "buildSubFailData",
-            "type": "script",
-            "properties": {
-                "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'FAILED_TO_SUBSCRIBE',\n  \"description\": 'Failed to create subscription- IB Flow'\n  }\n}\n\nconst deleteAppUrl = `${steps.prepareMuleSoftData.url}/${steps.createMuleSoftApp.response.body.id}`;\n\ndone({body,deleteAppUrl})"
-            }
-        },
-        {
-            "id": 344400,
-            "onSuccess": [
-                "deleteAppOnUnsubscribe"
-            ],
-            "onFailure": [],
-            "name": "buildUnsubscribeData",
-            "type": "script",
-            "properties": {
-                "body": "\nconst subData =\n  {\n 'state' : 'UNSUBSCRIBED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n}\n\nconst apps = steps.getApps.response.body;\n\nconst createdApp = apps.find(app => app.name === steps.readTriggerActionAndPrepareData.subscriptionId);\nlet appUrl = '';\nif(createdApp !== undefined) {\n  appUrl = `${steps.prepareMuleSoftData.url}/${createdApp.id}`;\n\n\n}\n\ndone({subData, appUrl})"
-            }
-        },
-        {
-            "id": 344402,
-            "onSuccess": [
-                "updateSubscriptionState"
-            ],
-            "onFailure": [],
-            "name": "buildUpdateSubData",
-            "type": "script",
-            "properties": {
-                "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'ACTIVE',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
-            }
-        },
-        {
-            "id": 344403,
-            "onSuccess": [
-                "buildApproveSubData"
-            ],
-            "onFailure": [
-                "checkActionUnsubscribeInitiated"
-            ],
-            "name": "checkActionApprove",
-            "type": "filter",
-            "properties": {
-                "body": "const action = steps.readTriggerActionAndPrepareData.action;\n\ndone(action.toLowerCase() == \"approved\")"
-            }
-        },
-        {
-            "id": 344404,
-            "onSuccess": [
-                "buildRejectedData"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "checkActionRejected",
-            "type": "filter",
-            "properties": {
-                "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"rejected\");"
-            }
-        },
-        {
-            "id": 344405,
-            "onSuccess": [
-                "getApps"
-            ],
-            "onFailure": [
-                "checkActionRejected"
-            ],
-            "name": "checkActionUnsubscribeInitiated",
-            "type": "filter",
-            "properties": {
-                "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"unsubscribeinitiated\");"
-            }
-        },
-        {
-            "id": 344406,
-            "onSuccess": [
-                "readTierId"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "createMuleSoftApp",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.prepareMuleSoftData.appData}",
-                "url": "${steps.prepareMuleSoftData.url}",
-                "headers": "${steps.prepareMuleSoftData.headers}"
-            }
-        },
-        {
-            "id": 344407,
-            "onSuccess": [
-                "buildUpdateSubData"
-            ],
-            "onFailure": [
-                "buildSubFailData"
-            ],
-            "name": "createMuleSoftContract",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildDataToCreateSubscription.body}",
-                "url": "${steps.buildDataToCreateSubscription.createContractUrl}",
-                "headers": "${steps. prepareMuleSoftData.headers}"
-            }
-        },
-        {
-            "id": 344408,
-            "onSuccess": [
-                "updateSubscriptionFailState"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "deleteApp",
-            "type": "httpRequest",
-            "properties": {
-                "method": "DELETE",
-                "url": "${steps.buildSubFailData.deleteAppUrl}",
-                "headers": "${steps.prepareMuleSoftData.headers}"
-            }
-        },
-        {
-            "id": 344409,
-            "onSuccess": [
-                "updateSubscriptionStateUnsubscribe"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "deleteAppOnUnsubscribe",
-            "type": "httpRequest",
-            "properties": {
-                "method": "DELETE",
-                "url": "${steps.buildUnsubscribeData.appUrl}",
-                "headers": "${steps.prepareMuleSoftData.headers}"
-            }
-        },
-        {
-            "id": 344410,
-            "onSuccess": [],
-            "onFailure": [],
-            "name": "end",
-            "type": "script",
-            "properties": {
-                "body": "done(false);"
-            }
-        },
-        {
-            "id": 344411,
-            "onSuccess": [
-                "muleSoftLogin"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getApiServerConsumerInstance",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "url": "${steps.readTriggerActionAndPrepareData.apiServerConsumerInstanceUrl}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344412,
-            "onSuccess": [
-                "buildUnsubscribeData"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getApps",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "url": "${steps.prepareMuleSoftData.url}",
-                "headers": "${steps.prepareMuleSoftData.headers}"
-            }
-        },
-        {
-            "id": 344413,
-            "onSuccess": [
-                "createMuleSoftApp"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getAvailableTiers",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "url": "${steps.prepareDataMuleSoftTiers.tierUrl}",
-                "headers": "${steps.prepareDataMuleSoftTiers.headers}"
-            }
-        },
-        {
-            "id": 345731,
-            "onSuccess": [
-                "readTriggerActionAndPrepareData"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getAxwayAccessToken",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.prepAxwayAccessTokenRequest.form}",
-                "url": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
-                "headers": "${steps.prepAxwayAccessTokenRequest.headers}",
-                "form": ""
-            }
-        },
-        {
-            "id": 345732,
-            "onSuccess": [
-                "checkActionApprove"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "getConsumerEmail",
-            "type": "httpRequest",
-            "properties": {
-                "method": "GET",
-                "url": "${steps.readTriggerActionAndPrepareData.platformGetUserUrl}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344415,
-            "onSuccess": [
-                "prepareMuleSoftData"
-            ],
-            "onFailure": [],
-            "name": "getHeaders",
-            "type": "script",
-            "properties": {
-                "body": "\nconst orgId = config.axwayTenantId;\nconst tokenServiceHeaders = {'APIKey': `${config.apiCentralTokenCredentials}`};\n\ndone({\n  orgId,\n  tokenServiceHeaders\n})"
-            }
-        },
-        {
-            "id": 344418,
-            "onSuccess": [
-                "prepareDataMuleSoftTiers"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "muleSoftLogin",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.prepareMuleSoftData.loginData}",
-                "url": "https://anypoint.mulesoft.com/accounts/login"
-            }
-        },
-        {
-            "id": 344420,
-            "onSuccess": [
-                "getAvailableTiers"
-            ],
-            "onFailure": [],
-            "name": "prepareDataMuleSoftTiers",
-            "type": "script",
-            "properties": {
-                "body": "const appId = steps.getApiServerConsumerInstance.response.body.attributes.apiId;\nconst envId = steps.getApiServerConsumerInstance.response.body.attributes.environmentId;\n\nconst tierUrl = `https://anypoint.mulesoft.com/apimanager/api/v1/organizations/${config.muleSoftOrgId}/environments/${envId}/apis/${appId}/tiers`;\n\nconst headers = {\n  'Authorization' : `Bearer ${steps.muleSoftLogin.response.body.access_token}`\n\n};\n\ndone({tierUrl, headers});"
-            }
-        },
-        {
-            "id": 344421,
-            "onSuccess": [
-                "prepAxwayAccessTokenRequest"
-            ],
-            "onFailure": [],
-            "name": "prepareMuleSoftData",
-            "type": "script",
-            "properties": {
-                "body": "done({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.muleSoftUserName + ':' + config.muleSoftPassword)\n  },\n  'appData': {\n    \"name\" : trigger.args.subscription.id\n  },\n  'loginData': {\n    'username': config.muleSoftUserName,\n    'password': config.muleSoftPassword\n  },\n  'url': `https://anypoint.mulesoft.com/exchange/api/v1/organizations/${config.muleSoftOrgId}/applications`\n});\n"
-            }
-        },
-        {
-            "id": 345730,
-            "onSuccess": [
-                "getAxwayAccessToken"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "prepAxwayAccessTokenRequest",
-            "type": "script",
-            "properties": {
-                "body": "\ndone({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.axwayClientId + ':' + config.axwayClientSecret),\n      'Content-Type': 'application/x-www-form-urlencoded'\n  },\n  form: 'grant_type=client_credentials'\n});\n"
-            }
-        },
-        {
-            "id": 344422,
-            "onSuccess": [
-                "sendEmail"
-            ],
-            "onFailure": [],
-            "name": "prepSubscriptionEmailNotification",
-            "type": "script",
-            "properties": {
-                "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail.response.body.result && steps.getConsumerEmail.response.body.result.email;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${steps.readTriggerActionAndPrepareData.apicentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst clientId = steps.createMuleSoftContract.response.body.clientId;\nconst clientSecret = steps.createMuleSoftContract.response.body.clientSecret;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Client Id: <b>${clientId}</b>` ;\n\tmessage += `<br>Client Secret: <b>${clientSecret}</b>` ;\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
-            }
-        },
-        {
-            "id": 344423,
-            "onSuccess": [
-                "buildDataToCreateSubscription"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "readTierId",
-            "type": "script",
-            "properties": {
-                "body": "let tier;\nif(trigger.args.subscription.properties !== undefined && trigger.args.subscription.properties.profile !== undefined) {\n\ntier = steps.getAvailableTiers.response.body.tiers.find((tier) => tier.name === trigger.args.subscription.properties.profile.plan);\n}\n\nif(tier === undefined) {\n  done(false);\n}\n\ndone(tier.id);"
-            }
-        },
-        {
-            "id": 344424,
-            "onSuccess": [
-                "getConsumerEmail"
-            ],
-            "onFailure": [],
-            "name": "readTriggerActionAndPrepareData",
-            "type": "script",
-            "properties": {
-                "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\nconst apicentralUrl = 'https://apicentral.axway.com';\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getAxwayAccessToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${apicentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `https://platform.axway.com/api/v1/user/${consumerUserId}`;\n\nconst apiServerConsumerInstanceUrl = `${apicentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl,\n  apicentralUrl\n\n};\n\ndone(data);"
-            }
-        },
-        {
-            "id": 344425,
-            "onSuccess": [],
-            "onFailure": [],
-            "name": "sendEmail",
-            "type": "elementRequest",
-            "properties": {
-                "method": "POST",
-                "elementInstanceId": "${config.outlookEmail}",
-                "body": "${steps.prepSubscriptionEmailNotification.body}",
-                "api": "/messages"
-            }
-        },
-        {
-            "id": 344428,
-            "onSuccess": [],
-            "onFailure": [
-                "end"
-            ],
-            "name": "updateSubscriptionFailState",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildSubFailData.subData}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344429,
-            "onSuccess": [
-                "prepSubscriptionEmailNotification"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "updateSubscriptionState",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildUpdateSubData.subData}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344430,
-            "onSuccess": [
-                "getApiServerConsumerInstance"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "updateSubscriptionStateApproved",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildApproveSubData.subData}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344431,
-            "onSuccess": [
-                "prepSubscriptionEmailNotification"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "updateSubscriptionStateRejected",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildRejectedData.subData}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        },
-        {
-            "id": 344432,
-            "onSuccess": [
-                "prepSubscriptionEmailNotification"
-            ],
-            "onFailure": [
-                "end"
-            ],
-            "name": "updateSubscriptionStateUnsubscribe",
-            "type": "httpRequest",
-            "properties": {
-                "method": "POST",
-                "body": "${steps.buildUnsubscribeData.subData}",
-                "url": "${steps.readTriggerActionAndPrepareData.statesURL}",
-                "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}"
-            }
-        }
-    ],
-    "triggers": [
-        {
-            "id": 32981,
-            "onSuccess": [
-                "getHeaders"
-            ],
-            "onFailure": [],
-            "type": "manual",
-            "async": false,
-            "name": "trigger",
-            "properties": {}
-        }
-    ],
-    "engine": "v3",
-    "active": true,
-    "debugLoggingEnabled": false,
-    "singleThreaded": false,
-    "configuration": [
-        {
-            "id": 71369,
-            "key": "axwayClientId",
-            "name": "axwayClientId",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71368,
-            "key": "axwayClientSecret",
-            "name": "axwayClientSecret",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71296,
-            "key": "axwayTenantId",
-            "name": "axwayTenantId",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71297,
-            "key": "muleSoftOrgId",
-            "name": "muleSoftOrgId",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71298,
-            "key": "muleSoftPassword",
-            "name": "muleSoftPassword",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71299,
-            "key": "muleSoftUserName",
-            "name": "muleSoftUserName",
-            "type": "value",
-            "required": true
-        },
-        {
-            "id": 71300,
-            "key": "outlookEmail",
-            "name": "outlookEmail",
-            "type": "elementInstance",
-            "required": true
-        }
-    ]
+  "id": 40694,
+  "name": "MuleSoft Registration Flow",
+  "userId": 34974,
+  "accountId": 28579,
+  "createdDate": "2020-09-29T00:09:16Z",
+  "steps": [
+    {
+      "id": 429849,
+      "onSuccess": [
+        "updateSubscriptionStateApproved"
+      ],
+      "onFailure": [],
+      "name": "buildApproveSubData",
+      "type": "script",
+      "properties": {
+        "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'APPROVED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+      }
+    },
+    {
+      "id": 429850,
+      "onSuccess": [
+        "createMuleSoftContract"
+      ],
+      "onFailure": [],
+      "name": "buildDataToCreateSubscription",
+      "type": "script",
+      "properties": {
+        "body": "const consumerInstance = steps.getApiServerConsumerInstance.response.body;\n\nconst createContractUrl = `${steps.prepareMuleSoftData.url}/${steps.createMuleSoftApp.response.body.id}/contracts`;\n\nconst body = {\n  ...consumerInstance.attributes,\n  'requestedTierId' : steps.readTierId,\n  'version' : '1.0.0',\n  'versionGroup': 'v1'\n}\ndone ({body, createContractUrl});"
+      }
+    },
+    {
+      "id": 429851,
+      "onSuccess": [
+        "updateSubscriptionStateRejected"
+      ],
+      "onFailure": [],
+      "name": "buildRejectedData",
+      "type": "script",
+      "properties": {
+        "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'REJECTED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+      }
+    },
+    {
+      "id": 429852,
+      "onSuccess": [
+        "deleteApp"
+      ],
+      "onFailure": [],
+      "name": "buildSubFailData",
+      "type": "script",
+      "properties": {
+        "body": "\nconst body = \n{\n  'subData' : \n  {\n  'state' : 'FAILED_TO_SUBSCRIBE',\n  \"description\": 'Failed to create subscription- IB Flow'\n  }\n}\n\nconst deleteAppUrl = `${steps.prepareMuleSoftData.url}/${steps.createMuleSoftApp.response.body.id}`;\n\ndone({body,deleteAppUrl})"
+      }
+    },
+    {
+      "id": 429853,
+      "onSuccess": [
+        "deleteAppOnUnsubscribe"
+      ],
+      "onFailure": [],
+      "name": "buildUnsubscribeData",
+      "type": "script",
+      "properties": {
+        "body": "\nconst subData =\n  {\n 'state' : 'UNSUBSCRIBED',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n}\n\nconst apps = steps.getApps.response.body;\n\nconst createdApp = apps.find(app => app.name === steps.readTriggerActionAndPrepareData.subscriptionId);\nlet appUrl = '';\nif(createdApp !== undefined) {\n  appUrl = `${steps.prepareMuleSoftData.url}/${createdApp.id}`;\n\n\n}\n\ndone({subData, appUrl})"
+      }
+    },
+    {
+      "id": 429854,
+      "onSuccess": [
+        "updateSubscriptionState"
+      ],
+      "onFailure": [],
+      "name": "buildUpdateSubData",
+      "type": "script",
+      "properties": {
+        "body": "const body = \n{\n  'subData' : \n  {\n  'state' : 'ACTIVE',\n  'description': steps.readTriggerActionAndPrepareData.actionMessage\n  }\n}\n\ndone(body)"
+      }
+    },
+    {
+      "id": 429855,
+      "onSuccess": [
+        "buildApproveSubData"
+      ],
+      "onFailure": [
+        "checkActionUnsubscribeInitiated"
+      ],
+      "name": "checkActionApprove",
+      "type": "filter",
+      "properties": {
+        "body": "const action = steps.readTriggerActionAndPrepareData.action;\n\ndone(action.toLowerCase() == \"approved\")"
+      }
+    },
+    {
+      "id": 429856,
+      "onSuccess": [
+        "buildRejectedData"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "checkActionRejected",
+      "type": "filter",
+      "properties": {
+        "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"rejected\");"
+      }
+    },
+    {
+      "id": 429857,
+      "onSuccess": [
+        "getApps"
+      ],
+      "onFailure": [
+        "checkActionRejected"
+      ],
+      "name": "checkActionUnsubscribeInitiated",
+      "type": "filter",
+      "properties": {
+        "body": "const action = trigger.args.subscription && trigger.args.subscription.action;\n\ndone(action.toLowerCase() == \"unsubscribeinitiated\");"
+      }
+    },
+    {
+      "id": 429858,
+      "onSuccess": [
+        "readTierId"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "createMuleSoftApp",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.prepareMuleSoftData.appData}",
+        "method": "POST",
+        "headers": "${steps.prepareMuleSoftData.headers}",
+        "url": "${steps.prepareMuleSoftData.url}"
+      }
+    },
+    {
+      "id": 429859,
+      "onSuccess": [
+        "buildUpdateSubData"
+      ],
+      "onFailure": [
+        "buildSubFailData"
+      ],
+      "name": "createMuleSoftContract",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildDataToCreateSubscription.body}",
+        "method": "POST",
+        "headers": "${steps. prepareMuleSoftData.headers}",
+        "url": "${steps.buildDataToCreateSubscription.createContractUrl}"
+      }
+    },
+    {
+      "id": 429860,
+      "onSuccess": [
+        "updateSubscriptionFailState"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "deleteApp",
+      "type": "httpRequest",
+      "properties": {
+        "method": "DELETE",
+        "headers": "${steps.prepareMuleSoftData.headers}",
+        "url": "${steps.buildSubFailData.deleteAppUrl}"
+      }
+    },
+    {
+      "id": 429861,
+      "onSuccess": [
+        "updateSubscriptionStateUnsubscribe"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "deleteAppOnUnsubscribe",
+      "type": "httpRequest",
+      "properties": {
+        "method": "DELETE",
+        "headers": "${steps.prepareMuleSoftData.headers}",
+        "url": "${steps.buildUnsubscribeData.appUrl}"
+      }
+    },
+    {
+      "id": 429862,
+      "onSuccess": [],
+      "onFailure": [],
+      "name": "end",
+      "type": "script",
+      "properties": {
+        "body": "done(false);"
+      }
+    },
+    {
+      "id": 429863,
+      "onSuccess": [
+        "muleSoftLogin"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "getApiServerConsumerInstance",
+      "type": "httpRequest",
+      "properties": {
+        "method": "GET",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.apiServerConsumerInstanceUrl}"
+      }
+    },
+    {
+      "id": 429864,
+      "onSuccess": [
+        "buildUnsubscribeData"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "getApps",
+      "type": "httpRequest",
+      "properties": {
+        "method": "GET",
+        "headers": "${steps.prepareMuleSoftData.headers}",
+        "url": "${steps.prepareMuleSoftData.url}"
+      }
+    },
+    {
+      "id": 429865,
+      "onSuccess": [
+        "createMuleSoftApp"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "getAvailableTiers",
+      "type": "httpRequest",
+      "properties": {
+        "method": "GET",
+        "headers": "${steps.prepareDataMuleSoftTiers.headers}",
+        "url": "${steps.prepareDataMuleSoftTiers.tierUrl}"
+      }
+    },
+    {
+      "id": 429866,
+      "onSuccess": [
+        "readTriggerActionAndPrepareData"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "getAxwayAccessToken",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.prepAxwayAccessTokenRequest.form}",
+        "method": "POST",
+        "form": "",
+        "headers": "${steps.prepAxwayAccessTokenRequest.headers}",
+        "url": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token"
+      }
+    },
+    {
+      "id": 429867,
+      "onSuccess": [
+        "checkActionApprove"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "getConsumerEmail",
+      "type": "httpRequest",
+      "properties": {
+        "method": "GET",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.platformGetUserUrl}"
+      }
+    },
+    {
+      "id": 429868,
+      "onSuccess": [
+        "prepareMuleSoftData"
+      ],
+      "onFailure": [],
+      "name": "getHeaders",
+      "type": "script",
+      "properties": {
+        "body": "\nconst orgId = config.axwayTenantId;\nconst tokenServiceHeaders = {'APIKey': `${config.apiCentralTokenCredentials}`};\n\ndone({\n  orgId,\n  tokenServiceHeaders\n})"
+      }
+    },
+    {
+      "id": 429869,
+      "onSuccess": [
+        "prepareDataMuleSoftTiers"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "muleSoftLogin",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.prepareMuleSoftData.loginData}",
+        "method": "POST",
+        "url": "${steps.prepareMuleSoftData.loginUrl}"
+      }
+    },
+    {
+      "id": 429870,
+      "onSuccess": [
+        "getAvailableTiers"
+      ],
+      "onFailure": [],
+      "name": "prepareDataMuleSoftTiers",
+      "type": "script",
+      "properties": {
+        "body": "const appId = steps.getApiServerConsumerInstance.response.body.attributes.apiId;\nconst envId = steps.getApiServerConsumerInstance.response.body.attributes.environmentId;\n\nconst tierUrl = `${config.muleSoftAnypointExchangeUrl ? config.muleSoftAnypointExchangeUrl : \"https://anypoint.mulesoft.com\"}/apimanager/api/v1/organizations/${config.muleSoftOrgId}/environments/${envId}/apis/${appId}/tiers`;\n\nconst headers = {\n  'Authorization' : `Bearer ${steps.muleSoftLogin.response.body.access_token}`\n\n};\n\ndone({tierUrl, headers});"
+      }
+    },
+    {
+      "id": 429871,
+      "onSuccess": [
+        "prepAxwayAccessTokenRequest"
+      ],
+      "onFailure": [],
+      "name": "prepareMuleSoftData",
+      "type": "script",
+      "properties": {
+        "body": "done({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.muleSoftUserName + ':' + config.muleSoftPassword)\n  },\n  'appData': {\n    \"name\" : trigger.args.subscription.id\n  },\n  'loginData': {\n    'username': config.muleSoftUserName,\n    'password': config.muleSoftPassword\n  },\n  'loginUrl': `${config.muleSoftAnypointExchangeUrl ? config.muleSoftAnypointExchangeUrl : \"https://anypoint.mulesoft.com\"}/accounts/login`,\n  'url': `${config.muleSoftAnypointExchangeUrl ? config.muleSoftAnypointExchangeUrl : \"https://anypoint.mulesoft.com\"}/exchange/api/v1/organizations/${config.muleSoftOrgId}/applications`\n});\n"
+      }
+    },
+    {
+      "id": 429872,
+      "onSuccess": [
+        "getAxwayAccessToken"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "prepAxwayAccessTokenRequest",
+      "type": "script",
+      "properties": {
+        "body": "\ndone({\n  'headers': { \n      Authorization: 'Basic ' + CE.b64(config.axwayClientId + ':' + config.axwayClientSecret),\n      'Content-Type': 'application/x-www-form-urlencoded'\n  },\n  form: 'grant_type=client_credentials'\n});\n"
+      }
+    },
+    {
+      "id": 429873,
+      "onSuccess": [
+        "sendEmail"
+      ],
+      "onFailure": [],
+      "name": "prepSubscriptionEmailNotification",
+      "type": "script",
+      "properties": {
+        "body": "// Configure these three params\nconst subject = 'RE: Subscription Notification';\nconst recipient = steps.getConsumerEmail.response.body.result && steps.getConsumerEmail.response.body.result.email;\nconst catalogItemId = steps.readTriggerActionAndPrepareData.catalogItemId;\nconst catalogItemName = steps.readTriggerActionAndPrepareData.catalogItemName;\nconst catalogItemLink = `${steps.readTriggerActionAndPrepareData.apicentralUrl}/catalog/explore/${catalogItemId}`;\n\nconst action = steps.readTriggerActionAndPrepareData.action;\nlet message = '';\n\nif (action.toLowerCase() == \"approved\") {\nconst clientId = steps.createMuleSoftContract.response.body.clientId;\nconst clientSecret = steps.createMuleSoftContract.response.body.clientSecret;\n message = `<br>Subscription created for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a>`;\n\tmessage += `<br>Client Id: <b>${clientId}</b>` ;\n\tmessage += `<br>Client Secret: <b>${clientSecret}</b>` ;\n} else if(action.toLowerCase() == 'unsubscribeinitiated') {\n   message = `<br>Successfully unsubscribed for Catalog Item: <a href= ${catalogItemLink}> ${steps.readTriggerActionAndPrepareData.catalogItemName} </a>`;\n} else if (action.toLowerCase() == 'rejected') {\n  message =`<br>Subscription for Catalog Item: <a href= ${catalogItemLink}> ${catalogItemName} </a> is not approved.`\n}\n\t\n\t\n\tconst body = {\n  \"Body\": {\n    \"Content\": `${message}`,\n    \"ContentType\": \"HTML\"\n  },\n  \"Importance\": \"0\",\n  \"InferenceClassification\": \"Focused\",\n  \"IsDeliveryReceiptRequested\": false,\n  \"IsRead\": false,\n  \"IsReadReceiptRequested\": false,\n  \"Subject\": subject,\n  \"ToRecipients\": [\n    {\n      \"EmailAddress\": {\n        \"Address\": recipient\n      }\n    }\n  ]\n}\n\t\n\ndone({body});\n"
+      }
+    },
+    {
+      "id": 429874,
+      "onSuccess": [
+        "buildDataToCreateSubscription"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "readTierId",
+      "type": "script",
+      "properties": {
+        "body": "let tier;\nif(trigger.args.subscription.properties !== undefined && trigger.args.subscription.properties.profile !== undefined) {\n\ntier = steps.getAvailableTiers.response.body.tiers.find((tier) => tier.name === trigger.args.subscription.properties.profile.plan);\n}\n\nif(tier === undefined) {\n  done(false);\n}\n\ndone(tier.id);"
+      }
+    },
+    {
+      "id": 429875,
+      "onSuccess": [
+        "getConsumerEmail"
+      ],
+      "onFailure": [],
+      "name": "readTriggerActionAndPrepareData",
+      "type": "script",
+      "properties": {
+        "body": "let subscriptionId;\nlet catalogItemId;\nlet catalogItemName;\nlet action;\nlet actionMessage;\nlet consumerUserId;\nconst apicentralUrl = 'https://apicentral.axway.com';\n\nif(trigger.args.catalogItem) {\n   catalogItemId = trigger.args.catalogItem.id;\n   catalogItemName = trigger.args.catalogItem.name;\n}\n\nconst relationships = trigger.args.catalogItem.relationships;\n\nlet environmentName;\nlet environmentId;\nlet consumerInstanceId;\nlet consumerInstanceName;\n\nif(relationships) {\n  environmentName = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_NAME').value;\n  environmentId = relationships.find(rel => rel.type == 'API_SERVER_ENVIRONMENT_ID').value;\n  consumerInstanceId = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_ID').value;\n  consumerInstanceName = relationships.find(rel => rel.type == 'API_SERVER_CONSUMER_INSTANCE_NAME').value;\n}\n\n\nif(trigger.args.subscription) {\n   subscriptionId = trigger.args.subscription.id;\n   action = trigger.args.subscription.action;\n   actionMessage = trigger.args.subscription.message;\n   consumerUserId = trigger.args.subscription.userId;\n}\n\n\nconst ucsHeaders = {\n  'X-Axway-Tenant-Id': config.axwayTenantId,\n  'Authorization': `Bearer ${steps.getAxwayAccessToken.response.body.access_token}`,\n  'Content-Type': 'application/json'\n}\n\nconst statesURL = `${apicentralUrl}/api/unifiedCatalog/v1/catalogItems/${catalogItemId}/subscriptions/${subscriptionId}/states`;\n\nconst platformGetUserUrl = `https://platform.axway.com/api/v1/user/${consumerUserId}`;\n\nconst apiServerConsumerInstanceUrl = `${apicentralUrl}/apis/management/v1alpha1/environments/${environmentName}/consumerinstances/${consumerInstanceName}`;\n\nlet data = {\n  \"catalogItemId\" : catalogItemId,\n  \"catalogItemName\": catalogItemName,\n  \"subscriptionId\" : subscriptionId,\n  \"action\": action,\n  \"actionMessage\": actionMessage,\n  statesURL,\n  ucsHeaders,\n  consumerUserId,\n  platformGetUserUrl,\n  environmentName,\n  environmentId,\n  consumerInstanceId,\n  consumerInstanceName,\n  apiServerConsumerInstanceUrl,\n  apicentralUrl\n\n};\n\ndone(data);"
+      }
+    },
+    {
+      "id": 429876,
+      "onSuccess": [],
+      "onFailure": [],
+      "name": "sendEmail",
+      "type": "elementRequest",
+      "properties": {
+        "body": "${steps.prepSubscriptionEmailNotification.body}",
+        "method": "POST",
+        "api": "/messages",
+        "elementInstanceId": "${config.outlookEmail}"
+      }
+    },
+    {
+      "id": 429877,
+      "onSuccess": [],
+      "onFailure": [
+        "end"
+      ],
+      "name": "updateSubscriptionFailState",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildSubFailData.subData}",
+        "method": "POST",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+      }
+    },
+    {
+      "id": 429878,
+      "onSuccess": [
+        "prepSubscriptionEmailNotification"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "updateSubscriptionState",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildUpdateSubData.subData}",
+        "method": "POST",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+      }
+    },
+    {
+      "id": 429879,
+      "onSuccess": [
+        "getApiServerConsumerInstance"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "updateSubscriptionStateApproved",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildApproveSubData.subData}",
+        "method": "POST",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+      }
+    },
+    {
+      "id": 429880,
+      "onSuccess": [
+        "prepSubscriptionEmailNotification"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "updateSubscriptionStateRejected",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildRejectedData.subData}",
+        "method": "POST",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+      }
+    },
+    {
+      "id": 429881,
+      "onSuccess": [
+        "prepSubscriptionEmailNotification"
+      ],
+      "onFailure": [
+        "end"
+      ],
+      "name": "updateSubscriptionStateUnsubscribe",
+      "type": "httpRequest",
+      "properties": {
+        "body": "${steps.buildUnsubscribeData.subData}",
+        "method": "POST",
+        "headers": "${steps.readTriggerActionAndPrepareData.ucsHeaders}",
+        "url": "${steps.readTriggerActionAndPrepareData.statesURL}"
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "id": 36768,
+      "onSuccess": [
+        "getHeaders"
+      ],
+      "onFailure": [],
+      "type": "manual",
+      "async": false,
+      "name": "trigger",
+      "properties": {}
+    }
+  ],
+  "engine": "v3",
+  "active": true,
+  "debugLoggingEnabled": false,
+  "singleThreaded": false,
+  "configuration": [
+    {
+      "id": 80222,
+      "key": "axwayClientId",
+      "name": "axwayClientId",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80223,
+      "key": "axwayClientSecret",
+      "name": "axwayClientSecret",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80224,
+      "key": "axwayTenantId",
+      "name": "axwayTenantId",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80225,
+      "key": "muleSoftAnypointExchangeUrl",
+      "name": "muleSoftAnypointExchangeUrl",
+      "type": "value",
+      "description": "Default value: \"https://anypoint.mulesoft.com\".\nOverwrite if your account was provisioned in a different region then US.",
+      "required": false
+    },
+    {
+      "id": 80226,
+      "key": "muleSoftOrgId",
+      "name": "muleSoftOrgId",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80227,
+      "key": "muleSoftPassword",
+      "name": "muleSoftPassword",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80228,
+      "key": "muleSoftUserName",
+      "name": "muleSoftUserName",
+      "type": "value",
+      "required": true
+    },
+    {
+      "id": 80229,
+      "key": "outlookEmail",
+      "name": "outlookEmail",
+      "type": "elementInstance",
+      "required": true
+    }
+  ]
 }

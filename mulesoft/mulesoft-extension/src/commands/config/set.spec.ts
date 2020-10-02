@@ -41,23 +41,7 @@ describe('config: set', () => {
 		expect(outputJsonSync.calledOnceWith('foobarPath', argv)).to.be.true;
 	})
 
-	it('can set known config and ignore unknowns when setting multiple config properties at once', async () => {
-		let localConfig: Partial<Config> = {};
-		readJsonSync.returns(localConfig);
-		outputJsonSync.returns(true);
-		configFilePath.value('foobarPath');
-		let argv: Partial<Config> = {
-			//@ts-ignore
-			meh: 'foo.png',
-			icon: 'foo.png'
-		};
-
-		set.action({ console: mockConsole as any, argv });
-		expect(readJsonSync.calledOnce).to.be.true;
-		expect(outputJsonSync.calledOnceWith('foobarPath', {icon: 'foo.png'})).to.be.true;
-	})
-
-	it('throws on unknown config', async () => {
+	it('ignore unknown config', async () => {
 		let localConfig: Partial<Config> = {};
 		readJsonSync.returns(localConfig);
 		outputJsonSync.returns(true);
@@ -67,8 +51,8 @@ describe('config: set', () => {
 			meh: 'foo.png'
 		};
 
-		expect(() => set.action({ console: mockConsole as any, argv })).to.throw('Missing required configuration properties to set')
-		expect(readJsonSync.calledOnce).to.be.false;
-		expect(outputJsonSync.calledOnceWith('foobarPath', localConfig)).to.be.false;
+		set.action({ console: mockConsole as any, argv });
+		expect(readJsonSync.calledOnce).to.be.true;
+		expect(outputJsonSync.calledOnceWith('foobarPath', localConfig)).to.be.true;
 	})
 })
