@@ -1,6 +1,6 @@
 {
   "name": "@axway/amplify-central-apigee-extension",
-  "version": "0.0.3-dev.0",
+  "version": "0.0.3-dev.1",
   "description": "Create AMPLIFY Central resources from Apigee API Proxies",
   "author": {
     "email": "support@axway.com",
