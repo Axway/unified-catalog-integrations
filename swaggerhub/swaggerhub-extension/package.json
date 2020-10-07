@@ -1,6 +1,6 @@
 {
   "name": "@axway/amplify-central-swaggerhub-extension",
-  "version": "0.0.3-dev.0",
+  "version": "0.0.3-dev.1",
   "description": "Create AMPLIFY Central resources from Swagger Hub API Management APIs",
   "author": {
     "email": "support@axway.com",
