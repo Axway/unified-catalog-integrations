@@ -1,11 +1,11 @@
 const { Octokit } = require("@octokit/rest");
-const got = require("got");
 const SwaggerParser = require("@apidevtools/swagger-parser");
 const yaml = require("js-yaml");
-const fs = require("fs");
-const Path = require("path");
-const mime = require('mime-types');
+import isEmpty from 'lodash/isEmpty';
 import { commitToFs, getIconData } from './utils';
+import { loadConfig } from '@axway/amplify-cli-utils';
+import https from 'https';
+import HttpsProxyAgent from 'https-proxy-agent';
 
 module.exports = class GithubService {
     constructor(config) {
@@ -28,9 +28,45 @@ module.exports = class GithubService {
         console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central github-extension config set -h' to see a list of params`);
         process.exit(1);
       }
-      this.octokit = new Octokit({
-        auth: this.config.gitToken,
-      });
+
+      const centralConfig = loadConfig().values;
+    
+      if (centralConfig.network && !isEmpty(centralConfig.network)) {
+        // using strict ssl mode by default
+        const sslConfig = { rejectUnauthorized: centralConfig.network.strictSSL === undefined || centralConfig.network.strictSSL };
+        const proxyUrl = centralConfig.network.httpProxy || centralConfig.network.httpsProxy || centralConfig.network.proxy;
+        // using HttpsProxyAgent if proxy url configured, else - regular node agent.
+        let agent;
+        if (proxyUrl) {
+          let parsedProxyUrl;
+          try {
+            parsedProxyUrl = new URL(proxyUrl);
+          } catch {
+            throw new Error(`Could not parse provided network proxy url: ${proxyUrl}`);
+          }
+          agent = new HttpsProxyAgent({
+            host: parsedProxyUrl.hostname,
+            port: parsedProxyUrl.port,
+            protocol: parsedProxyUrl.protocol,
+            auth: `${parsedProxyUrl.username}:${parsedProxyUrl.password}`,
+            ...sslConfig,
+          });
+
+          console.log(`Connecting using proxy settings protocol:${parsedProxyUrl.protocol}, host:${parsedProxyUrl.hostname}, port: ${parsedProxyUrl.port}, username: ${parsedProxyUrl.username}, rejectUnauthorized: ${sslConfig.rejectUnauthorized}`);
+        } else {
+          console.log(`Connecting using rejectUnauthorized: ${sslConfig.rejectUnauthorized}`);
+          agent = new https.Agent(sslConfig);
+        }
+        
+        this.octokit = new Octokit({
+          auth: this.config.gitToken,
+          request: {agent}
+        });
+      } else {
+        this.octokit = new Octokit({
+          auth: this.config.gitToken,
+        });
+      }
     }
 
     async generateResources() {
@@ -44,12 +80,11 @@ module.exports = class GithubService {
         outputDir = './resources'
       } = this.config;
         
-      var github = {
+      const github = {
         owner: gitUserName,
         repo,
         branch,
       };
-      let repo = github.repo;
       let path = "";
       let owner = github.owner;
       let ref = github.commit
@@ -60,7 +95,7 @@ module.exports = class GithubService {
         ? github.branch
         : "master";
       console.log('Listing Github APIs');
-      return this.processRepo(owner, repo, ref, path, path);
+      return this.processRepo(owner, github.repo, ref, path, path);
     }
 
     async processRepo(owner, repo, ref, path, sourceRoot) {
@@ -76,20 +111,21 @@ module.exports = class GithubService {
           console.error(e);
           process.exit(1);
         });
-      console.log('Building Resources');
+      if (path) console.log(`Checking for resources on path: ${path}`);
       for (var item of (files || { data: [] }).data) {
-        if (item.type == "dir") {
+        if (item.type === "dir") {
           await this.processRepo(owner, repo, ref, item.path, sourceRoot);
         }
-        if (item.type == "file") {
+        if (item.type === "file") {
           if (isOASExtension(item.name)) {
-            var contents = await this.getContents(item);
-            if (peek(item.name, contents)) {
-              try {
+            try {
+              var contents = await this.getContents(owner, repo, item, ref);
+              if (peek(item.name, contents)) {
                 var api = await SwaggerParser.validate(item.download_url);
                 await this.writeAPI4Central(repo, item, api);
-              } catch (err) {
               }
+            } catch (err) {
+              console.error(`Could not build resources for path ${item.path}. Error: ${err}`);
             }
           }
         }
@@ -104,10 +140,9 @@ module.exports = class GithubService {
           "jpdiff.yaml"
         ].includes(filename)) {
           return false
-        };
+        }
         var pattern = /\.(yaml|yml|json)$/i;
-        var isOAS = pattern.test(filename);
-        return isOAS;
+        return pattern.test(filename);
       }
   
       function isYaml(filename) {
@@ -121,7 +156,7 @@ module.exports = class GithubService {
       }
   
       function peek(name, contents) {
-        var isOAS = false;
+        let isOAS = false;
         if (isYaml(name)) {
           // see if root of YAML is swagger for v2.0 or openapi for v3.0
           const obj = yaml.safeLoad(contents);
@@ -140,10 +175,12 @@ module.exports = class GithubService {
       
       
     }
-    async getContents(item) {
-      const response = await got(item.download_url);
-      return response.body;
+    async getContents(owner, repo, item, ref) {
+      console.log(`Downloading spec from ${item.path}`);
+      const result = await this.octokit.repos.getContent({ "owner": owner, "repo": repo, "path": item.path, "ref": ref })
+      return Buffer.from(result.data.content, 'base64').toString('utf8')
     }
+
     async writeAPI4Central(repo, item, api) {
       const resources = [];    
       let attributes = {
@@ -153,8 +190,8 @@ module.exports = class GithubService {
         html_url: item.html_url,
       };
       let iconData = getIconData(this.config.icon);    
-      var apiName = api.info.title + "-" + api.info.version;
-      var apiServiceName = `${apiName}`.toLowerCase().replace(/\W+/g, "-");
+      const apiName = api.info.title + "-" + api.info.version;
+      const apiServiceName = `${apiName}`.toLowerCase().replace(/\W+/g, "-");
       
       // APIService
       const apiService = {
@@ -179,7 +216,7 @@ module.exports = class GithubService {
     
       // APIServiceRevision
       const apiServiceRevisionName = apiServiceName; //`${api.info.title}-${api.info.version}`;
-      var type = "oas3";
+      let type = "oas3";
       if (api.swagger) {
         type = "oas2";
       }
@@ -204,6 +241,34 @@ module.exports = class GithubService {
       };
 
       resources.push(apiServiceRevision);
+
+      let endpoints = [];
+
+      if (type === "oas2") {
+          endpoints =  [{
+            host: api.host,
+            protocol: (api.schemes || []).includes('https') ? 'https': 'http',
+            port: (api.schemes || []).includes('https') ? 443: 80,
+            ...(api.basePath ? { routing: { basePath: api.basePath } } : {})
+          }]
+      }
+      else {
+        for (const server of api.servers) {
+          let parsedUrl = new URL(server.url);
+          let endpoint = {
+            host: parsedUrl.hostname,
+            protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(':'))
+          };
+  
+          if (parsedUrl.port) {
+            endpoint.port = parseInt(parsedUrl.port, 10);
+          }
+          endpoint.routing = { basePath: parsedUrl.pathname };
+          endpoints.push(endpoint);
+        }
+             
+      }
+
       // APIServiceInstance
       const apiServiceInstance = {
         apiVersion: "v1alpha1",
@@ -218,12 +283,7 @@ module.exports = class GithubService {
         },
         spec: {
           apiServiceRevision: apiServiceRevisionName,
-          endpoint: [{
-            host: api.host,
-            protocol: (api.schemes || []).includes('https') ? 'https': 'http',
-            port: (api.schemes || []).includes('https') ? 443: 80,
-            ...(api.basePath ? { routing: { basePath: api.basePath } } : {})
-          }],
+          endpoint: endpoints
         },
       };
 
@@ -256,3 +316,4 @@ module.exports = class GithubService {
       await commitToFs(consumerInstance, this.config.outputDir, resources)
     }
 }
+
