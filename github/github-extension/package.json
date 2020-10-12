@@ -60,12 +60,15 @@
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^9.0.1",
-    "@octokit/rest": "^18.0.0",
+    "@axway/amplify-cli-utils": "2.0.0",
+    "@octokit/rest": "18.0.6",
     "adm-zip": "^0.4.14",
     "form-data": "^3.0.0",
     "fs-extra": "^9.0.0",
-    "got": "^11.2.0",
+    "https": "^1.0.0",
+    "https-proxy-agent": "^2.2.4",
     "js-yaml": "^3.14.0",
+    "lodash": "^4.17.20",
     "mime-types": "^2.1.27",
     "node-fetch": "^2.6.0",
     "request": "^2.88.2"

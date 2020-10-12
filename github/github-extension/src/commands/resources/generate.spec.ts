@@ -43,4 +43,23 @@ describe('resources: generate', () => {
     generateResources.calledOnceWith(testConfig);
     expect(mockConsole.log.calledTwice).to.be.true;
   })
+
+
+  it('reads config, generates resources with output dir, logs success', async () => {
+    const testConfig = {
+      gitToken: 'token',
+      gitUserName: 'user',
+      repo: 'repo',
+      branch: 'branch',
+      environmentName: 'test',
+      outputDir: 'dir'
+    }
+    readJsonSync.returns(testConfig);
+    generateResources.resolves();
+    createSupportResources.resolves();
+
+    await generate.action({ console: mockConsole as any })
+    generateResources.calledOnceWith(testConfig);
+    expect(mockConsole.log.calledTwice).to.be.true;
+  })
 })

@@ -1,0 +1,20 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+      "title": "API Server specification.",
+      "version": "0.24.0",
+      "contact": {
+        "name": "Axway Support",
+        "email": "support@axway.com"
+      },
+      "license": {
+        "name": "Copyright Axway 2020. All rights reserved."
+      },
+      "description": "API Server specification for Amplify Central."
+    },
+    "security": [],
+    "servers": [
+    ],
+    "paths": {},
+    "components": {}
+  }
