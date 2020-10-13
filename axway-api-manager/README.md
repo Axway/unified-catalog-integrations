@@ -24,9 +24,13 @@ Follow the steps below to use this example:
 ### Prerequisites: Configure the Axway V7 agent to discover and publish the APIs from Axway API Manager
 Documentation available [here](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/filtering-apis-to-be-discovered/index.html)
 
-### Step 1: Create Amplify Central Service Account
+### Step 1: Create Amplify Central Service Account (using OAuth2 Client Credentials Grant Type)
 
-Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow.
+This service account is different from the one used by the AMPLIFY agents or AMPLIFY CLI. 
+
+This account can be used in services (Integration Builder or Power Automate for example) where private/public keys can not be stored and used.
+
+Save the **clientId** and **clientSecret** from the response which will be used later in the flow.
 
 ##### Option 1 - using amplify cli and jq
 
