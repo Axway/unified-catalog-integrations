@@ -12,7 +12,7 @@ The basic use case is as follows:
 * On approval, a subscription key will be created in Azure API Management and the key will be sent to the API Consumer's email. After the key has been sent, the state of the Subscription in Unified Catalog gets updated to Active and the Consumer can now use the API with the key that was received over email. 
 * Can cancel the subscription from the Unified Catalog. When cancelled, the subscription in Azure Management will be removed and the state of the Unified Catalog will be updated to unsubscribed, indicating the consumer will no longer be able to use the API with the key received. 
   
-<img src="https://github.com/Axway/mulesoft-catalog-integration/blob/master/images/MulesoftIntegrationDiagram.PNG" width="700" height="400" />
+<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/Azure2UnifiedCatalogDiagram.png" height="400" />
   
 The technologies that were used for this project: 
 
