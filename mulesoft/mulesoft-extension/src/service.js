@@ -3,7 +3,7 @@ const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
 import { commitToFs, requestPromise } from './utils';
-import { loadConfig } from '@axway/amplify-cli-utils';
+import { loadConfig } from '@axway/amplify-config';
 
 const ORDER = [
 	'Environment',
@@ -41,8 +41,7 @@ module.exports = class MulesoftService {
 			this.config.anypointExchangeUrl = 'https://anypoint.mulesoft.com'
 		}
 
-		const centralConfig = loadConfig().values;
-		const networkSettings = centralConfig && centralConfig.network || {};
+		const networkSettings = loadConfig().get('network');
 		const strictSSL = networkSettings.strictSSL;
 		const proxy = networkSettings.httpProxy;
 		if (strictSSL === false) {
