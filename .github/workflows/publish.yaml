@@ -1,0 +1,44 @@
+name: publish to npm
+on:
+  release:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+    # Publish mulesoft extension to npm with release tag version.    
+    - run: |
+        cd mulesoft/mulesoft-extension
+        npm version "${GITHUB_REF}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public
+    # Publish swaggerhub extension to npm with release tag version.    
+    - run: |       
+        cd swaggerhub/swaggerhub-extension
+        npm version "${GITHUB_REF}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public
+    # Publish github extension to npm with release tag version.    
+    - run: |           
+        cd github/github-extension
+        npm version "${GITHUB_REF}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public
+    # Publish azure extension to npm with release tag version.    
+    - run: |           
+        cd azure/azure-extension
+        npm version "${GITHUB_REF}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public
+    # Publish apigee extension to npm with release tag version.    
+    - run: |           
+        cd apigee/apigee-extension
+        npm version "${GITHUB_REF}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public                        
+      env:
+        NPM_EXTERNAL_AUTH_TOKEN: ${{ secrets.NPM_EXTERNAL_AUTH_TOKEN }}
