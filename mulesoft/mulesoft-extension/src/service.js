@@ -51,8 +51,10 @@ module.exports = class MulesoftService {
 			try {
 				const parsedProxy = new URL(proxy);
 				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
 			} catch (e) {
-				throw new Error(`Could not parse provided network proxy url: ${proxy}`);
+				console.log(`Could not parse proxy url ${proxy}`);
+				process.exit(1);
 			}
 		}
 	}
