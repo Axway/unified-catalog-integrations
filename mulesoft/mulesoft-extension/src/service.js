@@ -3,6 +3,7 @@ const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
 import { commitToFs, requestPromise } from './utils';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 const ORDER = [
 	'Environment',
@@ -17,6 +18,7 @@ const ORDER = [
 module.exports = class MulesoftService {
 	constructor(config) {
 		this.config = config || {};
+		this.proxySettings = {};
 		let missingParam = [
 			'password',
 			'username',
@@ -37,6 +39,22 @@ module.exports = class MulesoftService {
 
 		if (!this.config.anypointExchangeUrl) {
 			this.config.anypointExchangeUrl = 'https://anypoint.mulesoft.com'
+		}
+
+		const centralConfig = loadConfig().values;
+		const networkSettings = centralConfig && centralConfig.network || {};
+		const strictSSL = networkSettings.strictSSL;
+		const proxy = networkSettings.httpProxy;
+		if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
+		}
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+			} catch (e) {
+				throw new Error(`Could not parse provided network proxy url: ${proxy}`);
+			}
 		}
 	}
 
@@ -351,7 +369,8 @@ module.exports = class MulesoftService {
 		return requestPromise({
 			method: 'GET',
 			url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets?offset=${offset}&limit=${pageSize}&masterOrganizationId=${orgId}`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	}
 
@@ -363,7 +382,8 @@ module.exports = class MulesoftService {
 			json: {
 				username,
 				password
-			}
+			},
+			...this.proxySettings
 		});
 	}
 
@@ -371,7 +391,8 @@ module.exports = class MulesoftService {
 		return requestPromise({
 			method: 'GET',
 			url: `${this.config.anypointExchangeUrl}/apimanager/api/v1/organizations/${organizationId}/environments/${environmentId}/apis?assetId=${assetId}`,
-			headers: { Authorization: `Bearer ${token}` }
+			headers: { Authorization: `Bearer ${token}` },
+			...this.proxySettings
 		});
 	}
 
@@ -379,7 +400,8 @@ module.exports = class MulesoftService {
 		return requestPromise({
 			method: 'GET',
 			url: `${this.config.anypointExchangeUrl}/exchange/api/v1/organizations/${organizationId}/assets/${groupId}/${assetId}/${version}/pages/home`,
-			headers: { Authorization: `Bearer ${token}` }
+			headers: { Authorization: `Bearer ${token}` },
+			...this.proxySettings
 		});
 	}
 
@@ -404,7 +426,10 @@ module.exports = class MulesoftService {
 		let packaging = 'txt';
 		if (fileEntries.length > 0) {
 			if (fileEntries[0].packaging === 'zip' && (specFileClassifier === 'oas' || specFileClassifier === 'wsdl')) {
-				await unzipper.downloadAndUnzip(fileEntries[0].externalLink, fileEntries[0].mainFile).then(function (value) {
+				await unzipper.downloadAndUnzip({
+					url: fileEntries[0].externalLink,
+					...this.proxySettings
+				}, fileEntries[0].mainFile).then(function (value) {
 					specContent = value;
 				});
 				packaging = 'json';
@@ -416,7 +441,8 @@ module.exports = class MulesoftService {
 					encoding: null,
 					headers: {
 						Accept: '*/*'
-					}
+					},
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -429,9 +455,8 @@ module.exports = class MulesoftService {
 					method: 'GET',
 					url: fileEntries[0].externalLink,
 					encoding: null,
-					headers: {
-						Accept: "*/*"
-					}
+					headers: { Accept: "*/*" },
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -442,9 +467,8 @@ module.exports = class MulesoftService {
 					method: 'GET',
 					url: fileEntries[0].externalLink,
 					encoding: null,
-					headers: {
-						Accept: "*/*"
-					}
+					headers: { Accept: "*/*" },
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -455,7 +479,8 @@ module.exports = class MulesoftService {
 			image = await requestPromise({
 				method: 'GET',
 				url: api.icon,
-				encoding: null
+				encoding: null,
+				...this.proxySettings
 			});
 			image = image.toString('base64');
 		}
@@ -465,7 +490,8 @@ module.exports = class MulesoftService {
 			await requestPromise({
 				method: 'GET',
 				url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets/${api.id}`,
-				headers: { Authorization: `Basic ${token}` }
+				headers: { Authorization: `Basic ${token}` },
+				...this.proxySettings
 			})
 		);
 	
