@@ -44,9 +44,11 @@ module.exports = class MulesoftService {
 		const networkSettings = loadConfig().get('network');
 		const strictSSL = networkSettings.strictSSL;
 		const proxy = networkSettings.httpProxy;
+
 		if (strictSSL === false) {
 			this.proxySettings.strictSSL = false;
 		}
+
 		if (proxy) {
 			try {
 				const parsedProxy = new URL(proxy);
