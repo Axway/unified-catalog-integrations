@@ -586,7 +586,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 5. Add an action of type `HTTP` to configure calling to Integration Builder
 
    * Set `Method`to `POST`
-   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
+   * Set `URI`to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FLOW_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
    * Set `Headers`to `Content-Type: application/json`<p/>
    * Set the `Body`to
     
@@ -642,7 +642,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 9. On the `If yes` branch, send the event data to Integration Builder.
    * Select a `HTTP` action. 
    * Set the `Method` to `POST`
-   * Set the `URI` to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FORMULA_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
+   * Set the `URI` to `https://staging.cloud-elements.com/elements/api-v2/formulas/instances/{FLOW_INSTANCE_ID_HERE}/executions`. Please make sure to replace {FLOW_INSTANCE_ID_HERE} with the Flow Instance ID created at Step 3: Configure Integration Builder flow to update subscriptions and send email notifications. 
    * Set the `Headers` to `Content-Type: application/json`
    * Set the `Body`to:
     
