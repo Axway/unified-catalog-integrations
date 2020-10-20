@@ -1,13 +1,14 @@
-const request = require("request");
 const fs = require("fs");
 const yaml = require("js-yaml");
 const urlParser = require("url");
 const SwaggerParser = require("@apidevtools/swagger-parser");
-const { requestPromise, commitToFs, getIconData } = require("./utils");
+import { requestPromise, commitToFs, getIconData } from "./utils";
+import { loadConfig } from '@axway/amplify-config';
 
 module.exports = class SwaggerHubService {
   constructor(config) {
     this.config = config || {};
+    this.proxySettings = {};
 
     // Assert required params
 		let missingParam = [
@@ -24,14 +25,34 @@ module.exports = class SwaggerHubService {
 
 		if (missingParam.length) {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central swaggerhub-extension config set -h' to see a list of params`);
-			process.exit(1);
+			return process.exit(1);
     }
+
+    const networkSettings = loadConfig().get('network');
+		const strictSSL = networkSettings.strictSSL;
+		const proxy = networkSettings.httpProxy;
+
+		if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
+		}
+
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+			} catch (e) {
+				console.log(`Could not parse proxy url ${proxy}`);
+				return process.exit(1);
+			}
+		}
     
     // Request settings for fetching apis
     this.requestSettings = {
       getAPIs: {
         method: "GET",
         url: `${this.config.rootUrl}${this.config.owner}`,
+        ...this.proxySettings
       },
     };
   }
