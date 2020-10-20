@@ -51,8 +51,7 @@ module.exports = class SwaggerHubService {
     this.requestSettings = {
       getAPIs: {
         method: "GET",
-        url: `${this.config.rootUrl}${this.config.owner}`,
-        ...this.proxySettings
+        url: `${this.config.rootUrl}${this.config.owner}`
       },
     };
   }
@@ -68,6 +67,7 @@ module.exports = class SwaggerHubService {
     console.log('Listing Swaggerhub APIs');
     return requestPromise({
       ...this.requestSettings.getAPIs,
+      ...this.proxySettings
     });
   }
 

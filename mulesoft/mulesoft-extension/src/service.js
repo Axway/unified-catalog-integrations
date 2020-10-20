@@ -1,4 +1,3 @@
-const request = require('request');
 const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
