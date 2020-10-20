@@ -17,12 +17,14 @@ Check out our [readme](https://github.com/Axway/unified-catalog-integrations/blo
 ### Integration with Mulesoft Anypoint Exchange
 Check out our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/mulesoft/MulesoftIntegtration.md) to learn how to publish APIs from Mulesoft to Unified Catalog, and build a custom subscription flow to delegate the aprroval of suscription requests to Microsoft Teams. 
 
+### Integration with Bitbucket
+Read our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/bitbucket/bitbucket-extension/README.md) to learn how to fetch APIs from Bitbucket and publish them to the Unified Catalog.
+
 ### Integration with Github
 Read our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/github/github-extension/Readme.md) to learn how to fetch APIs from Github and publish them to the Unified Catalog.  
 
 ### Integration with SwaggerHub
 Check our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/swaggerhub/swaggerhub-extension/README.md) to learn how to fetch your API definitions from SwaggerHub and publish them to the Unified Catalog. 
-
 
 ### Integration with Apigee
 Check our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/apigee/apigee-extension/README.md) to learn how to fetch your API definitions from Apigee and publish them to the Unified Catalog. 
