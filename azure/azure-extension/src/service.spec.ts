@@ -108,7 +108,7 @@ describe('service', () => {
 		expect(response).to.equal('response');
 		expect(requestPromise.lastCall.args[0])
 			.to.deep.equal({
-				...service.requestSettings.getAPIs,
+				...service.requestSettings.getAPIs('Bearer token'),
 				headers: { Authorization: `Bearer mytoken` }
 			})
 	});

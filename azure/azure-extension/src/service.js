@@ -49,7 +49,6 @@ module.exports =  class AzureService {
 			}
 		}
 		
-
 		const {
 			tenantId,
 			clientId,
@@ -79,19 +78,17 @@ module.exports =  class AzureService {
 					client_id: clientId,
 					client_secret: clientSecret,
 					resource: 'https://management.azure.com/'
-				},
-				...this.proxySettings
+				}
 			},
-			getAPIs: {
+			getAPIs: (token) => ({
 				method: 'GET',
 				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis?api-version=2019-01-01&$top=100${filterString}`,
-				...this.proxySettings
-			},
+				headers: { Authorization: `Bearer ${token}` }
+			}),
 			getSwagger: (name, token) => ({
 				method: 'GET',
-				headers: { Authorization: `Bearer ${token}` },
 				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${name}?export=true&format=swagger&api-version=2019-01-01`,
-				...this.proxySettings
+				headers: { Authorization: `Bearer ${token}` }
 			})
 		}
 	}
@@ -107,20 +104,26 @@ module.exports =  class AzureService {
 
 	// auth azure
 	_authorize() {
-		return requestPromise(this.requestSettings.azureAuth);
+		return requestPromise({
+			...this.requestSettings.azureAuth,
+			...this.proxySettings
+		});
 	}
 
 	// list azure apis
 	_listAPIs (token) {
 		return requestPromise({
-			...this.requestSettings.getAPIs,
-			headers: { Authorization: `Bearer ${token}` }
+			...this.requestSettings.getAPIs(token),
+			...this.proxySettings
 		});
 	}
 
 	// fetch an azure swagger def
 	async _getSwagger(name, token) {
-		return requestPromise(this.requestSettings.getSwagger(name, token))
+		return requestPromise({
+			...this.requestSettings.getSwagger(name, token),
+			...this.proxySettings
+		})
 	}
 
 	// take the api info and the config info and prep data for generating yaml files

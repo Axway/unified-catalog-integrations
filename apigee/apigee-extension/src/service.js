@@ -63,21 +63,54 @@ module.exports =  class ApigeeService {
 					grant_type: 'password',
 					username: username,
 					password: password
-				},
-				...this.proxySettings
+				}
 			},
 			// get all APIs
-			APIsOptions: {
+			APIsOptions: (token) => ({
 				method: 'GET',
 				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis`,
-				...this.proxySettings
-			},
-		
-			environments: {
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			environments: (token) => ({
 				method: 'GET',
 				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/environments`,
-				...this.proxySettings
-			}
+				headers: { Authorization: `Basic ${token}`, Accept: 'application/json' }
+			}),
+			revisionDetails: (apiName, revisionNumber, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis/${apiName}/revisions/${revisionNumber}`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			resourceFiles: (apiName, revisionNumber, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			revisionSpec: (apiName, revisionNumber, specFile, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles/openapi/${specFile}`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			deployments: (apiName, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis/${apiName}/deployments`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			hosts: (envName, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/environments/${envName}/virtualhosts`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			virtualHosts: (envName, virtualHostName, token) => ({
+				method: 'GET',
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/environments/${envName}/virtualhosts/${virtualHostName}`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			swagger: (specPath, token) => ({
+				method: 'GET',
+				url: `https://apigee.com${specPath}`,
+				headers: { Authorization: `Bearer ${token}` }
+			})
 		}
 	}
 
@@ -92,33 +125,32 @@ module.exports =  class ApigeeService {
 	// Authorize
 	async _authorize() {
 		this.log('Generating access token');
-		return requestPromise(this.requestSettings.apigeeAuth);
+		return requestPromise({
+			...this.requestSettings.apigeeAuth,
+			...this.proxySettings
+		});
 	};
 
 	// List APIS from apigee
 	async _listAPIs(token) {
 		return requestPromise({
-			...this.requestSettings.APIsOptions,
-			headers: { Authorization: `Basic ${token}` }
+			...this.requestSettings.APIsOptions(token),
+			...this.proxySettings
 		});
 	};
 
 	// Get api revision details
 	async _apiRevisionDetails(token, apiName, revisionNumber) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.revisionDetails(apiName, revisionNumber, token),
 			...this.proxySettings
-		});
+		})
 	};
 
 	// Get a list of resource files
 	async _apiResourceFiles(token, apiName, revisionNumber) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.resourceFiles(apiName, revisionNumber, token),
 			...this.proxySettings
 		});
 	};
@@ -126,9 +158,7 @@ module.exports =  class ApigeeService {
 	// Get openapi spec association
 	async _apiRevisionSpecAssociation(token, apiName, revisionNumber, specFile) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles/openapi/${specFile}`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.revisionSpec(apiName, revisionNumber, specFile, token),
 			...this.proxySettings
 		});
 	};
@@ -136,9 +166,7 @@ module.exports =  class ApigeeService {
 	// List all virtual hosts for environment
 	async _listAPIDeployments(token, apiName) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/deployments`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.deployments(apiName, token),
 			...this.proxySettings
 		});
 	};
@@ -146,19 +174,15 @@ module.exports =  class ApigeeService {
 	// List all the environments
 	async _listEnvironments(token) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments`,
-			headers: { Authorization: `Basic ${token}`, Accept: 'application/json' },
+			...this.requestSettings.environments(token),
 			...this.proxySettings
-		});
+		})
 	};
 
 	// List all virtual hosts for environment
 	async _listVirtualHostsForEnvironment(token, envName) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments/${envName}/virtualhosts`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.hosts(envName, token),
 			...this.proxySettings
 		});
 	};
@@ -166,9 +190,7 @@ module.exports =  class ApigeeService {
 	// Get virtual hosts details
 	async _listVirtualHostDetailsForEnvironment(token, envName, virtualHostName) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments/${envName}/virtualhosts/${virtualHostName}`,
-			headers: { Authorization: `Basic ${token}` },
+			...this.requestSettings.virtualHosts(envName, virtualHostName, token),
 			...this.proxySettings
 		});
 	};
@@ -176,9 +198,7 @@ module.exports =  class ApigeeService {
 	// Get swagger for an API def
 	async _getSwagger(specPath, token) {
 		return requestPromise({
-			method: 'GET',
-			url: `https://apigee.com${specPath}`,
-			headers: { Authorization: `Bearer ${token}` },
+			...this.requestSettings.swagger(specPath, token),
 			...this.proxySettings
 		});
 	};

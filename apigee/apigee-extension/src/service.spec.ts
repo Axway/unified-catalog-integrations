@@ -146,8 +146,7 @@ describe('service', () => {
 		await service._listAPIs('token');
 		expect(requestPromise.callCount).to.equal(1);
 		expect(requestPromise.lastCall.args[0]).to.deep.equal({
-			...service.requestSettings.APIsOptions,
-			headers: { Authorization: 'Basic token' }
+			...service.requestSettings.APIsOptions('token')
 		})
 	});
 
