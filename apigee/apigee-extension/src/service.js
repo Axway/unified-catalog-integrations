@@ -1,11 +1,12 @@
-const request = require('request');
 const fs = require('fs');
 const yaml = require('js-yaml');
 const { requestPromise, commitToFs } = require('./utils');
+import { loadConfig } from '@axway/amplify-config';
 
 module.exports =  class ApigeeService {
 	constructor(config, log) {
 		this.config = config || {};
+		this.proxySettings = {};
 		this.log = log;
 		let missingParam = [
 			'organizationId',
@@ -22,7 +23,26 @@ module.exports =  class ApigeeService {
 
 		if (missingParam.length) {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central apigee-extension config set -h' to see a list of params`);
-			process.exit(1);
+			return process.exit(1);
+		}
+
+		const networkSettings = loadConfig().get('network');
+		const strictSSL = networkSettings.strictSSL;
+		const proxy = networkSettings.httpProxy;
+
+		if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
+		}
+
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+			} catch (e) {
+				console.log(`Could not parse proxy url ${proxy}`);
+				return process.exit(1);
+			}
 		}
 
 		const {
@@ -43,17 +63,20 @@ module.exports =  class ApigeeService {
 					grant_type: 'password',
 					username: username,
 					password: password
-				}
+				},
+				...this.proxySettings
 			},
 			// get all APIs
 			APIsOptions: {
 				method: 'GET',
-				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis`
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/apis`,
+				...this.proxySettings
 			},
 		
 			environments: {
 				method: 'GET',
-				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/environments`
+				url: `https://api.enterprise.apigee.com/v1/organizations/${organizationId}/environments`,
+				...this.proxySettings
 			}
 		}
 	}
@@ -85,7 +108,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -94,7 +118,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -103,7 +128,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/revisions/${revisionNumber}/resourcefiles/openapi/${specFile}`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -112,7 +138,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/apis/${apiName}/deployments`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -121,7 +148,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments`,
-			headers: { Authorization: `Basic ${token}`, Accept: 'application/json' }
+			headers: { Authorization: `Basic ${token}`, Accept: 'application/json' },
+			...this.proxySettings
 		});
 	};
 
@@ -130,7 +158,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments/${envName}/virtualhosts`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -139,7 +168,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://api.enterprise.apigee.com/v1/organizations/${this.config.organizationId}/environments/${envName}/virtualhosts/${virtualHostName}`,
-			headers: { Authorization: `Basic ${token}` }
+			headers: { Authorization: `Basic ${token}` },
+			...this.proxySettings
 		});
 	};
 
@@ -148,7 +178,8 @@ module.exports =  class ApigeeService {
 		return requestPromise({
 			method: 'GET',
 			url: `https://apigee.com${specPath}`,
-			headers: { Authorization: `Bearer ${token}` }
+			headers: { Authorization: `Bearer ${token}` },
+			...this.proxySettings
 		});
 	};
 

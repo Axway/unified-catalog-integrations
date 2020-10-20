@@ -45,7 +45,7 @@ module.exports =  class AzureService {
 				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
 			} catch (e) {
 				console.log(`Could not parse proxy url ${proxy}`);
-				process.exit(1);
+				return process.exit(1);
 			}
 		}
 		

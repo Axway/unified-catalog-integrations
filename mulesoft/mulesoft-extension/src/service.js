@@ -34,7 +34,7 @@ module.exports = class MulesoftService {
 
 		if (missingParam.length) {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central mulesoft-extension config set -h' to see a list of params`);
-			process.exit(1);
+			return process.exit(1);
 		}
 
 		if (!this.config.anypointExchangeUrl) {

@@ -14,8 +14,7 @@ describe('service', () => {
 	let generateAssets: SinonStub;
 	let requestPromise: SinonStub = sandbox.stub();
 	let commitToFs: SinonStub = sandbox.stub();
-
-	
+	let proxyConfig = {};
 
 	let Service = proxyquire('./service', {
 		'./utils': {
@@ -40,8 +39,6 @@ describe('service', () => {
 		environmentName: 'test',
 		filter: 'tags=unifiedcatalog, stuff=foo'
 	}
-
-	let proxyConfig = {};
 
 	afterEach(() => {
 		sandbox.restore();
