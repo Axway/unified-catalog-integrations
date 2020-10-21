@@ -59,7 +59,7 @@
     "typescript": "^3.9.2"
   },
   "dependencies": {
-    "@axway/amplify-config": "^2.1.3",
+    "@axway/amplify-config": "^1.3.0",
     "form-data": "^3.0.0",
     "fs-extra": "^9.0.0",
     "js-yaml": "^3.14.0",

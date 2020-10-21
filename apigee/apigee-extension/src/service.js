@@ -27,7 +27,7 @@ module.exports =  class ApigeeService {
 		}
 
 		const networkSettings = loadConfig().get('network') || {};
-		const strictSSL = networkSettings.strictSSL;
+		const strictSSL = networkSettings.strictSSL || {};
 		const proxy = networkSettings.httpProxy;
 
 		if (strictSSL === false) {
