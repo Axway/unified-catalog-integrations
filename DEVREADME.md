@@ -77,21 +77,3 @@ vim <path to cli>
 
 3. Azure generate resources ```amplify central azure-extension resources generate```
 
-
-## Convenience commands (unix)
-
-```bash
-
-# Add all extensions at once
-for i in `ls -1 | grep \-extension`; do name=`echo $i | awk -F- '{print $1}'`; amplify central config set extensions.$name `pwd`/$i; done
-
-# Build all extensions
-for i in `ls -1 | grep \-extension`; do cd $i; yarn && yarn build; cd ..; done
-
-# Run all extensions
-for i in `ls -1 | grep \-extension`; do amplify central $i resources generate; done
-
-# Run all tests
-for i in `ls -1 | grep \-extension`; do cd $i; yarn test:nc; cd ..; done
-
-```
