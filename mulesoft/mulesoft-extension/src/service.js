@@ -41,7 +41,7 @@ module.exports = class MulesoftService {
 		}
 
 		const anypointExchangeUrl = this.config.anypointExchangeUrl;
-		const networkSettings = loadConfig().get('network');
+		const networkSettings = loadConfig().get('network') || {};
 		const strictSSL = networkSettings.strictSSL;
 		const proxy = networkSettings.httpProxy;
 

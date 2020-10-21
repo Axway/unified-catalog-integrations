@@ -28,7 +28,7 @@ module.exports = class SwaggerHubService {
 			return process.exit(1);
     }
 
-    const networkSettings = loadConfig().get('network');
+    const networkSettings = loadConfig().get('network') || {};
 		const strictSSL = networkSettings.strictSSL;
 		const proxy = networkSettings.httpProxy;
 
