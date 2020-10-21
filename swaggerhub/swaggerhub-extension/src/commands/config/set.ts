@@ -32,7 +32,7 @@ export const set = {
   aliases: ["set"],
   options: {
     "--owner [value]": "Required: Set your Swagger Hub owner name",
-    "--root-url [value]": "Required: Set Swagger Hub root url",
+    "--root-url [value]": "Set Swagger Hub root url. Defaults to https://api.swaggerhub.com/apis/",
     "--output-dir [value]": "Set absolute path for output directory",
     "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",

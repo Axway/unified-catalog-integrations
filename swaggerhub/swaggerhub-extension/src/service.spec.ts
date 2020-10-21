@@ -41,6 +41,17 @@ describe('service', () => {
 		proxyConfig = {}
 	});
 
+	it('init: defaults rootUrl', () => {
+		consoleStub = sandbox.stub(console, 'log');
+		processStub = sandbox.stub(process, 'exit');
+		const extension = new Service({
+			owner: 'stoda',
+			environmentName: 'test'
+		});
+		expect(processStub.callCount).to.equal(0);
+		expect(extension.config).to.haveOwnProperty('rootUrl');
+		expect(extension.config.rootUrl).to.equal('https://api.swaggerhub.com/apis/');
+	})
 	it('init: construct class ok & sets properties', () => {
 		proxyConfig = {
 			httpProxy: 'http://foo:bar@test.com:8080'

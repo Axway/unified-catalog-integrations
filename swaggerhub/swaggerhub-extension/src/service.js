@@ -12,7 +12,6 @@ module.exports = class SwaggerHubService {
 
     // Assert required params
 		let missingParam = [
-      'rootUrl',
       'owner',
 			'environmentName'
 		].reduce((acc, cur) => {
@@ -27,6 +26,10 @@ module.exports = class SwaggerHubService {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central swaggerhub-extension config set -h' to see a list of params`);
 			return process.exit(1);
     }
+
+    if (!this.config.rootUrl) {
+			this.config.rootUrl = 'https://api.swaggerhub.com/apis/'
+		}
 
     const networkSettings = loadConfig().get('network') || {};
 		const strictSSL = networkSettings.strictSSL;
