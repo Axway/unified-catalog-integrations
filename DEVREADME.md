@@ -40,7 +40,7 @@ Under src/commands/resources/generate.ts is where you add/shoehorn the generate 
 2. Fetch the apis from service
 
 3. Create the files
-Give that array of properties to createResources and it will generate the yamls
+
 
 ## Debugging
 
