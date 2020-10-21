@@ -44,7 +44,7 @@ Under src/commands/resources/generate.ts is where you add/shoehorn the generate 
 
 ## Debugging
 
-There are several ways you can debug a new/current extension. Several extensions come with a launch file you can use to debug in vscode. Alternatively, you can use the blow method:
+There are several ways you can debug a new/current extension. Several extensions come with a launch file you can use to debug in vscode. Alternatively, you can use the below method:
 
 1. Add your breakpoints with 'debugger' statements
 
