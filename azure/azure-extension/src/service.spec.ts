@@ -14,12 +14,18 @@ describe('service', () => {
 	let generateAssets: SinonStub;
 	let requestPromise: SinonStub = sandbox.stub();
 	let commitToFs: SinonStub = sandbox.stub();
+	let proxyConfig = {};
 
 	let Service = proxyquire('./service', {
 		'./utils': {
 			requestPromise,
 			commitToFs,
 			getIconData: () => ({})
+		},
+		'@axway/amplify-config': {
+			loadConfig: () => ({
+				get: () => (proxyConfig)
+			})
 		}
 	});
 
@@ -36,15 +42,32 @@ describe('service', () => {
 
 	afterEach(() => {
 		sandbox.restore();
+		proxyConfig = {}
 	});
 
 	it('init: construct class ok & sets properties', () => {
+		proxyConfig = {
+			httpProxy: 'http://foo:bar@test.com:8080'
+		}
+		consoleStub = sandbox.stub(console, 'log');
 		processStub = sandbox.stub(process, 'exit');
 		const extension = new Service(okConfig);
 		expect(processStub.callCount).to.equal(0);
 		expect(extension).to.haveOwnProperty('log');
 		expect(extension).to.haveOwnProperty('config');
 		expect(extension).to.haveOwnProperty('requestSettings');
+		expect(consoleStub.lastCall.args[0].startsWith('Connecting using proxy settings')).to.be.true;
+	});
+
+	it('init: error if httpProxy is non-url', () => {
+		proxyConfig = {
+			httpProxy: 'not a url'
+		}
+		processStub = sandbox.stub(process, 'exit');
+		consoleStub = sandbox.stub(console, 'log');
+		new Service(okConfig);
+		expect(processStub.callCount).to.equal(1);
+		expect(consoleStub.lastCall.args[0].startsWith('Could not parse proxy')).to.be.true;
 	});
 
 	it('init: error if missing required params', () => {
@@ -85,7 +108,7 @@ describe('service', () => {
 		expect(response).to.equal('response');
 		expect(requestPromise.lastCall.args[0])
 			.to.deep.equal({
-				...service.requestSettings.getAPIs,
+				...service.requestSettings.getAPIs('Bearer token'),
 				headers: { Authorization: `Bearer mytoken` }
 			})
 	});

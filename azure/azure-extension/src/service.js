@@ -1,13 +1,13 @@
-const request = require('request');
 const fs = require('fs');
 const yaml = require('js-yaml');
-const { requestPromise, getIconData, commitToFs } = require('./utils');
+import { requestPromise, getIconData, commitToFs } from './utils';
+import { loadConfig } from '@axway/amplify-config';
 
 module.exports =  class AzureService {
 	constructor(config, log) {
 		this.config = config || {};
+		this.proxySettings = {};
 		this.log = log;
-
 		// Assert required params
 		let missingParam = [
 			'tenantId',
@@ -27,9 +27,28 @@ module.exports =  class AzureService {
 
 		if (missingParam.length) {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central azure-extension config set -h' to see a list of params`);
-			process.exit(1);
+			return process.exit(1);
+		} 
+		
+		const networkSettings = loadConfig().get('network') || {};
+		const strictSSL = networkSettings.strictSSL;
+		const proxy = networkSettings.httpProxy;
+
+		if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
 		}
 
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+			} catch (e) {
+				console.log(`Could not parse proxy url ${proxy}`);
+				return process.exit(1);
+			}
+		}
+		
 		const {
 			tenantId,
 			clientId,
@@ -61,14 +80,15 @@ module.exports =  class AzureService {
 					resource: 'https://management.azure.com/'
 				}
 			},
-			getAPIs: {
+			getAPIs: (token) => ({
 				method: 'GET',
-				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis?api-version=2019-01-01&$top=100${filterString}`
-			},
+				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis?api-version=2019-01-01&$top=100${filterString}`,
+				headers: { Authorization: `Bearer ${token}` }
+			}),
 			getSwagger: (name, token) => ({
 				method: 'GET',
-				headers: { Authorization: `Bearer ${token}` },
-				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${name}?export=true&format=swagger&api-version=2019-01-01`
+				url: `https://management.azure.com/subscriptions/${subscriptionId}/resourceGroups/${resourceGroupName}/providers/Microsoft.ApiManagement/service/${serviceName}/apis/${name}?export=true&format=swagger&api-version=2019-01-01`,
+				headers: { Authorization: `Bearer ${token}` }
 			})
 		}
 	}
@@ -84,20 +104,26 @@ module.exports =  class AzureService {
 
 	// auth azure
 	_authorize() {
-		return requestPromise(this.requestSettings.azureAuth);
+		return requestPromise({
+			...this.requestSettings.azureAuth,
+			...this.proxySettings
+		});
 	}
 
 	// list azure apis
 	_listAPIs (token) {
 		return requestPromise({
-			...this.requestSettings.getAPIs,
-			headers: { Authorization: `Bearer ${token}` }
+			...this.requestSettings.getAPIs(token),
+			...this.proxySettings
 		});
 	}
 
 	// fetch an azure swagger def
 	async _getSwagger(name, token) {
-		return requestPromise(this.requestSettings.getSwagger(name, token))
+		return requestPromise({
+			...this.requestSettings.getSwagger(name, token),
+			...this.proxySettings
+		})
 	}
 
 	// take the api info and the config info and prep data for generating yaml files

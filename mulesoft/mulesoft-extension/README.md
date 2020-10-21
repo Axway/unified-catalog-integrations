@@ -23,7 +23,7 @@ $ [sudo] npm install -g @axway/amplify-cli
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```bash
-$ amplify pm install @axway/amplify-central-cli@0.1.3-dev.10
+$ amplify pm install @axway/amplify-central-cli
 ```
 
 You can then install the @axway/amplify-central-mulesoft-extension:
