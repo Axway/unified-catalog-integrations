@@ -94,7 +94,7 @@ Copy the access token. You will use this to set the AMPLIFY Central Production e
 
 ![service_account](../images/CreateServiceAccount.PNG) 
 
-Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
+Save the **clientId** and **clientSecret** from the response which will be used in the Microsoft flow. Below is an example of the response body. 
 
 ```json
 {
@@ -120,7 +120,10 @@ Save the **clientId** and **clientSecret** from the response which will be used 
 ### Step 2: Configure Microsoft Teams flow to Approve / Reject subscription requests
 ***
 
-**AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
+**AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.
+This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. 
+The API provider can then approve or reject the subscription requests from within the MS Active card.
+ 
 The MS flow will also post notifications in the channel for any subscription updates. 
 
 ![ms_teams](../images/MSTeamsAdaptiveCard.png)

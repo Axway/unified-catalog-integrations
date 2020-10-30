@@ -1,8 +1,8 @@
-const request = require('request');
 const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
 import { commitToFs, requestPromise } from './utils';
+import { loadConfig } from '@axway/amplify-config';
 
 const ORDER = [
 	'Environment',
@@ -17,6 +17,7 @@ const ORDER = [
 module.exports = class MulesoftService {
 	constructor(config) {
 		this.config = config || {};
+		this.proxySettings = {};
 		let missingParam = [
 			'password',
 			'username',
@@ -32,11 +33,75 @@ module.exports = class MulesoftService {
 
 		if (missingParam.length) {
 			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central mulesoft-extension config set -h' to see a list of params`);
-			process.exit(1);
+			return process.exit(1);
 		}
 
 		if (!this.config.anypointExchangeUrl) {
 			this.config.anypointExchangeUrl = 'https://anypoint.mulesoft.com'
+		}
+
+		const anypointExchangeUrl = this.config.anypointExchangeUrl;
+		const networkSettings = loadConfig().get('network') || {};
+		const strictSSL = networkSettings.strictSSL;
+		const proxy = networkSettings.httpProxy;
+
+		if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
+		}
+
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+			} catch (e) {
+				console.log(`Could not parse proxy url ${proxy}`);
+				process.exit(1);
+			}
+		}
+
+		this.requestSettings = {
+			listAPIs: (token, pageSize, offset, orgId) => ({
+				method: 'GET',
+				url: `${anypointExchangeUrl}/exchange/api/v2/assets?offset=${offset}&limit=${pageSize}&masterOrganizationId=${orgId}`,
+				headers: { Authorization: `Basic ${token}` }
+			}),
+			getAccessToken: (username, password) => ({
+				method: 'POST',
+				url: `${anypointExchangeUrl}/accounts/login`,
+				json: {
+					username,
+					password
+				}
+			}),
+			assetLinkedAPI: (token, organizationId, environmentId, assetId) => ({
+				method: 'GET',
+				url: `${anypointExchangeUrl}/apimanager/api/v1/organizations/${organizationId}/environments/${environmentId}/apis?assetId=${assetId}`,
+				headers: { Authorization: `Bearer ${token}` }
+			}),
+			getAssetHomePage: (token, organizationId, groupId, assetId, version) => ({
+				method: 'GET',
+				url: `${anypointExchangeUrl}/exchange/api/v1/organizations/${organizationId}/assets/${groupId}/${assetId}/${version}/pages/home`,
+				headers: { Authorization: `Bearer ${token}` }
+			}),
+			apiDetails: (url) => ({
+				method: 'GET',
+				url,
+				encoding: null,
+				headers: {
+					Accept: '*/*'
+				}
+			}),
+			apiDetailsIcon: (url) => ({
+				method: 'GET',
+				url,
+				encoding: null
+			}),
+			apiDetailsInstances: (token, apiId) => ({
+				method: 'GET',
+				url: `${anypointExchangeUrl}/exchange/api/v2/assets/${apiId}`,
+				headers: { Authorization: `Basic ${token}` }
+			})
 		}
 	}
 
@@ -349,37 +414,30 @@ module.exports = class MulesoftService {
 
 	async listAPIs (token, pageSize, offset, orgId) {
 		return requestPromise({
-			method: 'GET',
-			url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets?offset=${offset}&limit=${pageSize}&masterOrganizationId=${orgId}`,
-			headers: { Authorization: `Basic ${token}` }
+			...this.requestSettings.listAPIs(token, pageSize, offset, orgId),
+			...this.proxySettings
 		});
 	}
 
 	async getAccessToken (username, password) {
 		console.log('Logging into Mulesoft');
 		return requestPromise({
-			method: 'POST',
-			url: `${this.config.anypointExchangeUrl}/accounts/login`,
-			json: {
-				username,
-				password
-			}
+			...this.requestSettings.getAccessToken(username, password),
+			...this.proxySettings
 		});
 	}
 
 	async assetLinkedAPI (token, organizationId, environmentId, assetId) {
 		return requestPromise({
-			method: 'GET',
-			url: `${this.config.anypointExchangeUrl}/apimanager/api/v1/organizations/${organizationId}/environments/${environmentId}/apis?assetId=${assetId}`,
-			headers: { Authorization: `Bearer ${token}` }
+			...this.requestSettings.assetLinkedAPI(token, organizationId, environmentId, assetId),
+			...this.proxySettings
 		});
 	}
 
 	async getAssetHomePage(token, organizationId, groupId, assetId, version) {
 		return requestPromise({
-			method: 'GET',
-			url: `${this.config.anypointExchangeUrl}/exchange/api/v1/organizations/${organizationId}/assets/${groupId}/${assetId}/${version}/pages/home`,
-			headers: { Authorization: `Bearer ${token}` }
+			...this.requestSettings.getAssetHomePage(token, organizationId, groupId, assetId, version),
+			...this.proxySettings
 		});
 	}
 
@@ -404,19 +462,18 @@ module.exports = class MulesoftService {
 		let packaging = 'txt';
 		if (fileEntries.length > 0) {
 			if (fileEntries[0].packaging === 'zip' && (specFileClassifier === 'oas' || specFileClassifier === 'wsdl')) {
-				await unzipper.downloadAndUnzip(fileEntries[0].externalLink, fileEntries[0].mainFile).then(function (value) {
+				await unzipper.downloadAndUnzip({
+					url: fileEntries[0].externalLink,
+					...this.proxySettings
+				}, fileEntries[0].mainFile).then(function (value) {
 					specContent = value;
 				});
 				packaging = 'json';
 			} else {
 				// custom file
 				specContent = await requestPromise({
-					method: 'GET',
-					url: fileEntries[0].externalLink,
-					encoding: null,
-					headers: {
-						Accept: '*/*'
-					}
+					...this.requestSettings.apiDetails(fileEntries[0].externalLink),
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -426,12 +483,8 @@ module.exports = class MulesoftService {
 			fileEntries = api.files.filter(filter => filter.classifier === 'fat-raml');
 			if (fileEntries.length > 0) {
 				specContent = await requestPromise({
-					method: 'GET',
-					url: fileEntries[0].externalLink,
-					encoding: null,
-					headers: {
-						Accept: "*/*"
-					}
+					...this.requestSettings.apiDetails(fileEntries[0].externalLink),
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -439,12 +492,8 @@ module.exports = class MulesoftService {
 			fileEntries = api.files.filter(filter => filter.packaging === 'jar');
 			if (fileEntries.length > 0) {
 				specContent = await requestPromise({
-					method: 'GET',
-					url: fileEntries[0].externalLink,
-					encoding: null,
-					headers: {
-						Accept: "*/*"
-					}
+					...this.requestSettings.apiDetails(fileEntries[0].externalLink),
+					...this.proxySettings
 				});
 				packaging = fileEntries[0].packaging;
 			}
@@ -453,9 +502,8 @@ module.exports = class MulesoftService {
 		let image = null;
 		if (api.icon) {
 			image = await requestPromise({
-				method: 'GET',
-				url: api.icon,
-				encoding: null
+				...this.requestSettings.apiDetailsIcon(api.icon),
+				...this.proxySettings
 			});
 			image = image.toString('base64');
 		}
@@ -463,9 +511,8 @@ module.exports = class MulesoftService {
 		//get instances
 		let assetDetails = JSON.parse(
 			await requestPromise({
-				method: 'GET',
-				url: `${this.config.anypointExchangeUrl}/exchange/api/v2/assets/${api.id}`,
-				headers: { Authorization: `Basic ${token}` }
+				...this.requestSettings.apiDetailsInstances(token, api.id),
+				...this.proxySettings
 			})
 		);
 	

@@ -33,7 +33,7 @@ describe('unzipper', () => {
 			.get('/')
 			.reply(200, [1, 2, 3])
 
-		await unzipper.downloadAndUnzip('http://example.com', 'foo.zip')
+		await unzipper.downloadAndUnzip({ url: 'http://example.com' }, 'foo.zip')
 		expect(getData.callCount).to.equal(1);
 	});
 
@@ -43,7 +43,7 @@ describe('unzipper', () => {
 			.get('/')
 			.reply(200, [1, 2, 3])
 
-		await unzipper.downloadAndUnzip('http://example.com')
+		await unzipper.downloadAndUnzip({ url: 'http://example.com' })
 		expect(getData.callCount).to.equal(1);
 	});
 
@@ -53,7 +53,7 @@ describe('unzipper', () => {
 			.get('/')
 			.reply(200, [1, 2, 3])
 		try {
-			await unzipper.downloadAndUnzip('http://example.com');
+			await unzipper.downloadAndUnzip({ url: 'http://example.com' });
 		}	catch (e) {
 			expect(getData.callCount).to.equal(0);
 			expect(e.message.startsWith('No file')).to.equal(true);

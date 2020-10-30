@@ -1,19 +1,19 @@
 var AdmZip = require('adm-zip');
 var request = require('request');
 
-var downloadAndUnzip = function(url, filename) {
+var downloadAndUnzip = function(requestOptions, filename) {
 	/**
      * Download a file
      * 
      * @param url
      */
-	var download = function(url) {
+	var download = function(requestOptions) {
 		return new Promise(function(resolve, reject) {
 			request(
 				{
-					url: url,
 					method: 'GET',
-					encoding: null
+					encoding: null,
+					...requestOptions
 				},
 				function(err, response, body) {
 					if (err) {
@@ -58,7 +58,7 @@ var downloadAndUnzip = function(url, filename) {
 			}
 		});
 	};
-	return download(url).then(unzip);
+	return download(requestOptions).then(unzip);
 };
 
 module.exports = {
