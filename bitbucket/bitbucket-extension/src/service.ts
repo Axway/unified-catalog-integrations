@@ -170,7 +170,6 @@ export class BitbucketService {
     let canPage = true; 
     while (canPage === true) {
 
-      // TODO: if path is an oas extension, we can just call write specification on the path I think instead of getpage
       if (isOASExtension(this.config.path)) {
         return this.writeSpecification(this.config.path)
       }
@@ -206,14 +205,14 @@ export class BitbucketService {
    * @param pageHash hash of the page to fetch
    */
   private async getPage(pageOptions: getPageConfig) {
-    const { pageHash, start, limit } = pageOptions;
+    const { pageHash: page, start, limit } = pageOptions;
     const { branch, repo, workspace, apiVersion, path, host } = this.config;
 
     let clientOptions: any;
     if (apiVersion === 'v1') {
       clientOptions = { start, limit, path, branch, repo_slug: repo, workspace, host }
     } else {
-      clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, page: pageHash }
+      clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, ...(!!page ? { page } : {}) }
     }
     try {
       const { data } = await this.client.source.read(clientOptions);
