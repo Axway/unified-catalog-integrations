@@ -8,48 +8,9 @@ import HttpsProxyAgent from "https-proxy-agent";
 import yaml from "js-yaml";
 import * as uri from "url";
 import * as p from "path";
-import { Config, ConfigKeys } from "../types";
+import { Config, ConfigKeys, ProxySettings, v1ReadOpts, v1BitbucketConfig, getPageConfig, pageValue } from "../types";
 import { commitToFs, getIconData, requestPromise, isOASExtension } from "./utils";
 
-type ProxySettings = {
-  strictSSL?: boolean;
-  proxy?: string
-}
-
-type v1ReadOpts = {
-  start: number,
-  limit: number,
-  path: string,
-  workspace: string,
-  repo_slug: string,
-  branch: string,
-  baseUrl: string
-}
-
-type v1BitbucketAuth = {
-  username?: string,
-  password?: string,
-  token?: string
-}
-
-type v1BitbucketConfig = {
-  auth: v1BitbucketAuth,
-  network: {
-    strictSSL?: boolean;
-    httpProxy?: string
-  }
-}
-
-type getPageConfig = {
-  pageHash?: string,
-  start?: number,
-  limit?: number
-}
-
-type pageValue = {
-  type?: string,
-  path?: string
-}
 
 class BitBucketV1 {
   private auth;
@@ -57,7 +18,7 @@ class BitBucketV1 {
 
   constructor (config: v1BitbucketConfig) {
     this.auth = config.auth;
-    const { strictSSL, httpProxy: proxy } = config.network;
+    const { strictSSL, httpProxy: proxy } = config.network || {};
 
     if (strictSSL === false) {
 			this.proxySettings.strictSSL = false;
@@ -67,7 +28,7 @@ class BitBucketV1 {
 			try {
 				const parsedProxy = new uri.URL(proxy);
 				this.proxySettings.proxy = proxy;
-				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${this.proxySettings.strictSSL}`);
 			} catch (e) {
 				console.log(`Could not parse proxy url ${proxy}`);
 				return process.exit(1);
@@ -81,8 +42,8 @@ class BitBucketV1 {
         const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, baseUrl } = options;
         const qs = `?start=${start}&limit=${limit}&at=${branch}`;
         const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
-  
         const url = uri.resolve(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`, `projects/${project}/repos/${repo}${dirOrFile}${qs}`)
+
         return { data: await requestPromise({
           method: 'GET',
           json: true,
@@ -140,12 +101,11 @@ export class BitbucketService {
     // read amplify-cli config values for network settings
     const amplifyConfig = loadConfig().values;
 
+    // Configure a proxy if it is configured
     let agent;
     if (amplifyConfig?.network) {
-      // using strict ssl mode by default
       const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
       const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
-      // using HttpsProxyAgent if proxy url configured, else - regular node agent.
       if (proxyUrl) {
         let parsedProxyUrl;
         try {
@@ -171,13 +131,13 @@ export class BitbucketService {
     }
 
     if (this.config.apiVersion === 'v1') {
-      // Mimic the npm module for older API
-     this.client = new BitBucketV1({ auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD], token: config[ConfigKeys.ACCESS_TOKEN] }, network: amplifyConfig?.network || {} })
+      this.client = new BitBucketV1({
+        auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD], token: config[ConfigKeys.ACCESS_TOKEN] },
+        network: amplifyConfig?.network
+      });
     } else {
       this.client = new Bitbucket({
-        auth: {
-          ...(config[ConfigKeys.USERNAME] ? { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] } : { token: config[ConfigKeys.ACCESS_TOKEN] })
-        },
+        auth: { ...(config[ConfigKeys.USERNAME] ? { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] } : { token: config[ConfigKeys.ACCESS_TOKEN] })},
         request: { agent },
         ...(this.config.baseUrl ? { baseUrl : this.config.baseUrl } : {})
       });
@@ -186,30 +146,29 @@ export class BitbucketService {
 
   public async generateResources() {
     /**
+     * Get page, for each values that is oas: write to writespec
      * v1:  while isLastPage !== true
-     *      get page, for each values that is oas, write to writespec
-     * 
-     * newer:  while data.next
-     *      get page, for each values that is oas write to spec
+     * v2:  while data.next
      */
 
-    let nextPageHash = "";
+    let nextPageHash = '';
     let start = 0;
     let limit = 25;
     let canPage = true; 
     while (canPage === true) {
 
+      // Write spec if the path was an absolute path
       if (isOASExtension(this.config.path)) {
         return this.writeSpecification(this.config.path)
       }
 
-      const data = await this.getPage({
+      const page = await this.getPage({
         pageHash: nextPageHash,
         start,
         limit
       });
 
-      const specPaths = data.values?.reduce((acc: Array<string>, item: pageValue | string) => {
+      const specPaths = page.values?.reduce((acc: Array<string>, item: pageValue | string) => {
         if (typeof item === 'object' && item.type === "commit_file" && isOASExtension(item.path || "")) {
          return acc.concat(item.path as string)
         }
@@ -221,10 +180,10 @@ export class BitbucketService {
 
       await Promise.all(specPaths.map((p: string) => this.writeSpecification(p)))
 
-      start = data.nextPageStart;
-      data.next = data.next || '';
-      nextPageHash = (data.next).substring(data.next.lastIndexOf("page="), data.next.length).replace("page=", "");
-      canPage = this.config.apiVersion === 'v1' ? !data.isLastPage : !!data.next
+      start = page.nextPageStart;
+      page.next = page.next || '';
+      nextPageHash = (page.next).substring(page.next.lastIndexOf("page="), page.next.length).replace("page=", "");
+      canPage = this.config.apiVersion === 'v1' ? !page.isLastPage : !!page.next
     }
   }
 

@@ -16,3 +16,41 @@ export enum ConfigKeys {
 export type Config = {
   [k in ConfigKeys]: string;
 };
+
+export type ProxySettings = {
+  strictSSL?: boolean;
+  proxy?: string
+}
+
+export type v1ReadOpts = {
+  start: number,
+  limit: number,
+  path: string,
+  workspace: string,
+  repo_slug: string,
+  branch: string,
+  baseUrl: string
+}
+
+export type v1BitbucketConfig = {
+  auth: {
+    username?: string,
+    password?: string,
+    token?: string
+  },
+  network: {
+    strictSSL?: boolean;
+    httpProxy?: string
+  }
+}
+
+export type getPageConfig = {
+  pageHash?: string,
+  start?: number,
+  limit?: number
+}
+
+export type pageValue = {
+  type?: string,
+  path?: string
+}
