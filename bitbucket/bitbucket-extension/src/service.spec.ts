@@ -25,6 +25,10 @@ describe("Bitbucket service", () => {
       workspace: "test",
       icon: "test",
       outputDir: "test",
+      path: "/",
+      host: "http://127.0.0.1:7990",
+      apiVersion: "v1",
+      accessToken: '123'
     };
     expect(() => new BitbucketService(config)).to.not.throw();
   });

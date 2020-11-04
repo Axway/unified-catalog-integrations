@@ -4,6 +4,7 @@ import yaml from "js-yaml";
 import mime from "mime-types";
 import { homedir } from "os";
 import { join, resolve } from "path";
+const request = require('request');
 
 export const configFilePath = join(homedir(), ".axway", "bitbucket-extension.json");
 export const ensureConfigFileExists = () => !pathExistsSync(configFilePath) && outputJsonSync(configFilePath, {});
@@ -72,3 +73,25 @@ export const commitToFs = async (resource: any, outputDir: string | boolean, res
   outputDir = typeof outputDir === "string" ? outputDir : "./resources";
   await writeResource(resource, outputDir, createYamlStr(resources));
 };
+
+// Creates a promise for a request 
+export const requestPromise = (options: any) => {
+  return new Promise((resolve, reject) => {
+    request(options, (err: any, response: any) => {
+      if (err) {
+				return reject(new Error(err));
+			} else if (response.statusCode > 200) {
+				return reject(new Error(`Bad response ${response.body}`))
+			}
+      resolve(response.body);
+    });
+  });
+};
+
+export const isOASExtension = (filename: string)  => {
+  if (["package-lock.json", "package.json", ".travis.yml", "fixup.yaml", "jpdiff.yaml"].includes(filename)) {
+    return false;
+  }
+  const pattern = /\.(yaml|yml|json)$/i;
+  return pattern.test(filename);
+}

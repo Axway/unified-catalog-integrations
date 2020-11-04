@@ -7,6 +7,10 @@ export enum ConfigKeys {
   REPO = "repo",
   WORKSPACE = "workspace",
   USERNAME = "username",
+  PATH = "path",
+  HOST = "host",
+  API_VERSION = "apiVersion",
+  ACCESS_TOKEN = "accessToken"
 }
 
 export type Config = {

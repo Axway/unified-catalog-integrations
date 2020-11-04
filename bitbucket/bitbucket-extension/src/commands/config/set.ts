@@ -37,5 +37,10 @@ export const set = {
     "--branch [value]": "Required: repository branch to search in",
     "--workspace [value]": "Required: repository workspace",
     "--username [value]": "Required: Bitbucket username",
+
+    "--path [value]": "Path in repo to search for specs. Use a spec's absolute path to import one. Defaults to root",
+    "--host [value]": "Bitbucket host, defaults to // TODO",
+    "--api-version [value]": "Bitbucket version, defaults to v1",
+    "--access-token [value]": "Bitbucket personal access token" 
   },
 };

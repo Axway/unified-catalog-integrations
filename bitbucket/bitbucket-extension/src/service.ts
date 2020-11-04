@@ -1,22 +1,114 @@
 import SwaggerParser from "@apidevtools/swagger-parser";
 //@ts-ignore
 import { loadConfig } from "@axway/amplify-cli-utils";
-import { Bitbucket, Schema as BitbucketSchema } from "bitbucket";
+import { Bitbucket } from "bitbucket";
+import { APIClient } from "bitbucket/src/plugins/register-endpoints/types";
 import https from "https";
 import { HttpsProxyAgent } from "https-proxy-agent";
 import yaml from "js-yaml";
 import { URL } from "url";
 import { Config, ConfigKeys } from "../types";
-import { commitToFs, getIconData } from "./utils";
+import { commitToFs, getIconData, requestPromise, isOASExtension } from "./utils";
+
+type Network = {
+  strictSSL?: boolean;
+  httpProxy?: string
+}
+
+type ProxySettings = {
+  strictSSL?: boolean;
+  proxy?: string
+}
+
+type v1ReadOpts = {
+  start: number,
+  limit: number,
+  path: string,
+  workspace: string,
+  repo_slug: string,
+  branch: string,
+  host: string
+}
+
+type v1BitbucketAuth = {
+  username?: string,
+  password?: string,
+  token?: string
+}
+
+type v1BitbucketConfig = {
+  auth: v1BitbucketAuth,
+  network: Network
+}
+
+type getPageConfig = {
+  pageHash?: string,
+  start?: number,
+  limit?: number
+}
+
+type pageValue = {
+  type?: string,
+  path?: string
+}
+
+class BitBucketV1 {
+  private auth;
+  private proxySettings: ProxySettings = {}
+
+  constructor (config: v1BitbucketConfig) {
+    this.auth = config.auth;
+    const { strictSSL, httpProxy: proxy } = config.network;
+
+    if (strictSSL === false) {
+			this.proxySettings.strictSSL = false;
+		}
+
+		if (proxy) {
+			try {
+				const parsedProxy = new URL(proxy);
+				this.proxySettings.proxy = proxy;
+				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
+			} catch (e) {
+				console.log(`Could not parse proxy url ${proxy}`);
+				return process.exit(1);
+			}
+		}
+  }
+  get source() {
+    let self = this;
+    return {
+      read:  async (options: v1ReadOpts) => {
+        const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, host } = options;
+        const qs = `?start=${start}&limit=${limit}&at=${branch}`;
+        const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
+       
+        const url = `${host}/rest/api/latest/projects/${project}/repos/${repo}${dirOrFile}${qs}`
+        return { data: await requestPromise({
+          method: 'GET',
+          json: true,
+          url,
+          auth: {
+            ...(self.auth.username ? { username: self.auth.username, password: self.auth.password } : { bearer: self.auth.token })
+          },
+          ...self.proxySettings
+        })}
+      }
+    }
+  }
+}
 
 export class BitbucketService {
-  private readonly client;
+  private readonly client : BitBucketV1 | APIClient
 
   constructor(private config: Config) {
     // validate if all the required configuration options have been set
-    if ([ConfigKeys.BRANCH, ConfigKeys.ENVIRONMENT_NAME, ConfigKeys.REPO, ConfigKeys.WORKSPACE, ConfigKeys.APP_PASSWORD, ConfigKeys.USERNAME].some((key) => !config[key])) {
+    // TODO: fix this
+    if ([ConfigKeys.BRANCH, ConfigKeys.ENVIRONMENT_NAME, ConfigKeys.REPO, ConfigKeys.WORKSPACE].some((key) => !config[key])) {
       throw new Error(`Missing required config. Run 'amplify central bitbucket-extension config set -h' to see a list of params`);
     }
+
+    this.config.apiVersion = this.config.apiVersion || 'v1'
 
     // read amplify-cli config values for network settings
     const amplifyConfig = loadConfig().values;
@@ -24,9 +116,11 @@ export class BitbucketService {
     let agent;
     if (amplifyConfig?.network) {
       // using strict ssl mode by default
-      const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
+      // TODO strictssl be negated here
+      const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || !amplifyConfig.network.strictSSL };
       const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
       // using HttpsProxyAgent if proxy url configured, else - regular node agent.
+      // TODO needs to be tested
       if (proxyUrl) {
         let parsedProxyUrl;
         try {
@@ -51,31 +145,52 @@ export class BitbucketService {
       }
     }
 
-    this.client = new Bitbucket({ auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] }, request: { agent } });
+    if (this.config.apiVersion === 'v1') {
+      // Mimic the npm module for older API
+     this.client = new BitBucketV1({ auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD], token: config[ConfigKeys.ACCESS_TOKEN] }, network: amplifyConfig?.network || {} })
+    } else {
+      this.client = new Bitbucket({ auth: {
+        ...(config[ConfigKeys.USERNAME] ? { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] } : { token: config[ConfigKeys.ACCESS_TOKEN] })
+        }, request: { agent } });
+    }
   }
 
   public async generateResources() {
+    /**
+     * v1:  while isLastPage !== true
+     *      get page, for each values that is oas, write to writespec
+     * 
+     * newer:  while data.next
+     *      get page, for each values that is oas write to spec
+     */
+
     let nextPageHash = "";
+    let start = 0;
+    let limit = 25;
+    let canPage = true; 
+    while (canPage === true) {
+      const data = await this.getPage({
+        pageHash: nextPageHash,
+        start,
+        limit
+      });
 
-    while (true) {
-      // get a page of contents
-      const data = await this.getPage(nextPageHash || undefined);
+      const specPaths = data.values?.reduce((acc: Array<string>, item: pageValue | string) => {
+        if (typeof item === 'object' && item.type === "commit_file" && isOASExtension(item.path || "")) {
+         return acc.concat(item.path as string)
+        }
+        if (isOASExtension(item as string)) {
+          return acc.concat(item as string);
+        }
+        return acc;
+      }, []);
 
-      // see if the page contains a file that could be a specification yaml / json
-      const entry = data.values?.find((e) => e.type === "commit_file" && this.isOASExtension(e.path || ""));
+      await Promise.all(specPaths.map((p: string) => this.writeSpecification(p)))
 
-      if (entry?.path) {
-        console.log(`Verifying specification at ${entry.path}`);
-        // verify if we found a specification at this path
-        await this.writeSpecification(entry.path);
-        break;
-      } else if (!data.next) {
-        // if we did not find a specification file and there is no more next page, throw an error
-        throw new Error("Could not find a specification file");
-      } else {
-        // there may be more pages to check, extract the page hash from the next link
-        nextPageHash = data.next.substring(data.next.lastIndexOf("page="), data.next.length).replace("page=", "");
-      }
+      start = data.nextPageStart;
+      data.next = data.next || '';
+      nextPageHash = (data.next).substring(data.next.lastIndexOf("page="), data.next.length).replace("page=", "");
+      canPage = this.config.apiVersion === 'v1' ? !data.isLastPage : !!data.next
     }
   }
 
@@ -84,10 +199,17 @@ export class BitbucketService {
    * @note pageHash = undefined fetches the first page
    * @param pageHash hash of the page to fetch
    */
-  private async getPage(pageHash?: string): Promise<BitbucketSchema.PaginatedTreeentries> {
-    const { branch, repo, workspace } = this.config;
+  private async getPage(pageOptions: getPageConfig) {
+    const { pageHash, start, limit } = pageOptions;
+    const { branch, repo, workspace, apiVersion, path, host } = this.config;
 
-    const { data } = await this.client.source.read({ max_depth: 20, node: branch, path: "", repo_slug: repo, workspace: workspace, page: pageHash });
+    let clientOptions: any;
+    if (apiVersion === 'v1') {
+      clientOptions = { start, limit, path, branch, repo_slug: repo, workspace, host }
+    } else {
+      clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, page: pageHash }
+    }
+    const { data } = await this.client.source.read(clientOptions);
     return data;
   }
 
@@ -96,26 +218,20 @@ export class BitbucketService {
    * @param path Bitbucket source path for a specification file
    */
   private async writeSpecification(path: string) {
-    const { branch, repo, workspace } = this.config;
+    const { branch, repo, workspace, host, apiVersion } = this.config;
     console.log(`Reading file: ${path}`);
-    const result = await this.client.source.read({ node: branch, path: path, repo_slug: repo, workspace });
-
-    if (this.peek(path, result.data as string)) {
-      const api = await SwaggerParser.validate(JSON.parse(result.data as string));
+    let clientOptions: any;
+    if (apiVersion === 'v1') {
+      clientOptions = { path, branch, repo_slug: repo, workspace, host }
+    } else {
+      clientOptions = { node: branch, path: path, repo_slug: repo, workspace }
+    }
+    const result = await this.client.source.read(clientOptions);
+    const content = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
+    if (this.peek(path, content)) {
+      const api = await SwaggerParser.validate(JSON.parse(content as string));
       await this.writeAPI4Central(repo, api);
     }
-  }
-
-  /**
-   * Validates if a file name ends in yaml/json and is not a well-known non-specification file
-   * @param filename name of a file
-   */
-  private isOASExtension(filename: string) {
-    if (["package-lock.json", "package.json", ".travis.yml", "fixup.yaml", "jpdiff.yaml"].includes(filename)) {
-      return false;
-    }
-    const pattern = /\.(yaml|yml|json)$/i;
-    return pattern.test(filename);
   }
 
   /**
