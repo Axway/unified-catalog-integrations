@@ -8,7 +8,7 @@ export enum ConfigKeys {
   WORKSPACE = "workspace",
   USERNAME = "username",
   PATH = "path",
-  HOST = "host",
+  BASE_URL = "baseUrl",
   API_VERSION = "apiVersion",
   ACCESS_TOKEN = "accessToken"
 }

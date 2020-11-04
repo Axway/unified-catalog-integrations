@@ -39,8 +39,8 @@ export const set = {
     "--username [value]": "Required: Bitbucket username, used with app-password",
 
     "--path [value]": "Path in repo to search for specs. Use a spec's absolute path to import one. Defaults to root",
-    "--host [value]": "Bitbucket host, defaults to // TODO",
-    "--api-version [value]": "Bitbucket version, defaults to v1",
+    "--base-url [value]": "Bitbucket host, defaults to https://api.bitbucket.org/2.0 for api-version v2. Required for v1",
+    "--api-version [value]": "Bitbucket version, defaults to v2",
     "--access-token [value]": "Required: Bitbucket personal access token for an alternate to username/app-password. " 
   },
 };

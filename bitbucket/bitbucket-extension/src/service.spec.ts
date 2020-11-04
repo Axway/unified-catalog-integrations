@@ -26,7 +26,7 @@ describe("Bitbucket service", () => {
       icon: "test",
       outputDir: "test",
       path: "/",
-      host: "http://127.0.0.1:7990",
+      baseUrl: "127.0.0.1:7990/rest/api/1.0",
       apiVersion: "v1",
       accessToken: '123'
     };

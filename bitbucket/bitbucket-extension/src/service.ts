@@ -6,15 +6,10 @@ import { APIClient } from "bitbucket/src/plugins/register-endpoints/types";
 import https from "https";
 import HttpsProxyAgent from "https-proxy-agent";
 import yaml from "js-yaml";
-import { URL } from "url";
-import path from "path";
+import * as uri from "url";
+import * as p from "path";
 import { Config, ConfigKeys } from "../types";
 import { commitToFs, getIconData, requestPromise, isOASExtension } from "./utils";
-
-type Network = {
-  strictSSL?: boolean;
-  httpProxy?: string
-}
 
 type ProxySettings = {
   strictSSL?: boolean;
@@ -28,7 +23,7 @@ type v1ReadOpts = {
   workspace: string,
   repo_slug: string,
   branch: string,
-  host: string
+  baseUrl: string
 }
 
 type v1BitbucketAuth = {
@@ -39,7 +34,10 @@ type v1BitbucketAuth = {
 
 type v1BitbucketConfig = {
   auth: v1BitbucketAuth,
-  network: Network
+  network: {
+    strictSSL?: boolean;
+    httpProxy?: string
+  }
 }
 
 type getPageConfig = {
@@ -67,7 +65,7 @@ class BitBucketV1 {
 
 		if (proxy) {
 			try {
-				const parsedProxy = new URL(proxy);
+				const parsedProxy = new uri.URL(proxy);
 				this.proxySettings.proxy = proxy;
 				console.log(`Connecting using proxy settings protocol:${parsedProxy.protocol}, host:${parsedProxy.hostname}, port: ${parsedProxy.port}, username: ${parsedProxy.username}, rejectUnauthorized: ${!this.proxySettings.strictSSL}`);
 			} catch (e) {
@@ -80,11 +78,11 @@ class BitBucketV1 {
     let self = this;
     return {
       read:  async (options: v1ReadOpts) => {
-        const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, host } = options;
+        const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, baseUrl } = options;
         const qs = `?start=${start}&limit=${limit}&at=${branch}`;
         const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
   
-        const url = `${host}/rest/api/1.0/projects/${project}/repos/${repo}${dirOrFile}${qs}`
+        const url = uri.resolve(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`, `projects/${project}/repos/${repo}${dirOrFile}${qs}`)
         return { data: await requestPromise({
           method: 'GET',
           json: true,
@@ -118,7 +116,7 @@ export class BitbucketService {
       return acc;
     }, []);
 
-    // if user then check password, 
+    // Check user/password/token
     if (!config.username && !config.appPassword && !config.accessToken) {
       missingParam.push('appPassword + username or accessToken')
     } else if (config.username && !config.appPassword) {
@@ -127,12 +125,17 @@ export class BitbucketService {
       missingParam.push('username')
     }
 
+    // v1 isn't in bitbucket cloud anymore
+    if (config.apiVersion === 'v1' && !config.baseUrl) {
+      missingParam.push('apiVersion v1 requires setting a baseUrl. example: 127.0.0.1:7990/rest/api/1.0')
+    }
+
     if (missingParam.length) {
       console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central bitbucket-extension config set -h' to see a list of params`);
       return process.exit(1);
     }
 
-    this.config.apiVersion = this.config.apiVersion || 'v1'
+    this.config.apiVersion = this.config.apiVersion || 'v2'
 
     // read amplify-cli config values for network settings
     const amplifyConfig = loadConfig().values;
@@ -146,7 +149,7 @@ export class BitbucketService {
       if (proxyUrl) {
         let parsedProxyUrl;
         try {
-          parsedProxyUrl = new URL(proxyUrl);
+          parsedProxyUrl = new uri.URL(proxyUrl);
         } catch {
           throw new Error(`Could not parse provided network proxy url: ${proxyUrl}`);
         }
@@ -171,9 +174,13 @@ export class BitbucketService {
       // Mimic the npm module for older API
      this.client = new BitBucketV1({ auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD], token: config[ConfigKeys.ACCESS_TOKEN] }, network: amplifyConfig?.network || {} })
     } else {
-      this.client = new Bitbucket({ auth: {
-        ...(config[ConfigKeys.USERNAME] ? { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] } : { token: config[ConfigKeys.ACCESS_TOKEN] })
-        }, request: { agent } });
+      this.client = new Bitbucket({
+        auth: {
+          ...(config[ConfigKeys.USERNAME] ? { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD] } : { token: config[ConfigKeys.ACCESS_TOKEN] })
+        },
+        request: { agent },
+        ...(this.config.baseUrl ? { baseUrl : this.config.baseUrl } : {})
+      });
     }
   }
 
@@ -207,7 +214,7 @@ export class BitbucketService {
          return acc.concat(item.path as string)
         }
         if (isOASExtension(item as string)) {
-          return acc.concat(path.join(this.config.path, item as string));
+          return acc.concat(p.join(this.config.path, item as string));
         }
         return acc;
       }, []);
@@ -228,11 +235,11 @@ export class BitbucketService {
    */
   private async getPage(pageOptions: getPageConfig) {
     const { pageHash: page, start, limit } = pageOptions;
-    const { branch, repo, workspace, apiVersion, path, host } = this.config;
+    const { branch, repo, workspace, apiVersion, path, baseUrl } = this.config;
 
     let clientOptions: any;
     if (apiVersion === 'v1') {
-      clientOptions = { start, limit, path, branch, repo_slug: repo, workspace, host }
+      clientOptions = { start, limit, path, branch, repo_slug: repo, workspace, baseUrl }
     } else {
       clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, ...(!!page ? { page } : {}) }
     }
@@ -249,11 +256,11 @@ export class BitbucketService {
    * @param path Bitbucket source path for a specification file
    */
   private async writeSpecification(path: string) {
-    const { branch, repo, workspace, host, apiVersion } = this.config;
+    const { branch, repo, workspace, baseUrl, apiVersion } = this.config;
     console.log(`Reading file: ${path}`);
     let clientOptions: any;
     if (apiVersion === 'v1') {
-      clientOptions = { path, branch, repo_slug: repo, workspace, host }
+      clientOptions = { path, branch, repo_slug: repo, workspace, baseUrl }
     } else {
       clientOptions = { node: branch, path: path, repo_slug: repo, workspace }
     }
@@ -355,7 +362,7 @@ export class BitbucketService {
       });
     } else {
       for (const server of api.servers) {
-        const parsedUrl = new URL(server.url);
+        const parsedUrl = new uri.URL(server.url);
         endpoints.push({
           host: parsedUrl.hostname,
           protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(":")),
