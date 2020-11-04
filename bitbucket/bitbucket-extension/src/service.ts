@@ -7,6 +7,7 @@ import https from "https";
 import HttpsProxyAgent from "https-proxy-agent";
 import yaml from "js-yaml";
 import { URL } from "url";
+import path from "path";
 import { Config, ConfigKeys } from "../types";
 import { commitToFs, getIconData, requestPromise, isOASExtension } from "./utils";
 
@@ -82,8 +83,8 @@ class BitBucketV1 {
         const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, host } = options;
         const qs = `?start=${start}&limit=${limit}&at=${branch}`;
         const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
-       
-        const url = `${host}/rest/api/latest/projects/${project}/repos/${repo}${dirOrFile}${qs}`
+  
+        const url = `${host}/rest/api/1.0/projects/${project}/repos/${repo}${dirOrFile}${qs}`
         return { data: await requestPromise({
           method: 'GET',
           json: true,
@@ -99,13 +100,36 @@ class BitBucketV1 {
 }
 
 export class BitbucketService {
-  private readonly client : BitBucketV1 | APIClient
+  private readonly client : BitBucketV1 | APIClient | undefined
 
   constructor(private config: Config) {
     // validate if all the required configuration options have been set
-    // TODO: fix this
-    if ([ConfigKeys.BRANCH, ConfigKeys.ENVIRONMENT_NAME, ConfigKeys.REPO, ConfigKeys.WORKSPACE].some((key) => !config[key])) {
-      throw new Error(`Missing required config. Run 'amplify central bitbucket-extension config set -h' to see a list of params`);
+
+    let missingParam = [
+      ConfigKeys.BRANCH,
+      ConfigKeys.ENVIRONMENT_NAME,
+      ConfigKeys.REPO,
+      ConfigKeys.WORKSPACE
+    ].reduce((acc: Array<string>, cur: string) => {
+      if (!(config as any)[cur]) {
+        acc.push(cur);
+        return acc;
+      }
+      return acc;
+    }, []);
+
+    // if user then check password, 
+    if (!config.username && !config.appPassword && !config.accessToken) {
+      missingParam.push('appPassword + username or accessToken')
+    } else if (config.username && !config.appPassword) {
+      missingParam.push('appPassword');
+    } else if (!config.username && config.appPassword) {
+      missingParam.push('username')
+    }
+
+    if (missingParam.length) {
+      console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central bitbucket-extension config set -h' to see a list of params`);
+      return process.exit(1);
     }
 
     this.config.apiVersion = this.config.apiVersion || 'v1'
@@ -116,11 +140,9 @@ export class BitbucketService {
     let agent;
     if (amplifyConfig?.network) {
       // using strict ssl mode by default
-      // TODO strictssl be negated here?
       const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
       const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
       // using HttpsProxyAgent if proxy url configured, else - regular node agent.
-      // TODO needs to be tested
       if (proxyUrl) {
         let parsedProxyUrl;
         try {
@@ -185,7 +207,7 @@ export class BitbucketService {
          return acc.concat(item.path as string)
         }
         if (isOASExtension(item as string)) {
-          return acc.concat(item as string);
+          return acc.concat(path.join(this.config.path, item as string));
         }
         return acc;
       }, []);
@@ -215,7 +237,7 @@ export class BitbucketService {
       clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, ...(!!page ? { page } : {}) }
     }
     try {
-      const { data } = await this.client.source.read(clientOptions);
+      const { data } = await this.client?.source?.read(clientOptions);
       return data;
      } catch (e) {
        throw (e);
@@ -235,7 +257,7 @@ export class BitbucketService {
     } else {
       clientOptions = { node: branch, path: path, repo_slug: repo, workspace }
     }
-    const result = await this.client.source.read(clientOptions);
+    const result = await this.client?.source?.read(clientOptions);
     const content = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
     if (this.peek(path, content)) {
       const api = await SwaggerParser.validate(JSON.parse(content as string));

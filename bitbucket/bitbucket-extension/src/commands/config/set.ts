@@ -32,15 +32,15 @@ export const set = {
     "--output-dir [value]": "Set absolute path for output directory",
     "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",
-    "--app-password [value]": "Required: Bitbucket app password",
+    "--app-password [value]": "Required: Bitbucket app password, used with username",
     "--repo [value]": "Required: repository to search in",
     "--branch [value]": "Required: repository branch to search in",
     "--workspace [value]": "Required: repository workspace",
-    "--username [value]": "Required: Bitbucket username",
+    "--username [value]": "Required: Bitbucket username, used with app-password",
 
     "--path [value]": "Path in repo to search for specs. Use a spec's absolute path to import one. Defaults to root",
     "--host [value]": "Bitbucket host, defaults to // TODO",
     "--api-version [value]": "Bitbucket version, defaults to v1",
-    "--access-token [value]": "Bitbucket personal access token" 
+    "--access-token [value]": "Required: Bitbucket personal access token for an alternate to username/app-password. " 
   },
 };
