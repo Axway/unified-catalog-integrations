@@ -3,7 +3,7 @@ import Sinon from "sinon";
 import { Config } from "../types";
 import { BitbucketService } from "./service";
 
-describe("Bitbucket service", () => {
+describe.skip("Bitbucket service", () => {
   const sandbox = Sinon.createSandbox();
 
   afterEach(() => {
