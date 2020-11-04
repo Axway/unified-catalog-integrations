@@ -4,7 +4,7 @@ import { loadConfig } from "@axway/amplify-cli-utils";
 import { Bitbucket } from "bitbucket";
 import { APIClient } from "bitbucket/src/plugins/register-endpoints/types";
 import https from "https";
-import { HttpsProxyAgent } from "https-proxy-agent";
+import HttpsProxyAgent from "https-proxy-agent";
 import yaml from "js-yaml";
 import { URL } from "url";
 import { Config, ConfigKeys } from "../types";
@@ -116,8 +116,8 @@ export class BitbucketService {
     let agent;
     if (amplifyConfig?.network) {
       // using strict ssl mode by default
-      // TODO strictssl be negated here
-      const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || !amplifyConfig.network.strictSSL };
+      // TODO strictssl be negated here?
+      const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
       const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
       // using HttpsProxyAgent if proxy url configured, else - regular node agent.
       // TODO needs to be tested
@@ -133,7 +133,7 @@ export class BitbucketService {
           port: parsedProxyUrl.port,
           protocol: parsedProxyUrl.protocol,
           auth: `${parsedProxyUrl.username}:${parsedProxyUrl.password}`,
-          ...sslConfig,
+          ...sslConfig
         });
 
         console.log(

@@ -45,7 +45,7 @@
     "cli-kit": "^1.8.2",
     "fs-extra": "^9.0.1",
     "https": "^1.0.0",
-    "https-proxy-agent": "^5.0.0",
+    "https-proxy-agent": "^2.2.4",
     "js-yaml": "^3.14.0",
     "mime-types": "^2.1.27",
     "request": "^2.88.2"
