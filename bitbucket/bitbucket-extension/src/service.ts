@@ -35,10 +35,13 @@ class BitBucketV1 {
 			}
 		}
   }
+
   get source() {
     let self = this;
     return {
       read:  async (options: v1ReadOpts) => {
+        // URL for listing files <baseUrl>/projects/<project>/repos/<repo>/files/<path>?start=0&limit=25&at=<branch>
+        // URL for getting content <baseUrl>/projects/<project>/repos/<repo>/raw/<path>?start=0&limit=25&at=<branch>
         const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, baseUrl } = options;
         const qs = `?start=${start}&limit=${limit}&at=${branch}`;
         const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
@@ -103,7 +106,7 @@ export class BitbucketService {
 
     // Configure a proxy if it is configured
     let agent;
-    if (amplifyConfig?.network) {
+    if (amplifyConfig?.network && this.config.apiVersion !== 'v1') {
       const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
       const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
       if (proxyUrl) {
@@ -144,13 +147,13 @@ export class BitbucketService {
     }
   }
 
+  /**
+   * Creates resource files from the provided repo/path for the given branch/project/workspace
+   * Gets a page and writes the resource for each oas spec found
+   * v1:  while isLastPage !== true
+   * v2:  while data.next
+   */
   public async generateResources() {
-    /**
-     * Get page, for each values that is oas: write to writespec
-     * v1:  while isLastPage !== true
-     * v2:  while data.next
-     */
-
     let nextPageHash = '';
     let start = 0;
     let limit = 25;
@@ -168,9 +171,11 @@ export class BitbucketService {
         limit
       });
 
+      // Build a list of all the paths for the files eg: [ 'spec.json', 'dir/spec2.json' ]
+      // v2 has metadata and v1 doesn't
       const specPaths = page.values?.reduce((acc: Array<string>, item: pageValue | string) => {
         if (typeof item === 'object' && item.type === "commit_file" && isOASExtension(item.path || "")) {
-         return acc.concat(item.path as string)
+          return acc.concat(item.path as string)
         }
         if (isOASExtension(item as string)) {
           return acc.concat(p.join(this.config.path, item as string));
@@ -180,6 +185,7 @@ export class BitbucketService {
 
       await Promise.all(specPaths.map((p: string) => this.writeSpecification(p)))
 
+      // Setup for next loop or to exit. v1 uses page.next, v2 uses pageHash
       start = page.nextPageStart;
       page.next = page.next || '';
       nextPageHash = (page.next).substring(page.next.lastIndexOf("page="), page.next.length).replace("page=", "");
@@ -188,9 +194,9 @@ export class BitbucketService {
   }
 
   /**
-   * Reads the Bitbucket source tree for a maximum of 20 depth of directory and sub-directories for a specified pageHash
+   * Reads the Bitbucket source tree for specified pageHash or start/limit
    * @note pageHash = undefined fetches the first page
-   * @param pageHash hash of the page to fetch
+   * @param pageOptions object containing start/limit (v1) or pageHash (v2)
    */
   private async getPage(pageOptions: getPageConfig) {
     const { pageHash: page, start, limit } = pageOptions;
@@ -203,6 +209,7 @@ export class BitbucketService {
       clientOptions = { max_depth: 20, node: branch, path, repo_slug: repo, workspace, ...(!!page ? { page } : {}) }
     }
     try {
+      // Client can be undefined if the service constructor threw
       const { data } = await this.client?.source?.read(clientOptions);
       return data;
      } catch (e) {
