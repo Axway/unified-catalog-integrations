@@ -232,7 +232,7 @@ module.exports = class BitbucketService {
     }
     const result = await this.client?.source?.read(clientOptions);
     const content = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
-    if (this.peek(path, content)) {
+    if (content && this.peek(path, content)) {
       const api = await SwaggerParser.validate(JSON.parse(content as string));
       await this.writeAPI4Central(repo, api);
     }
@@ -332,8 +332,8 @@ module.exports = class BitbucketService {
         endpoints.push({
           host: parsedUrl.hostname,
           protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(":")),
-          port: parseInt(parsedUrl.port, 10),
           routing: { basePath: parsedUrl.pathname },
+          ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {})
         });
       }
     }
