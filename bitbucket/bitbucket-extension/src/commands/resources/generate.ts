@@ -2,8 +2,8 @@
 import { chalk, snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
-import { BitbucketService } from "../../service";
 import { configFilePath, createEnvironmentResource } from "../../utils";
+const BitbucketService = require('../../service');
 
 type args = {
   console: Console;

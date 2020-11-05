@@ -61,7 +61,7 @@ class BitBucketV1 {
   }
 }
 
-export class BitbucketService {
+module.exports = class BitbucketService {
   private readonly client : BitBucketV1 | APIClient | undefined
 
   constructor(private config: Config) {
@@ -91,7 +91,7 @@ export class BitbucketService {
 
     // v1 isn't in bitbucket cloud anymore
     if (config.apiVersion === 'v1' && !config.baseUrl) {
-      missingParam.push('apiVersion v1 requires setting a baseUrl. example: 127.0.0.1:7990/rest/api/1.0')
+      missingParam.push('apiVersion v1 requires setting a baseUrl. example: http://127.0.0.1:7990/rest/api/1.0')
     }
 
     if (missingParam.length) {
@@ -169,11 +169,11 @@ export class BitbucketService {
         pageHash: nextPageHash,
         start,
         limit
-      });
+      }) || {};
 
       // Build a list of all the paths for the files eg: [ 'spec.json', 'dir/spec2.json' ]
       // v2 has metadata and v1 doesn't
-      const specPaths = page.values?.reduce((acc: Array<string>, item: pageValue | string) => {
+      const specPaths = (page.values || []).reduce((acc: Array<string>, item: pageValue | string) => {
         if (typeof item === 'object' && item.type === "commit_file" && isOASExtension(item.path || "")) {
           return acc.concat(item.path as string)
         }
@@ -183,13 +183,13 @@ export class BitbucketService {
         return acc;
       }, []);
 
-      await Promise.all(specPaths.map((p: string) => this.writeSpecification(p)))
+      specPaths.length && await Promise.all(specPaths.map((p: string) => this.writeSpecification(p)))
 
       // Setup for next loop or to exit. v1 uses page.next, v2 uses pageHash
       start = page.nextPageStart;
       page.next = page.next || '';
       nextPageHash = (page.next).substring(page.next.lastIndexOf("page="), page.next.length).replace("page=", "");
-      canPage = this.config.apiVersion === 'v1' ? !page.isLastPage : !!page.next
+      canPage = this.config.apiVersion === 'v1' ? (page.isLastPage !== undefined ? !page.isLastPage : false) : !!page.next
     }
   }
 

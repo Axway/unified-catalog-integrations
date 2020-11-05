@@ -8,7 +8,7 @@ const utils = require('./utils');
 const yaml = require('js-yaml');
 
 
-describe.only('utils', () => {
+describe('utils', () => {
 	let sandbox: SinonSandbox = sinon.createSandbox();
 	let outputJsonSync: SinonStub;
 	let pathExistsSync: SinonStub;
@@ -90,7 +90,6 @@ describe.only('utils', () => {
 				timeout: 500
 			})
 		} catch (e) {
-			console.log(e.message)
 			expect(e.message).to.equal(`Error: ESOCKETTIMEDOUT`);
 		}
 		expect(result).to.equal(undefined);
