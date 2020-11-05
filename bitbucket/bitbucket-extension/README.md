@@ -10,7 +10,7 @@ This extension is example code and comes with no guarantee of support or mainten
 
 # Prerequisites
 
-This assumes you already have Node.js installed and a Bitbucket account with an [App Password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) set up. Please make sure your your App Password has `Projects:READ` and `Repositories:READ` permissions.
+This assumes you already have Node.js installed and Bitbucket acces with either an [App Password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/) or a [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html) set up. Please make sure your your App Password has `Projects:READ` and `Repositories:READ` permissions.
 
 
 # Installation
@@ -92,14 +92,19 @@ $ amplify central bitbucket-extension config list
 $ amplify central bitbucket-extension config set -h
 
 SET OPTIONS:
-  --app-password=<value>  Required: Bitbucket app password
-  --branch=<value>  Required: repository branch to search in
+  --access-token=<value>  Required*: Bitbucket personal access token for an alternate to username/app-password.
+  --app-password=<value>  Required*: Bitbucket app password, used with username
+  --username=<value>  Required*: Bitbucket username, used with app-password
+  --branch=<value>  Required: Repository branch to search
   --environment-name=<value>  Required: Set environment name to create
+  --repo=<value>  Required: Repository to search
+  --workspace=<value>  Required: Repository workspace. Often your username for v2 and your project name for v1
+  --api-version=<value>  Bitbucket API version ('v1' or 'v2'), defaults to 'v2'
+  --base-url=<value>  Bitbucket host, defaults to https://api.bitbucket.org/2.0 for api-version v2. Required for v1
   --icon=<value>  Set absolute path for custom icon
   --output-dir=<value>  Set absolute path for output directory
-  --repo=<value>  Required: repository to search in
-  --username=<value>  Required: Bitbucket username
-  --workspace=<value>  Required: repository workspace
+  --path=<value>  Path in repo to search for specs. Use a spec's absolute path to import one. Defaults to /
+  
 ```
 
 ---
