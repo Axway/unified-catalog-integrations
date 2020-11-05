@@ -8,7 +8,7 @@ const utils = require('./utils');
 const yaml = require('js-yaml');
 
 
-describe('utils', () => {
+describe.only('utils', () => {
 	let sandbox: SinonSandbox = sinon.createSandbox();
 	let outputJsonSync: SinonStub;
 	let pathExistsSync: SinonStub;
@@ -16,8 +16,6 @@ describe('utils', () => {
 	let readFileSync: SinonStub;
 	let writeFileSync: SinonStub;
 	let lookup: SinonStub;
-	let getIconData: SinonStub;
-	let commitToFs: SinonStub;
 	let writeResource: SinonStub;
 
 	beforeEach(() => {
@@ -33,7 +31,7 @@ describe('utils', () => {
 	});
 
 	it('exports configFilePath', () => {
-		let expectedPath = path.join(os.homedir(), '.axway', 'github-extension.json');
+		let expectedPath = path.join(os.homedir(), '.axway', 'bitbucket-extension.json');
 		expect(utils.configFilePath).to.equal(expectedPath)
 	})
 
@@ -83,7 +81,7 @@ describe('utils', () => {
 		let result;
 		nock('http://example.com')
 			.get('/foo')
-			.socketDelay(1000)
+			.delayConnection(1000)
 			.reply(400, expectedBody)
 		try {
 			result = await utils.requestPromise({
@@ -92,6 +90,7 @@ describe('utils', () => {
 				timeout: 500
 			})
 		} catch (e) {
+			console.log(e.message)
 			expect(e.message).to.equal(`Error: ESOCKETTIMEDOUT`);
 		}
 		expect(result).to.equal(undefined);
@@ -109,7 +108,7 @@ describe('utils', () => {
 	})
 
 	it('getIconData: uses default icon', () => {
-		const classifier = (x: any) => (x.args ||[])[0].endsWith('env_icon.png');
+		const classifier = (x: any) => (x.args ||[])[0].endsWith('bitbucket.jpg');
 		existsSync.returns(false);
 		lookup.returns('image/png');
 		readFileSync.returns({});
@@ -117,20 +116,6 @@ describe('utils', () => {
 		expect(readFileSync.getCalls()
 			.filter(classifier).length
 		).to.equal(1);
-	})
-
-	it('createSupportResources: creates env, subdef, webhook', async () => {
-		getIconData = sandbox.stub(utils, 'getIconData');
-		commitToFs = sandbox.stub(utils, 'commitToFs');
-		getIconData.returns({});
-		await utils.createSupportResources({
-			environmentName: 'env',
-			webhookUrl: '',
-			outputDir: './'
-		})
-		expect(commitToFs.lastCall.args[0].kind === 'Environment').to.be.true;
-		expect(commitToFs.lastCall.args[1] === './').to.be.true;
-		expect(commitToFs.lastCall.args[2][0].kind).to.equal('Environment');
 	})
 
 	it('createSupportResources: creates env, subdef, webhook', async () => {
@@ -194,5 +179,16 @@ describe('utils', () => {
 			'kind: Environment\n' +
 			'name: MyResource\n'
 		);
+	})
+
+	it('isOASExtension checks if filename patches spec', async () => {
+		expect(utils.isOASExtension('petstore.json')).to.equal(true);
+		expect(utils.isOASExtension('petstore.yaml')).to.equal(true);
+		expect(utils.isOASExtension('petstore.yml')).to.equal(true);
+		expect(utils.isOASExtension('/')).to.equal(false);
+		const falsy: boolean = ["package-lock.json", "package.json", ".travis.yml", "fixup.yaml", "jpdiff.yaml"].reduce((acc: boolean, item: string) => {
+			return acc || utils.isOASExtension(item)
+		}, false)
+		expect(falsy).to.equal(false);
 	})
 })
