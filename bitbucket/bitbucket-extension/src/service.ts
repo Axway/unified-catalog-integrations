@@ -114,6 +114,7 @@ module.exports = class BitbucketService {
         try {
           parsedProxyUrl = new uri.URL(proxyUrl);
         } catch {
+          // TODO: Sometimes we throw, sometimes we exit
           throw new Error(`Could not parse provided network proxy url: ${proxyUrl}`);
         }
         agent = new HttpsProxyAgent({

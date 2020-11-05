@@ -16,6 +16,7 @@ describe("Bitbucket service", () => {
   let clientRead: SinonStub;
   let peek: SinonStub;
   let writeAPI4Central: SinonStub;
+  let requestPromise: SinonStub;
 
   let proxyConfig:any = {
 		values: {}
@@ -38,6 +39,7 @@ describe("Bitbucket service", () => {
 
   afterEach(() => {
     sandbox.restore();
+    proxyConfig.values = {};
   });
 
   it("init: should exit if required configurations are not provided", async () => {
@@ -116,6 +118,20 @@ describe("Bitbucket service", () => {
 	
 		expect(consoleStub.firstCall.args[0].startsWith('Connecting using proxy settings')).to.be.true;
   });
+
+  it('init: construct class exit if proxy is wrong', () => {
+		consoleStub = sandbox.stub(console, 'log');
+		proxyConfig.values = {
+			network: {
+				httpsProxy: "notAURL",
+			}
+    }
+    try {
+      new Service(okConfig);
+    } catch (error) {
+      expect(error.message.startsWith('Could not parse')).to.equal(true)
+    }		
+  });
   
   it('init: construct class ok & sets rejectUnauthorized', () => {
 		processStub = sandbox.stub(process, 'exit');
@@ -137,6 +153,88 @@ describe("Bitbucket service", () => {
       baseUrl: 'http://127.0.0.1:7990/rest/api/1.0'
     });
     expect(svc.client.constructor.name).to.equal('BitBucketV1');
+  });
+
+  it('BitBucketV1: construct class ok & set proxySettings', () => {
+    consoleStub = sandbox.stub(console, 'log');
+    proxyConfig.values.network = {
+      httpProxy: 'http://127.0.0.1:8001',
+      strictSSL: false
+    }
+
+		const svc = new Service({
+      ...okConfig,
+      apiVersion: 'v1',
+      baseUrl: 'http://127.0.0.1:7990/rest/api/1.0'
+    });
+    expect(svc.client.constructor.name).to.equal('BitBucketV1');
+    expect(svc.client.proxySettings.strictSSL).to.deep.equal(proxyConfig.values.network.strictSSL)
+    expect(svc.client.proxySettings.proxy).to.deep.equal(proxyConfig.values.network.httpProxy)
+  });
+
+  it('BitBucketV1 read: create paths and querystring', async () => {
+    const baseUrl = 'http://127.0.0.1:7990/rest/api/1.0';
+    const branch = 'mybranch';
+    const repo_slug = 'myrepo';
+    const workspace = 'myspace';
+    const path = 'petstore.json';
+    const start = 1;
+
+    requestPromise = sandbox.stub().resolves({});
+    let isOASExtension = sandbox.stub().returns(true)
+    let Stubbed = proxyquire('./service', {
+      '@axway/amplify-cli-utils': {
+        loadConfig: () => (proxyConfig)
+      },
+      './utils': {
+        isOASExtension,
+        requestPromise
+      }
+    });
+
+		const svc = new Stubbed({
+      ...okConfig,
+      apiVersion: 'v1',
+      baseUrl: baseUrl
+    });
+    await svc.client.source.read({
+      branch,
+      repo_slug,
+      workspace,
+      baseUrl,
+      path,
+      start
+    })
+    expect(svc.client.constructor.name).to.equal('BitBucketV1');
+    expect(requestPromise.callCount).to.equal(1)
+    expect(requestPromise.lastCall.args[0].url).equal(`${baseUrl}/projects/${workspace}/repos/${repo_slug}/raw/${path}?start=${start}&limit=25&at=${branch}`)
+
+    isOASExtension.returns(false)
+    await svc.client.source.read({
+      branch,
+      repo_slug,
+      workspace,
+      baseUrl,
+      start
+    })
+    expect(requestPromise.callCount).to.equal(2)
+    expect(requestPromise.lastCall.args[0].url).equal(`${baseUrl}/projects/${workspace}/repos/${repo_slug}/files/?start=${start}&limit=25&at=${branch}`)
+  });
+
+  it('BitBucketV1: construct class exit if proxy is wrong', () => {
+    consoleStub = sandbox.stub(console, 'log');
+    processStub = sandbox.stub(process, 'exit');
+    proxyConfig.values.network = {
+      httpProxy: 'notAURL',
+      strictSSL: false
+    }
+
+		new Service({
+      ...okConfig,
+      apiVersion: 'v1',
+      baseUrl: 'http://127.0.0.1:7990/rest/api/1.0'
+    });
+    expect(processStub.callCount).to.equal(1)
   });
 
   it('generateResources: calls writeSpecification if path is OAS', async () => {
@@ -257,7 +355,8 @@ describe("Bitbucket service", () => {
     peek = sandbox.stub(Stubbed.prototype, 'peek').returns(true);
     writeAPI4Central = sandbox.stub(Stubbed.prototype, 'writeAPI4Central').resolves()
 
-    const svc = new Stubbed({
+    // v1
+    let svc = new Stubbed({
       ...okConfig,
       path: 'petstore.json',
       apiVersion: 'v1', 
@@ -272,6 +371,16 @@ describe("Bitbucket service", () => {
     expect(clientRead.callCount).to.equal(1)
     expect(peek.callCount).to.equal(1)
     expect(writeAPI4Central.callCount).to.equal(1)
+
+    // v2
+    svc = new Stubbed({
+      ...okConfig,
+      path: 'petstore.json'
+    });
+    clientRead = sandbox.stub(svc.client.source, 'read').resolves({ data: {} })
+    await svc.generateResources()
+    expect(peek.callCount).to.equal(2)
+    expect(writeAPI4Central.callCount).to.equal(2)
   });
 
   it('peek: true if yml is likely spec', async () => {
