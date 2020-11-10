@@ -232,6 +232,7 @@ module.exports = class BitbucketService {
       clientOptions = { node: branch, path: path, repo_slug: repo, workspace }
     }
     const result = await this.client?.source?.read(clientOptions);
+    // TODO: does this account for yaml?
     const content = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
     if (content && this.peek(path, content)) {
       const api = await SwaggerParser.validate(JSON.parse(content as string));
