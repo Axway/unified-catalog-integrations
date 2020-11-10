@@ -3,7 +3,8 @@ export enum ConfigKeys {
   ICON = "icon",
   OUTPUT_DIR = "outputDir",
   CLIENT_ID = "clientId",
-  CLIENT_SECRET = "clientSecret"
+  CLIENT_SECRET = "clientSecret",
+  BASE_URL = "baseUrl"
 }
 
 export type Config = {

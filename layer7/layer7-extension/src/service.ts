@@ -9,18 +9,19 @@ import * as uri from "url";
 import { Config, ConfigKeys, ProxySettings, getPageConfig, /* pageValue, */ ReadOpts } from "../types";
 import { commitToFs, getIconData, isOASExtension, requestPromise/* , isOASExtension */ } from "./utils";
 
-
 // TODO: fix tsconfig
 module.exports = class Layer7Service {
   private proxySettings: ProxySettings = { strictSSL: true, proxy: undefined }
   private accessToken: string = ''
+  private url: uri.URL = new uri.URL(this.config.baseUrl)
   constructor(private config: Config) {
     // validate if all the required configuration options have been set
 
     let missingParam = [
       ConfigKeys.ENVIRONMENT_NAME,
       ConfigKeys.CLIENT_ID,
-      ConfigKeys.CLIENT_SECRET
+      ConfigKeys.CLIENT_SECRET,
+      ConfigKeys.BASE_URL
     ].reduce((acc: Array<string>, cur: string) => {
       if (!(config as any)[cur]) {
         acc.push(cur);
@@ -58,12 +59,12 @@ module.exports = class Layer7Service {
 
   private async login() {
     console.log('logging in')
-    const { clientId, clientSecret } = this.config;
+    const { clientId, clientSecret, baseUrl } = this.config;
     let login;
     try {
       login = await requestPromise({
         method: 'POST',
-        url: 'https://apim-ssg.dev.com:9443/auth/oauth/v2/token',
+        url: `${this.url.origin}/auth/oauth/v2/token`,
         body: `client_id=${clientId}&grant_type=client_credentials&scope=OOB&client_secret=${clientSecret}`,
         json: true,
         headers: {
@@ -114,9 +115,10 @@ module.exports = class Layer7Service {
   private async read(readOpts: ReadOpts): Promise<any> {
     // /apis fetchs apis
     const { pageSize = 100, pageNumber = 1, path = '/', opts = {} } = readOpts;
+    
+
     const qs = `?pageSize=${pageSize}&pageNumber=${pageNumber}`;
-    // TODO: config this host and 'apim' section?
-    let url = `https://apim-ssg.dev.com:9443${path.startsWith('/') ? path : '/' + path}${qs}`;
+    let url = `${this.url.href}${path.startsWith('/') ? path : '/' + path}${qs}`;
     return { data: await requestPromise({
       method: 'GET',
       json: true,
@@ -145,7 +147,7 @@ module.exports = class Layer7Service {
       const { data }  = await this.read({
         pageNumber,
         pageSize,
-        path: '/apim/api-management/1.0/apis'
+        path: '/api-management/1.0/apis'
       });
 
       let apis = (await Promise.all(data.results.map(async (item: any) => {
@@ -153,12 +155,12 @@ module.exports = class Layer7Service {
         if (item.ssgServiceType === 'REST') {
           // get apis, need data later
           let { data: api }  = await this.read({
-            path: `/apim/api-management/1.0/apis/${item.uuid}`
+            path: `/api-management/1.0/apis/${item.uuid}`
           })
 
           // get assets
           let { data: assets } = await this.read({
-            path: `/apim/api-management/1.0/apis/${item.uuid}/assets`
+            path: `/api-management/1.0/apis/${item.uuid}/assets`
           }) || [];
 
           // TODO: Is this the best/only way to get spec? Only expect one?
@@ -171,7 +173,7 @@ module.exports = class Layer7Service {
           if (assets.length) {
             api.__fileName = assets[0].name;
             const { data: definition } =  await this.read({
-              path: `/apim/api-management/1.0/apis/${item.uuid}/assets/${assets[0].uuid}/file`,
+              path: `/api-management/1.0/apis/${item.uuid}/assets/${assets[0].uuid}/file`,
               opts: { json: false }
             })
             api.__definition = definition
@@ -180,7 +182,7 @@ module.exports = class Layer7Service {
         } else if (item.ssgServiceType === 'SOAP') {
           // TODO: Flesh out fetch wsdl
           let { data: api }  = await this.read({
-            path: `/apim/api-management/1.0/apis/${item.uuid}/assets/wsdl`
+            path: `/api-management/1.0/apis/${item.uuid}/assets/wsdl`
           })
           return api
         }

@@ -32,7 +32,8 @@ export const set = {
     "--output-dir [value]": "Set absolute path for output directory",
     "--environment-name [value]": "Required: Set environment name to create",
     "--icon [value]": "Set absolute path for custom icon",
-    "--client-id [value]": "Client id for fetching APIs",
-    "--client-secret [value]": "Client secret for fetching APIs"
+    "--client-id [value]": "Required: Client id for fetching APIs",
+    "--client-secret [value]": "Required: Client secret for fetching APIs",
+    "--base-url [value]": "Required: Portal baseurl"
   },
 };
