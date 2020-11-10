@@ -15,8 +15,8 @@ module.exports = class Layer7Service {
   private accessToken: string = ''
   private url: uri.URL = new uri.URL(this.config.baseUrl)
   constructor(private config: Config) {
-    // validate if all the required configuration options have been set
 
+    // validate if all the required configuration options have been set
     let missingParam = [
       ConfigKeys.ENVIRONMENT_NAME,
       ConfigKeys.CLIENT_ID,
@@ -58,9 +58,9 @@ module.exports = class Layer7Service {
   }
 
   private async login() {
-    console.log('logging in')
-    const { clientId, clientSecret, baseUrl } = this.config;
+    const { clientId, clientSecret } = this.config;
     let login;
+
     try {
       login = await requestPromise({
         method: 'POST',
@@ -79,13 +79,14 @@ module.exports = class Layer7Service {
   }
 
   public async generateResources() {
-    await this.login();
-
     let canPage = true; 
     let pageSize = 100;
     let pageNumber = 1;
 
-    
+    console.log('Logging in...');
+    await this.login();
+    console.log('Generating resources files...');
+
     while (canPage === true) {
       const page = await this.getPage({
         pageNumber,
@@ -93,32 +94,30 @@ module.exports = class Layer7Service {
       }) || { apis: [] };
 
       // Process our REST/WSDL APIs
-      page.apis.length && await Promise.all(page.apis.map(async (p: any) => {
-        
-        if (p.apiServiceType === 'REST') {
-          console.log('Validating swagger');
-          const api = await SwaggerParser.validate(p.__definition);
-          console.log('Decorating spec with api properties');
-          console.log('writeAPI4Central');
-        } else if (p.apiServiceType === 'SOAP') {
+      page.apis.length && await Promise.all(page.apis.map(async (entry: any) => {
+        const { __definition: definition, ...meta } = entry;
+
+        if (entry.apiServiceType === 'REST') {
+          const api = await SwaggerParser.validate(definition);
+          await this.writeAPI4Central(meta, api)
+        } else if (entry.apiServiceType === 'SOAP') {
           // TODO: look at mulesoft for WSDL
           console.log('Process wsdl')
         }
-      }))
+      }));
 
-      // Setup for next loop or to exit. v1 uses page.next, v2 uses pageHash
+      // Setup for next loop or to exit
       pageNumber++;
       canPage = page.canPage;
     }
   }
 
   private async read(readOpts: ReadOpts): Promise<any> {
-    // /apis fetchs apis
+    // fetchs apis
     const { pageSize = 100, pageNumber = 1, path = '/', opts = {} } = readOpts;
-    
-
     const qs = `?pageSize=${pageSize}&pageNumber=${pageNumber}`;
     let url = `${this.url.href}${path.startsWith('/') ? path : '/' + path}${qs}`;
+
     return { data: await requestPromise({
       method: 'GET',
       json: true,
@@ -142,7 +141,6 @@ module.exports = class Layer7Service {
     const { pageNumber, pageSize } = pageOptions;
 
     try {
-
       // List all APIs
       const { data }  = await this.read({
         pageNumber,
@@ -233,13 +231,27 @@ module.exports = class Layer7Service {
     }
     return isOAS;
   }
-
-  private async writeAPI4Central(repo: string, api: any) {
+  //  TODO: add/modify these resources
+  //  Apiserviceinstnace host should derive from baseurl for now. They're may be multiple portals in the future
+  //  Add a new config for webhook url
+  //  Create: webhook, consumersubscriptiondefinition thats linked in consumerinstance
+  private async writeAPI4Central(meta: any, api: any) {
     const resources = [];
-    const attributes = { repo };
     const iconData = getIconData(this.config.icon);
-    const apiName = api.info.title + "-" + api.info.version;
-    const apiServiceName = `${apiName}`.toLowerCase().replace(/\W+/g, "-");
+
+    const {
+      uuid: apiId,
+      name,
+      portalStatus,
+      description,
+      privateDescription,
+      version,
+      ssgUrl,
+      authenticationParameters
+    } = meta;
+    const attributes = { apiId };
+    const apiServiceName = `${name}`.toLowerCase().replace(/\W+/g, "-");
+    
 
     // APIService
     const apiService = {
@@ -255,7 +267,7 @@ module.exports = class Layer7Service {
         },
       },
       spec: {
-        description: api.info.description,
+        description: privateDescription,
         icon: iconData,
       },
     };
@@ -263,7 +275,8 @@ module.exports = class Layer7Service {
     resources.push(apiService);
 
     // APIServiceRevision
-    const apiServiceRevisionName = apiServiceName; //`${api.info.title}-${api.info.version}`;
+    const apiServiceRevisionName = `${apiServiceName}-${version}`;
+
     let type = "oas3";
     if (api.swagger) {
       type = "oas2";
@@ -271,7 +284,8 @@ module.exports = class Layer7Service {
     const apiServiceRevision = {
       apiVersion: "v1alpha1",
       kind: "APIServiceRevision",
-      name: apiServiceName,
+      name: apiServiceRevisionName,
+      title: apiServiceRevisionName,
       attributes: attributes,
       metadata: {
         scope: {
@@ -297,7 +311,7 @@ module.exports = class Layer7Service {
         host: api.host,
         protocol: (api.schemes || []).includes("https") ? "https" : "http",
         port: (api.schemes || []).includes("https") ? 443 : 80,
-        ...(api.basePath ? { routing: { basePath: api.basePath } } : {}),
+        ...(ssgUrl ? { routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` } } : {}),
       });
     } else {
       for (const server of api.servers) {
@@ -305,7 +319,7 @@ module.exports = class Layer7Service {
         endpoints.push({
           host: parsedUrl.hostname,
           protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(":")),
-          routing: { basePath: parsedUrl.pathname },
+          routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` },
           ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {})
         });
       }
@@ -348,9 +362,10 @@ module.exports = class Layer7Service {
         name: apiServiceName,
         apiServiceInstance: apiServiceName,
         subscription: {
-          enabled: false,
+          enabled: portalStatus === 'ENABLED',
           autoSubscribe: false,
         },
+        documentation: `${description} AuthenticationParameters: ${authenticationParameters}`
       },
     };
 
