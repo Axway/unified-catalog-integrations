@@ -97,13 +97,21 @@ module.exports = class Layer7Service {
       // Process our REST/WSDL APIs
       page.apis.length && await Promise.all(page.apis.map(async (entry: any) => {
         const { __definition: definition, ...meta } = entry;
-
-        if (entry.apiServiceType === 'REST') {
-          const api = await SwaggerParser.validate(definition);
-          await this.writeAPI4Central(meta, api)
+        const { __assetType: assetType } = meta;
+        if (entry.apiServiceType === 'REST' && assetType !== 'WADL') {
+          let api;
+          try {
+            api = await SwaggerParser.validate(definition);
+          } catch (error) {
+            // TODO: proceed for swagger validaotr support 3.0.5
+            // api = definition
+            console.warn(error);
+          }
+          api && await this.writeAPI4Central(meta, api)
         } else if (entry.apiServiceType === 'SOAP') {
-          // TODO: look at mulesoft for WSDL
-          console.log('Process wsdl')
+          await this.writeAPI4Central(meta, definition)
+        } else if (entry.apiServiceType === 'REST' && assetType === 'WADL') {
+          await this.writeAPI4Central(meta, definition)
         }
       }));
 
@@ -138,6 +146,7 @@ module.exports = class Layer7Service {
   private async getPage(pageOptions: getPageConfig) {
     // TODO: Get paging working
     // https://techdocs.broadcom.com/us/en/ca-enterprise-software/layer7-api-management/api-portal-legacy/3-5/manage-the-api-portal/customize-the-api-portal/paginate-the-records.html
+    // https://host:port/ssg/api-management/1.0/apis?page=1&size=1
     
     const { pageNumber, pageSize } = pageOptions;
 
@@ -151,53 +160,57 @@ module.exports = class Layer7Service {
 
       let apis = (await Promise.all(data.results.map(async (item: any) => {
         
-        if (item.ssgServiceType === 'REST') {
-          // get apis, need data later
-          let { data: api }  = await this.read({
-            path: `/api-management/1.0/apis/${item.uuid}`
-          })
+        // get api metadata
+        let { data: api }  = await this.read({
+          path: `/api-management/1.0/apis/${item.uuid}`
+        })
 
-          // get assets
-          let { data: assets } = await this.read({
-            path: `/api-management/1.0/apis/${item.uuid}/assets`
-          }) || [];
+        // get assets for api
+        let { data: assets } = await this.read({
+          path: `/api-management/1.0/apis/${item.uuid}/assets`
+        }) || [];
 
-          // TODO: Is this the best/only way to get spec? Only expect one?
-          assets = assets.filter((asset: any) => asset.type === 'JSON' && isOASExtension(asset.name));
-          if (assets.length > 1) {
-            throw new Error('More than one spec file found')
-          }
-
-          // Fetch the spec file
-          if (assets.length) {
-            api.__fileName = assets[0].name;
-            const { data: definition } =  await this.read({
-              path: `/api-management/1.0/apis/${item.uuid}/assets/${assets[0].uuid}/file`,
-              opts: { json: false }
-            })
-            api.__definition = definition
-          }
-          return api;
-        } else if (item.ssgServiceType === 'SOAP') {
-          // TODO: Flesh out fetch wsdl
-          let { data: api }  = await this.read({
-            path: `/api-management/1.0/apis/${item.uuid}/assets/wsdl`
-          })
-          return api
+        // TODO: Is this the best/only way to get spec? Only expect one?
+        assets = assets.filter((asset: any) => {
+          // Use this to handle wadle vs wsdl
+          api.__assetType = asset.type;
+          return (asset.type === 'JSON' && isOASExtension(asset.name)) || ['WSDL', 'WADL'].includes(asset.type)
+        });
+        if (assets.length > 1) {
+          // Do we have confidense there is only one
+          throw new Error('More than one spec file found');
         }
+
+        // Fetch the spec file
+        if (assets.length) {
+          api.__fileName = assets[0].name;
+
+          const { data: definition } =  await this.read({
+            path: `/api-management/1.0/apis/${item.uuid}/assets/${assets[0].uuid}/file`,
+            opts: {
+              json: false,
+              headers: {
+                accept: 'application/json, application/xml'
+              }
+            }
+          })
+          api.__definition = definition
+        }
+
+        return api;
+ 
       }))).filter((a: any) => {
-        // Only work on apis with specs or WSDL
-        if (a.apiServiceType === 'REST') {
+        if (a.apiServiceType === 'REST' && a.__assetType !== 'WADL') {
           // Parse the yaml/json while we're at it
           const isOAS = this.peek(a.__fileName, a.__definition)
           if (!!isOAS && typeof isOAS === 'object') {
             a.__definition = isOAS
-          } else if (!!isOAS) {
-            a.__definition = JSON.parse(a.__definition);
           }
           return !!isOAS;
         } else if (a.apiServiceType === 'SOAP') {
           return true;
+        } else if (a.apiServiceType === 'REST' && a.__assetType === 'WADL') {
+          return true
         }
         return false;
       })
@@ -227,7 +240,7 @@ module.exports = class Layer7Service {
       // see if root of JSON is XXX
       const obj = JSON.parse(contents);
       if (obj.swagger || obj.openapi) {
-        isOAS = true;
+        isOAS = obj;
       }
     }
     return isOAS;
@@ -246,7 +259,9 @@ module.exports = class Layer7Service {
       version,
       ssgUrl,
       authenticationParameters,
-      authenticationType
+      authenticationType,
+      __assetType: assetType,
+      __fileName: fileName
     } = meta;
     const attributes = { apiId };
     const apiServiceName = `${name}`.toLowerCase().replace(/\W+/g, "-");
@@ -257,7 +272,7 @@ module.exports = class Layer7Service {
       apiVersion: "v1alpha1",
       kind: "APIService",
       name: apiServiceName,
-      title: api.info.title,
+      title: api?.info?.title || apiServiceName,
       attributes: attributes,
       metadata: {
         scope: {
@@ -279,7 +294,12 @@ module.exports = class Layer7Service {
     let type = "oas3";
     if (api.swagger) {
       type = "oas2";
+    } else if (assetType === 'WSDL') {
+      type = 'wsdl'
+    } else if (assetType === 'WADL') {
+      type = 'wadl'
     }
+    
     const apiServiceRevision = {
       apiVersion: "v1alpha1",
       kind: "APIServiceRevision",
@@ -296,7 +316,7 @@ module.exports = class Layer7Service {
         apiService: apiServiceName,
         definition: {
           type: type,
-          value: Buffer.from(JSON.stringify(api)).toString("base64"),
+          value: Buffer.from(typeof api === 'string' ? api : JSON.stringify(api)).toString("base64"),
         },
       },
     };
@@ -305,7 +325,7 @@ module.exports = class Layer7Service {
 
     const endpoints = [];
 
-    if (type === "oas2") {
+    if (type === "oas2" || type === 'wsdl') {
       const parsedUrl = new uri.URL(this.config.baseUrl);
       endpoints.push({
         host: parsedUrl.hostname,
@@ -313,7 +333,7 @@ module.exports = class Layer7Service {
         ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {}),
         ...(ssgUrl ? { routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` } } : {}),
       });
-    } else {
+    } else if (type === 'oas3') {
       for (const _ of api.servers) {
         const parsedUrl = new uri.URL(this.config.baseUrl);
         endpoints.push({
@@ -369,7 +389,18 @@ module.exports = class Layer7Service {
           autoSubscribe: false,
           subscriptionDefinition: 'consumersubdef'
         },
-        documentation: `${description} AuthenticationParameters: ${authenticationParameters}`
+        ...(!!description ? { description } : { description: '' }),
+        ...(!!authenticationParameters ? {
+          documentation: `Authentication parameters: ${authenticationParameters}`
+        } : { documentation: '' }),
+        version,
+        ...(assetType === 'wadl' ? {
+            unstructuredDataProperties: {
+              contentType: 'application/xml',
+              fileName,
+              label: 'WADL'
+        }
+        }: {})
       },
     };
 
