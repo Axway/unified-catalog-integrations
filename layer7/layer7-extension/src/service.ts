@@ -232,10 +232,7 @@ module.exports = class Layer7Service {
     }
     return isOAS;
   }
-  //  TODO: add/modify these resources
-  //  Apiserviceinstnace host should derive from baseurl for now. They're may be multiple portals in the future
-  //  Add a new config for webhook url
-  //  Create: webhook, consumersubscriptiondefinition thats linked in consumerinstance
+
   private async writeAPI4Central(meta: any, api: any) {
     const resources = [];
     const iconData = getIconData(this.config.icon);
@@ -248,7 +245,8 @@ module.exports = class Layer7Service {
       privateDescription,
       version,
       ssgUrl,
-      authenticationParameters
+      authenticationParameters,
+      authenticationType
     } = meta;
     const attributes = { apiId };
     const apiServiceName = `${name}`.toLowerCase().replace(/\W+/g, "-");
@@ -352,7 +350,10 @@ module.exports = class Layer7Service {
       apiVersion: "v1alpha1",
       kind: "ConsumerInstance",
       name: apiServiceName,
-      attributes: attributes,
+      attributes: {
+        ...attributes,
+        authenticationType
+      },
       metadata: {
         scope: {
           kind: "Environment",
@@ -364,7 +365,7 @@ module.exports = class Layer7Service {
         name: apiServiceName,
         apiServiceInstance: apiServiceName,
         subscription: {
-          enabled: portalStatus === 'ENABLED',
+          enabled: portalStatus === 'ENABLED' && authenticationType !== 'NONE',
           autoSubscribe: false,
           subscriptionDefinition: 'consumersubdef'
         },
