@@ -2,7 +2,7 @@
 import { chalk, snooplogg } from "cli-kit";
 import { readJsonSync } from "fs-extra";
 import { Config } from "../../../types";
-import { configFilePath, createEnvironmentResource } from "../../utils";
+import { configFilePath, createSupportResource } from "../../utils";
 const BitbucketService = require('../../service');
 
 type args = {
@@ -17,7 +17,7 @@ export const generate = {
     const config: Config = readJsonSync(configFilePath);
     config.outputDir = typeof config.outputDir === "string" ? config.outputDir : "./resources";
     await new BitbucketService(config).generateResources();
-    await createEnvironmentResource(config);
+    await createSupportResource(config);
     console.log(chalk["yellow"](`Resources created in ${config.outputDir}`));
     console.log(chalk["yellow"]("Upload example: 'amplify central create -f=<path to resource>'\n"));
   },

@@ -21,7 +21,8 @@ module.exports = class Layer7Service {
       ConfigKeys.ENVIRONMENT_NAME,
       ConfigKeys.CLIENT_ID,
       ConfigKeys.CLIENT_SECRET,
-      ConfigKeys.BASE_URL
+      ConfigKeys.BASE_URL,
+      ConfigKeys.WEBHOOK_URL
     ].reduce((acc: Array<string>, cur: string) => {
       if (!(config as any)[cur]) {
         acc.push(cur);
@@ -365,6 +366,7 @@ module.exports = class Layer7Service {
         subscription: {
           enabled: portalStatus === 'ENABLED',
           autoSubscribe: false,
+          subscriptionDefinition: 'consumersubdef'
         },
         documentation: `${description} AuthenticationParameters: ${authenticationParameters}`
       },

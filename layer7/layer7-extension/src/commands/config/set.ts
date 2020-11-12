@@ -34,6 +34,7 @@ export const set = {
     "--icon [value]": "Set absolute path for custom icon",
     "--client-id [value]": "Required: Client id for fetching APIs",
     "--client-secret [value]": "Required: Client secret for fetching APIs",
-    "--base-url [value]": "Required: Portal baseurl"
+    "--base-url [value]": "Required: Portal baseurl",
+    "--webhook-url [value]": "Required: Set webhook url to use"
   },
 };

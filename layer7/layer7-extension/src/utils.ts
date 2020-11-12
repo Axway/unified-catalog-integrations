@@ -28,8 +28,8 @@ export const getIconData = (icon: string) => {
   return iconData;
 };
 
-export const createEnvironmentResource = async (config: any) => {
-  const { environmentName, icon, outputDir } = config;
+export const createSupportResource = async (config: any) => {
+  const { environmentName, icon, outputDir, webhookUrl } = config;
 
   let iconData = getIconData(icon);
 
@@ -49,8 +49,52 @@ export const createEnvironmentResource = async (config: any) => {
     },
   };
 
+  const webhook = {
+		apiVersion: "v1alpha1",
+		title: "webhook1 title",
+		name: "ibflow",
+		kind: "Webhook",
+		metadata: {
+			scope: {
+				kind: "Environment",
+				name: environmentName,
+			},
+		},
+		attributes: {
+			target: "ibflow",
+		},
+		tags: ["webhook", "cli", "axway"],
+		spec: {
+			enabled: true,
+			url: webhookUrl,
+			headers: {
+				"Content-Type": "application/json",
+			}
+		}
+  };
+  
+  const subscriptionDefinition = {
+		apiVersion: 'v1alpha1',
+		title: 'Invoke IB Flow for approval',
+		name: 'consumersubdef',
+		kind: 'ConsumerSubscriptionDefinition',
+		metadata: {
+			scope: {
+				kind: 'Environment',
+				name: environmentName
+			}
+		},
+		tags: ['subDefinition', 'cli', 'axway'],
+		spec:
+		{
+			webhooks: ['ibflow']
+		}
+	};
+
+
+
   //write yaml files to outputDir
-  await commitToFs(environment, outputDir, [environment]);
+  await commitToFs(environment, outputDir, [environment, webhook, subscriptionDefinition]);
 };
 
 // Given a properly ordered array of resource defs, create 1 yaml str

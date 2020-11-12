@@ -4,7 +4,8 @@ export enum ConfigKeys {
   OUTPUT_DIR = "outputDir",
   CLIENT_ID = "clientId",
   CLIENT_SECRET = "clientSecret",
-  BASE_URL = "baseUrl"
+  BASE_URL = "baseUrl",
+  WEBHOOK_URL = "webhookUrl"
 }
 
 export type Config = {
