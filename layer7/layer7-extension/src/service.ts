@@ -307,18 +307,19 @@ module.exports = class Layer7Service {
     const endpoints = [];
 
     if (type === "oas2") {
+      const parsedUrl = new uri.URL(this.config.baseUrl);
       endpoints.push({
-        host: api.host,
-        protocol: (api.schemes || []).includes("https") ? "https" : "http",
-        port: (api.schemes || []).includes("https") ? 443 : 80,
+        host: parsedUrl.hostname,
+        protocol: parsedUrl.protocol.replace(':',''),
+        ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {}),
         ...(ssgUrl ? { routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` } } : {}),
       });
     } else {
-      for (const server of api.servers) {
-        const parsedUrl = new uri.URL(server.url);
+      for (const _ of api.servers) {
+        const parsedUrl = new uri.URL(this.config.baseUrl);
         endpoints.push({
           host: parsedUrl.hostname,
-          protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(":")),
+          protocol: parsedUrl.protocol.replace(':', ''),
           routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` },
           ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {})
         });
