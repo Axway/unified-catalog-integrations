@@ -35,7 +35,7 @@ export const set = {
     "--app-password [value]": "Required: Bitbucket app password, used with username",
     "--repo [value]": "Required: repository to search in",
     "--branch [value]": "Required: repository branch to search in",
-    "--workspace [value]": "Required: repository workspace",
+    "--workspace [value]": "Required: repository workspace. Often your username for v2 and your project name for v1",
     "--username [value]": "Required: Bitbucket username, used with app-password",
     "--path [value]": "Path in repo to search for specs. Use a spec's absolute path to import one. Defaults to /",
     "--base-url [value]": "Bitbucket host, defaults to https://api.bitbucket.org/2.0 for api-version v2. Required for v1",

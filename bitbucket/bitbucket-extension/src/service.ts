@@ -244,10 +244,10 @@ module.exports = class BitbucketService {
         if ((error?.message || '').includes('Unsupported OpenAPI version')) {
           api = content;
         } else {
-          throw error;
+          console.warn('skipping', error);
         }
       }
-      await this.writeAPI4Central(repo, api);
+      !!api && await this.writeAPI4Central(repo, api);
     }
   }
 
