@@ -71,7 +71,7 @@ describe('utils', () => {
 				url: 'http://example.com/foo'
 			})
 		} catch (e) {
-			expect(e.message).to.equal(`Bad response ${expectedBody}`);
+			 expect(e.message).to.equal(`Bad response "${expectedBody}"`);
 		}
 		expect(result).to.equal(undefined);
 	})

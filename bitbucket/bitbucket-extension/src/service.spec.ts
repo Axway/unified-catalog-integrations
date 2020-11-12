@@ -388,7 +388,7 @@ describe("Bitbucket service", () => {
       ...okConfig
     });
     const isOAS = svc['peek']('petstore.yml', "swagger: '2.0'")
-    expect(isOAS).to.equal(true)
+    expect(typeof isOAS).to.equal('object')
   })
 
   it('peek: true if json is likely spec', async () => {
@@ -396,7 +396,7 @@ describe("Bitbucket service", () => {
       ...okConfig
     });
     const isOAS = svc['peek']('petstore.json', JSON.stringify({ swagger: '2.0' }))
-    expect(isOAS).to.equal(true)
+    expect(typeof isOAS).to.equal('object')
   })
 
   it('peek: false if name is not yaml/yml/json', async () => {
