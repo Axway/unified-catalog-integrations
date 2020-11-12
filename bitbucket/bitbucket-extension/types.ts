@@ -29,7 +29,8 @@ export type v1ReadOpts = {
   workspace: string,
   repo_slug: string,
   branch: string,
-  baseUrl: string
+  baseUrl: string,
+  req: object
 }
 
 export type v1BitbucketConfig = {
