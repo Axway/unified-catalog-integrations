@@ -18,15 +18,15 @@ export type ProxySettings = {
 }
 
 export type ReadOpts = {
-  pageNumber?: number,
-  pageSize?: number,
+  page?: number,
+  size?: number,
   path?: string,
   opts?: object
 }
 
 export type getPageConfig = {
-  pageNumber?: number,
-  pageSize?: number
+  page?: number,
+  size?: number
 }
 
 export type pageValue = {

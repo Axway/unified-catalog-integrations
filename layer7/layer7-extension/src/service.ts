@@ -2,12 +2,10 @@
 import SwaggerParser from "@apidevtools/swagger-parser";
 //@ts-ignore
 import { loadConfig } from "@axway/amplify-cli-utils";
-import { request } from "http";
 import yaml from "js-yaml";
 import * as uri from "url";
-// import * as p from "path";
-import { Config, ConfigKeys, ProxySettings, getPageConfig, /* pageValue, */ ReadOpts } from "../types";
-import { commitToFs, getIconData, isOASExtension, requestPromise/* , isOASExtension */ } from "./utils";
+import { Config, ConfigKeys, ProxySettings, getPageConfig, ReadOpts } from "../types";
+import { commitToFs, getIconData, isOASExtension, requestPromise } from "./utils";
 
 // TODO: fix tsconfig
 module.exports = class Layer7Service {
@@ -81,21 +79,21 @@ module.exports = class Layer7Service {
 
   public async generateResources() {
     let canPage = true; 
-    let pageSize = 100;
-    let pageNumber = 1;
+    let size = 100;
+    let page = 0;
 
     console.log('Logging in...');
     await this.login();
     console.log('Generating resources files...');
 
     while (canPage === true) {
-      const page = await this.getPage({
-        pageNumber,
-        pageSize
-      }) || { apis: [] };
+      const result = await this.getPage({
+        page,
+        size
+      }) || { apis: [], canPage: false };
 
       // Process our REST/WSDL APIs
-      page.apis.length && await Promise.all(page.apis.map(async (entry: any) => {
+      result.apis.length && await Promise.all(result.apis.map(async (entry: any) => {
         const { __definition: definition, ...meta } = entry;
         const { __assetType: assetType } = meta;
         if (entry.apiServiceType === 'REST' && assetType !== 'WADL') {
@@ -103,9 +101,11 @@ module.exports = class Layer7Service {
           try {
             api = await SwaggerParser.validate(definition);
           } catch (error) {
-            // TODO: proceed for swagger validaotr support 3.0.5
-            // api = definition
-            console.warn(error);
+            if ((error?.message || '').includes('Unsupported OpenAPI version')) {
+              api = definition;
+            } else {
+              console.warn('skipping', error);
+            }
           }
           api && await this.writeAPI4Central(meta, api)
         } else if (entry.apiServiceType === 'SOAP') {
@@ -116,15 +116,15 @@ module.exports = class Layer7Service {
       }));
 
       // Setup for next loop or to exit
-      pageNumber++;
-      canPage = page.canPage;
+      page++;
+      canPage = result.canPage;
     }
   }
 
   private async read(readOpts: ReadOpts): Promise<any> {
     // fetchs apis
-    const { pageSize = 100, pageNumber = 1, path = '/', opts = {} } = readOpts;
-    const qs = `?pageSize=${pageSize}&pageNumber=${pageNumber}`;
+    const { size = 100, page = 1, path = '/', opts = {} } = readOpts;
+    const qs = `?size=${size}&page=${page}`;
     let url = `${this.url.href}${path.startsWith('/') ? path : '/' + path}${qs}`;
 
     return { data: await requestPromise({
@@ -143,18 +143,14 @@ module.exports = class Layer7Service {
    * Reads the layer7 apis, returns { apis: object, canPage: bool }
    * @param pageOptions object containing page info
    */
-  private async getPage(pageOptions: getPageConfig) {
-    // TODO: Get paging working
-    // https://techdocs.broadcom.com/us/en/ca-enterprise-software/layer7-api-management/api-portal-legacy/3-5/manage-the-api-portal/customize-the-api-portal/paginate-the-records.html
-    // https://host:port/ssg/api-management/1.0/apis?page=1&size=1
-    
-    const { pageNumber, pageSize } = pageOptions;
+  private async getPage(pageOptions: getPageConfig) {    
+    const { page, size } = pageOptions;
 
     try {
       // List all APIs
       const { data }  = await this.read({
-        pageNumber,
-        pageSize,
+        page,
+        size,
         path: '/api-management/1.0/apis'
       });
 
@@ -216,7 +212,7 @@ module.exports = class Layer7Service {
       })
 
       // return our apis and indicate if we can still page
-      return { apis, canPage: !(data.currentPage + 1 === data.totalPages) };
+      return { apis, canPage: !(data.currentPage + 1 >= data.totalPages) };
      } catch (e) {
        throw (e);
      }
