@@ -9,7 +9,7 @@ type args = {
   console: Console;
 };
 
-const { log } = snooplogg("bitbucket-extension: config: set");
+const { log } = snooplogg("layer7-extension: config: set");
 
 export const set = {
   action: ({ argv }: args) => {
@@ -26,7 +26,7 @@ export const set = {
     log(`Writing updated config file: ${configFilePath}`);
     outputJsonSync(configFilePath, config);
   },
-  desc: "Set AMPLIFY Central bitbucket-extension configuration",
+  desc: "Set AMPLIFY Central layer7-extension configuration",
   aliases: ["set"],
   options: {
     "--output-dir [value]": "Set absolute path for output directory",

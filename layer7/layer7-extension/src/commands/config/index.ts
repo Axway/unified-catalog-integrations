@@ -3,5 +3,5 @@ import { set } from "./set";
 
 export const config = {
   commands: { list, set },
-  desc: "Manage Bitbucket Extension Configuration",
+  desc: "Manage Layer7 Extension Configuration",
 };

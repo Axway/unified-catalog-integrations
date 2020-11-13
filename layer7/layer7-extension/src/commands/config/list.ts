@@ -7,7 +7,7 @@ type args = {
   console: Console;
 };
 
-const { log } = snooplogg("bitbucket-extension: config: list");
+const { log } = snooplogg("layer7-extension: config: list");
 
 export const list = {
   action: ({ console }: args) => {
@@ -16,6 +16,6 @@ export const list = {
 
     console.log(readJsonSync(configFilePath));
   },
-  desc: "View AMPLIFY Central bitbucket-extension configuration",
+  desc: "View AMPLIFY Central layer7-extension configuration",
   aliases: ["ls", "view"],
 };
