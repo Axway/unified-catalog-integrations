@@ -226,6 +226,7 @@ module.exports = class BitbucketService {
   private async writeSpecification(path: string) {
     const { branch, repo, workspace, baseUrl, apiVersion } = this.config;
     console.log(`Reading file: ${path}`);
+
     let clientOptions: any;
     if (apiVersion === 'v1') {
       clientOptions = { path, branch, repo_slug: repo, workspace, baseUrl, req: { json: false } }
@@ -244,7 +245,7 @@ module.exports = class BitbucketService {
         if ((error?.message || '').includes('Unsupported OpenAPI version')) {
           api = content;
         } else {
-          console.warn('skipping', error);
+          console.warn(`Skipping ${path}`, error.message);
         }
       }
       !!api && await this.writeAPI4Central(repo, api);
@@ -295,7 +296,7 @@ module.exports = class BitbucketService {
         },
       },
       spec: {
-        description: api.info.description,
+        description: api?.info?.description || '',
         icon: iconData,
       },
     };
@@ -340,7 +341,7 @@ module.exports = class BitbucketService {
         ...(api.basePath ? { routing: { basePath: api.basePath } } : {}),
       });
     } else {
-      for (const server of api.servers) {
+      for (const server of (api.servers || [])) {
         const parsedUrl = new uri.URL(server.url);
         endpoints.push({
           host: parsedUrl.hostname,
