@@ -385,19 +385,20 @@ module.exports = class Layer7Service {
           autoSubscribe: false,
           subscriptionDefinition: 'consumersubdef'
         },
+        version,
         ...(!!description ? { description } : { description: '' }),
         ...(!!authenticationParameters ? {
           documentation: `Authentication parameters: ${authenticationParameters}`
         } : { documentation: '' }),
-        version,
         ...(assetType === 'WADL' ? {
             unstructuredDataProperties: {
-              contentType: 'application/xml',
+              type: 'wadl',
+              contentType: 'text/xml',
               fileName,
               label: 'WADL'
         }
         }: {})
-      },
+      }
     };
 
     resources.push(consumerInstance);
