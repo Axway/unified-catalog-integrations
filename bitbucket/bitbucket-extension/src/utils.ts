@@ -81,7 +81,7 @@ export const requestPromise = (options: any) => {
       if (err) {
 				return reject(new Error(err));
 			} else if (response.statusCode > 200) {
-				return reject(new Error(`Bad response ${response.body}`))
+				return reject(new Error(`Bad response ${JSON.stringify(response.body, null, 2)}`))
 			}
       resolve(response.body);
     });

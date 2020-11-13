@@ -42,7 +42,7 @@ class BitBucketV1 {
       read:  async (options: v1ReadOpts) => {
         // URL for listing files <baseUrl>/projects/<project>/repos/<repo>/files/<path>?start=0&limit=25&at=<branch>
         // URL for getting content <baseUrl>/projects/<project>/repos/<repo>/raw/<path>?start=0&limit=25&at=<branch>
-        const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, baseUrl } = options;
+        const { start = 0, limit = 25, path = '/', branch, repo_slug: repo, workspace: project, baseUrl, req = {} } = options;
         const qs = `?start=${start}&limit=${limit}&at=${branch}`;
         const dirOrFile = `${isOASExtension(path) ? '/raw/' : '/files/'}${ path.startsWith('/') ? path.substr(1) : path }`
         const url = uri.resolve(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`, `projects/${project}/repos/${repo}${dirOrFile}${qs}`)
@@ -54,7 +54,8 @@ class BitBucketV1 {
           auth: {
             ...(self.auth.username ? { username: self.auth.username, password: self.auth.password } : { bearer: self.auth.token })
           },
-          ...self.proxySettings
+          ...self.proxySettings,
+          ...req
         })}
       }
     }
@@ -227,15 +228,26 @@ module.exports = class BitbucketService {
     console.log(`Reading file: ${path}`);
     let clientOptions: any;
     if (apiVersion === 'v1') {
-      clientOptions = { path, branch, repo_slug: repo, workspace, baseUrl }
+      clientOptions = { path, branch, repo_slug: repo, workspace, baseUrl, req: { json: false } }
     } else {
       clientOptions = { node: branch, path: path, repo_slug: repo, workspace }
     }
+
     const result = await this.client?.source?.read(clientOptions);
-    const content = typeof result.data === 'object' ? JSON.stringify(result.data) : result.data;
-    if (content && this.peek(path, content)) {
-      const api = await SwaggerParser.validate(JSON.parse(content as string));
-      await this.writeAPI4Central(repo, api);
+    const content = result.data && this.peek(path, result.data);
+
+    if (content) {
+      let api;
+      try {
+        api = await SwaggerParser.validate(content as any);
+      } catch (error) {
+        if ((error?.message || '').includes('Unsupported OpenAPI version')) {
+          api = content;
+        } else {
+          console.warn('skipping', error);
+        }
+      }
+      !!api && await this.writeAPI4Central(repo, api);
     }
   }
 
@@ -250,13 +262,13 @@ module.exports = class BitbucketService {
       // see if root of YAML is swagger for v2.0 or openapi for v3.0s
       const obj: any = yaml.safeLoad(contents);
       if (obj.swagger || obj?.openapi) {
-        isOAS = true;
+        isOAS = obj;
       }
     } else if (/\.(json)$/i.test(name)) {
       // see if root of JSON is XXX
       const obj = JSON.parse(contents);
       if (obj.swagger || obj.openapi) {
-        isOAS = true;
+        isOAS = obj;
       }
     }
     return isOAS;
