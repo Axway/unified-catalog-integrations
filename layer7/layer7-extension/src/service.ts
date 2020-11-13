@@ -390,7 +390,7 @@ module.exports = class Layer7Service {
           documentation: `Authentication parameters: ${authenticationParameters}`
         } : { documentation: '' }),
         version,
-        ...(assetType === 'wadl' ? {
+        ...(assetType === 'WADL' ? {
             unstructuredDataProperties: {
               contentType: 'application/xml',
               fileName,
