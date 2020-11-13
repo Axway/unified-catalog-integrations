@@ -7,7 +7,6 @@ import * as uri from "url";
 import { Config, ConfigKeys, ProxySettings, getPageConfig, ReadOpts } from "../types";
 import { commitToFs, getIconData, isOASExtension, requestPromise } from "./utils";
 
-// TODO: fix tsconfig
 module.exports = class Layer7Service {
   private proxySettings: ProxySettings = { strictSSL: true, proxy: undefined }
   private accessToken: string = ''
