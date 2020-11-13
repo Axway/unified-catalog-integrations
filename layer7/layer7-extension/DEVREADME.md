@@ -1,4 +1,4 @@
-# Bitbucket Extension
+# Layer7 Extension
 
 ## Disclaimer
 
@@ -6,25 +6,7 @@ This extension is example code and comes with no guarantee of support or mainten
 
 ## Setup
 
-**For v1** (not offered on Bitbucket cloud now) you'll need to run a container somewhere that has the older bitbucket-server. Example:
-
-```
-docker run -v bitbucketVolume:/var/atlassian/application-data/bitbucket --name="bitbucket" -d -p 7990:7990 -p 7999:7999 atlassian/bitbucket-server:6.10.0-ubuntu
-```
-
-1. Navigate the to server page: http://127.0.0.1:7990/
-2. Setup an account, and create your project with a repo in it
-3. You'll need to create a [personal access token](https://confluence.atlassian.com/bitbucketserver/personal-access-tokens-939515499.html).
-
-v1 API docs found here: https://docs.atlassian.com/bitbucket-server/rest/6.10.0/bitbucket-rest.html
-
-**For v2**
-1. Create an account for bitbucket server cloud bitbucket.org
-2. Create a workspace/project with a repo inside
-3. You'll need to create an [App Password](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/)
-
-v2 API docs found here: https://developer.atlassian.com/bitbucket/api/2/reference/resource/
-
+amplify central layer7-extension config set -h
 
 ## Debugging
 
