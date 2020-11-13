@@ -165,12 +165,12 @@ module.exports = class Layer7Service {
           path: `/api-management/1.0/apis/${item.uuid}/assets`
         }) || [];
 
-        // TODO: Is this the best/only way to get spec? Only expect one?
         assets = assets.filter((asset: any) => {
           // Use this to handle wadle vs wsdl
           api.__assetType = asset.type;
           return (asset.type === 'JSON' && isOASExtension(asset.name)) || ['WSDL', 'WADL'].includes(asset.type)
         });
+
         if (assets.length > 1) {
           // Do we have confidense there is only one
           throw new Error('More than one spec file found');
@@ -179,7 +179,6 @@ module.exports = class Layer7Service {
         // Fetch the spec file
         if (assets.length) {
           api.__fileName = assets[0].name;
-
           const { data: definition } =  await this.read({
             path: `/api-management/1.0/apis/${item.uuid}/assets/${assets[0].uuid}/file`,
             opts: {
@@ -190,8 +189,19 @@ module.exports = class Layer7Service {
             }
           })
           api.__definition = definition
+        } else {
+          const { data: definition } =  await this.read({
+            path: `/2.0/Apis('${item.uuid}')/SpecContent`,
+            opts: {
+              json: false,
+              headers: {
+                accept: 'application/json, application/xml'
+              }
+            }
+          })
+          api.__definition = definition
         }
-
+        
         return api;
  
       }))).filter((a: any) => {
@@ -199,7 +209,10 @@ module.exports = class Layer7Service {
           // Parse the yaml/json while we're at it
           const isOAS = this.peek(a.__fileName, a.__definition)
           if (!!isOAS && typeof isOAS === 'object') {
-            a.__definition = isOAS
+            a.__definition = isOAS;
+            // TODO: Supply a default name/asset if there wasn't one for /speccontent
+            a.__fileName = a.__fileName || 'default.json'
+            a.__assetType = a.__assetType || 'JSON'
           }
           return !!isOAS;
         } else if (a.apiServiceType === 'SOAP') {
@@ -223,16 +236,17 @@ module.exports = class Layer7Service {
    * @param name file name
    * @param contents contents of the file
    */
-  private peek(name: string, contents: string) {
+  private peek(name: string, contents: string = '') {
     let isOAS = false;
+
     if (/\.(yaml|yml)$/i.test(name)) {
       // see if root of YAML is swagger for v2.0 or openapi for v3.0s
       const obj: any = yaml.safeLoad(contents);
       if (obj.swagger || obj?.openapi) {
         isOAS = obj;
       }
-    } else if (/\.(json)$/i.test(name)) {
-      // see if root of JSON is XXX
+    } else if ((/\.(json)$/i.test(name)) || (name === undefined && contents.startsWith('{'))) {
+      // TODO: If its json or a spec from /speccontent
       const obj = JSON.parse(contents);
       if (obj.swagger || obj.openapi) {
         isOAS = obj;
