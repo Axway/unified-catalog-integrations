@@ -239,19 +239,29 @@ module.exports = class Layer7Service {
   private peek(name: string, contents: string = '') {
     let isOAS = false;
 
-    if (/\.(yaml|yml)$/i.test(name)) {
-      // see if root of YAML is swagger for v2.0 or openapi for v3.0s
-      const obj: any = yaml.safeLoad(contents);
-      if (obj.swagger || obj?.openapi) {
-        isOAS = obj;
-      }
-    } else if ((/\.(json)$/i.test(name)) || (name === undefined && contents.startsWith('{'))) {
+     if ((/\.(json)$/i.test(name)) || (name === undefined && contents.startsWith('{'))) {
       // TODO: If its json or a spec from /speccontent
       const obj = JSON.parse(contents);
       if (obj.swagger || obj.openapi) {
         isOAS = obj;
       }
+    } else if (/\.(yaml|yml)$/i.test(name)) {
+      // see if root of YAML is swagger for v2.0 or openapi for v3.0s
+      const obj: any = yaml.safeLoad(contents);
+      if (obj.swagger || obj?.openapi) {
+        isOAS = obj;
+      }
+    } else if (name === undefined) {
+      // TODO: If its yaml from /speccontent and we don't know filename
+      try {
+        const obj = yaml.safeLoad(contents);
+        // @ts-ignore
+        isOAS = (obj?.swagger || obj?.openapi) ? obj : false
+      } catch (_) {
+        isOAS = false
+      }
     }
+
     return isOAS;
   }
 
@@ -273,8 +283,7 @@ module.exports = class Layer7Service {
       __fileName: fileName
     } = meta;
     const attributes = { apiId };
-    const apiServiceName = `${name}`.toLowerCase().replace(/\W+/g, "-");
-    
+    const apiServiceName = `${name}-api`.toLowerCase().replace(/\W+/g, "-");
 
     // APIService
     const apiService = {
@@ -290,7 +299,7 @@ module.exports = class Layer7Service {
         },
       },
       spec: {
-        description: privateDescription,
+        description: privateDescription ? privateDescription : '',
         icon: iconData,
       },
     };
