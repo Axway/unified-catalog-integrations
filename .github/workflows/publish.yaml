@@ -15,6 +15,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "mulesoft" ]; then           
         cd mulesoft/mulesoft-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public
@@ -24,6 +25,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "swaggerhub" ]; then           
         cd swaggerhub/swaggerhub-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public
@@ -33,6 +35,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "github" ]; then                   
         cd github/github-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public
@@ -42,6 +45,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "azure" ]; then            
         cd azure/azure-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public
@@ -51,6 +55,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "apigee" ]; then        
         cd apigee/apigee-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public      
@@ -60,6 +65,7 @@ jobs:
         export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
         if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "bitbucket" ]; then        
         cd bitbucket/bitbucket-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public      
