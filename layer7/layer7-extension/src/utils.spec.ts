@@ -31,7 +31,7 @@ describe('utils', () => {
 	});
 
 	it('exports configFilePath', () => {
-		let expectedPath = path.join(os.homedir(), '.axway', 'bitbucket-extension.json');
+		let expectedPath = path.join(os.homedir(), '.axway', 'layer7-extension.json');
 		expect(utils.configFilePath).to.equal(expectedPath)
 	})
 
@@ -107,7 +107,7 @@ describe('utils', () => {
 	})
 
 	it('getIconData: uses default icon', () => {
-		const classifier = (x: any) => (x.args ||[])[0].endsWith('bitbucket.jpg');
+		const classifier = (x: any) => (x.args ||[])[0].endsWith('layer7.png');
 		existsSync.returns(false);
 		lookup.returns('image/png');
 		readFileSync.returns({});
