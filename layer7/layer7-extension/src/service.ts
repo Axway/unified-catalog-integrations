@@ -92,7 +92,7 @@ module.exports = class Layer7Service {
       }) || { apis: [], canPage: false };
 
       // Process our REST/WSDL APIs
-      result.apis.length && await Promise.all(result.apis.map(async (entry: any) => {
+      result.apis?.length && await Promise.all(result.apis.map(async (entry: any) => {
         const { __definition: definition, ...meta } = entry;
         const { __assetType: assetType } = meta;
         if (entry.apiServiceType === 'REST' && assetType !== 'WADL') {
@@ -147,13 +147,13 @@ module.exports = class Layer7Service {
 
     try {
       // List all APIs
-      const { data }  = await this.read({
+      const { data = {} }  = await this.read({
         page,
         size,
         path: '/api-management/1.0/apis'
       });
 
-      let apis = (await Promise.all(data.results.map(async (item: any) => {
+      let apis = data.results && (await Promise.all(data.results.map(async (item: any) => {
         
         // get api metadata
         let { data: api }  = await this.read({
@@ -223,8 +223,8 @@ module.exports = class Layer7Service {
         return false;
       })
 
-      // return our apis and indicate if we can still page
-      return { apis, canPage: !(data.currentPage + 1 >= data.totalPages) };
+      // return our apis and page if our current page index isn't equal/above total
+      return { apis, canPage: data.currentPage && data.totalPages && !(data.currentPage + 1 >= data.totalPages) };
      } catch (e) {
        throw (e);
      }
@@ -357,7 +357,7 @@ module.exports = class Layer7Service {
         endpoints.push({
           host: parsedUrl.hostname,
           protocol: parsedUrl.protocol.replace(':', ''),
-          routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` },
+          ...(ssgUrl ? { routing: { basePath: ssgUrl.startsWith('/') ? ssgUrl : `/${ssgUrl}` } } : {}),
           ...(parsedUrl.port ? { port: parseInt(parsedUrl.port, 10) } : {})
         });
       }
