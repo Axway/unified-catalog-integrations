@@ -20,6 +20,9 @@ Check out our [readme](./mulesoft/README.md) to learn how to publish APIs from M
 ### Integration with Bitbucket
 Read our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/bitbucket/bitbucket-extension/README.md) to learn how to fetch APIs from Bitbucket and publish them to the Unified Catalog.
 
+### Integration with Layer7
+Read our [readme](https://github.com/Axway/unified-catalog-integrations/blob/master/layer7/layer7-extension/README.md) to learn how to fetch APIs from Layer7 and publish them to the Unified Catalog.
+
 ### Integration with Github
 Read our [readme](./github/github-extension/Readme.md) to learn how to fetch APIs from Github and publish them to the Unified Catalog.  
 

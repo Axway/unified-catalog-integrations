@@ -27,11 +27,11 @@ Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 $ amplify pm install @axway/amplify-central-cli
 ```
 
-You can then install the @axway/amplify-central-Layer7-extension:
+You can then install the @axway/amplify-central-layer7-extension:
 
 ```bash
-$ npm install @axway/amplify-central-Layer7-extension
-$ amplify central config set extensions.Layer7-extension <path to where you installed module>
+$ npm install @axway/amplify-central-layer7-extension
+$ amplify central config set extensions.layer7-extension <path to where you installed module>
 ```
 
 
@@ -109,7 +109,7 @@ SET OPTIONS:
 The `resources` command is utilized to generate github resources for Central. There is one resources sub-command: `generate`
 
 ```bash
-$ amplify central Layer7-extension resources -h
+$ amplify central layer7-extension resources -h
 
 USAGE: amplify central layer7-extension resources <command> [options]
 
