@@ -120,7 +120,7 @@ module.exports = class Layer7Service {
     }
   }
 
-  private async read(readOpts: ReadOpts): Promise<any> {
+  private async read(readOpts: ReadOpts = {}): Promise<any> {
     // fetchs apis
     const { size = 100, page = 1, path = '/', opts = {} } = readOpts;
     const qs = `?size=${size}&page=${page}`;

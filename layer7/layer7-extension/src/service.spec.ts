@@ -1,6 +1,7 @@
 const proxyquire =  require('proxyquire').noCallThru();
 import Sinon from "sinon";
 import url from "url";
+const nock = require('nock');
 import { ConfigKeys } from "../types";
 const testSwagger = require('../test/testSwagger.json');
 const testOas3 = require('../test/testOas3.json');
@@ -19,7 +20,8 @@ describe("Layer7 service", () => {
   let clientRead: SinonStub;
   let peek: SinonStub;
   let writeAPI4Central: SinonStub;
-  let requestPromise: SinonStub;
+	let requestPromise: SinonStub;
+	let read: SinonStub;
 
   let proxyConfig:any = {
 		values: {}
@@ -119,19 +121,98 @@ describe("Layer7 service", () => {
 	})
 	
 	it('generateResources: validate OAS, calls writeAPI4Central', async () => {
-    // TODO: generateResources
+		getPage = sandbox.stub(Service.prototype, 'getPage').resolves({
+			apis: [{
+				apiServiceType: 'REST',
+				__definition: testSwagger
+			}],
+			canPage: false
+		})
+
+		writeAPI4Central = sandbox.stub(Service.prototype, 'writeAPI4Central').resolves()
+
+		const svc = new Service({
+      ...okConfig
+    });
+    await svc.generateResources()
+    expect(writeAPI4Central.callCount).to.equal(1);
 	})
 	
 	it('generateResources: suppress OAS 3.0.5 error', async () => {
-    // TODO: generateResources
+    getPage = sandbox.stub(Service.prototype, 'getPage').resolves({
+			apis: [{
+				apiServiceType: 'REST',
+				__definition: {
+					...testOas3,
+					openapi: '3.0.5'
+				}
+			}],
+			canPage: false
+		})
+
+		writeAPI4Central = sandbox.stub(Service.prototype, 'writeAPI4Central').resolves()
+
+		const svc = new Service({
+      ...okConfig
+    });
+    await svc.generateResources()
+    expect(writeAPI4Central.callCount).to.equal(1);
+	})
+
+	it('generateResources: skip invalid swagger', async () => {
+		consoleStub = sandbox.stub(console, 'log');
+    getPage = sandbox.stub(Service.prototype, 'getPage').resolves({
+			apis: [{
+				apiServiceType: 'REST',
+				__definition: {}
+			}],
+			canPage: false
+		})
+
+		writeAPI4Central = sandbox.stub(Service.prototype, 'writeAPI4Central').resolves()
+
+		const svc = new Service({
+      ...okConfig
+    });
+    await svc.generateResources()
+    expect(writeAPI4Central.callCount).to.equal(0);
 	})
 	
 	it('generateResources: SOAP, calls writeAPI4Central', async () => {
-    // TODO: generateResources
+    getPage = sandbox.stub(Service.prototype, 'getPage').resolves({
+			apis: [{
+				apiServiceType: 'SOAP',
+				__definition: {}
+			}],
+			canPage: false
+		})
+
+		writeAPI4Central = sandbox.stub(Service.prototype, 'writeAPI4Central').resolves()
+
+		const svc = new Service({
+      ...okConfig
+    });
+    await svc.generateResources()
+    expect(writeAPI4Central.callCount).to.equal(1);
 	})
 	
 	it('generateResources: WADL, calls writeAPI4Central', async () => {
-    // TODO: generateResources
+    getPage = sandbox.stub(Service.prototype, 'getPage').resolves({
+			apis: [{
+				apiServiceType: 'REST',
+				__definition: {},
+				__assetType: 'WADL'
+			}],
+			canPage: false
+		})
+
+		writeAPI4Central = sandbox.stub(Service.prototype, 'writeAPI4Central').resolves()
+
+		const svc = new Service({
+      ...okConfig
+    });
+    await svc.generateResources()
+    expect(writeAPI4Central.callCount).to.equal(1);
   })
 
   it('getPage: Calls read', async () => {
@@ -157,8 +238,108 @@ describe("Layer7 service", () => {
     }
 	});
 	
-	it('getPage: gets WSDL, WADL, OAS via assets, return definitions', () => {
-		//TODO: getPage
+	it('getPage: gets WSDL, WADL, OAS via assets, return definitions', async () => {
+
+		let apis = [
+			{
+				uuid: 0,
+				type: 'JSON',
+				name: '0.json',
+				definition: { swagger: '2.0' },
+				apiServiceType: 'REST'
+			},
+			{
+				uuid: 1,
+				type: 'WSDL',
+				name: 'example.wsdl',
+				definition: '',
+				apiServiceType: 'SOAP'
+			},
+			{
+				uuid: 1,
+				type: 'WADL',
+				name: 'example.wadl',
+				definition: '',
+				apiServiceType: 'REST'
+			},
+			{
+				uuid: 0,
+				type: 'JSON',
+				name: '0.json',
+				definition: { swagger: '2.0' },
+				apiServiceType: 'REST',
+				skipAssets: true
+			}
+		]
+		
+		nock('https://myhost.com:9443/mybasepath')
+			.get('/api-management/1.0/apis?size=100&page=0')
+			.reply(200, { results: apis.map(a => ({ uuid: a.uuid }))})
+
+		apis.map(a => {
+
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/api-management/1.0/apis/${a.uuid}?size=100&page=1`)
+				.reply(200, a)
+
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/api-management/1.0/apis/${a.uuid}/assets?size=100&page=1`)
+				.reply(200, a.skipAssets ? [] : [ a ])
+
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/api-management/1.0/apis/${a.uuid}/assets/${a.uuid}/file?size=100&page=1`)
+				.reply(200, a.definition)
+			
+			// Example of getting definition if not in assets
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/2.0/Apis(%27${a.uuid}%27)/SpecContent?size=100&page=1`)
+				.reply(200, a.definition)
+		})
+
+		let svc = new Service(okConfig);
+		let result = await svc.getPage({ page: 0, size: 100 })
+		result.apis.map((entry: any, index: number) => {
+			expect(entry.__assetType).to.equal(apis[index].type)
+			expect(entry.__definition).to.deep.equal(apis[index].definition)
+			expect(entry.__fileName).to.equal(apis[index].skipAssets ? 'default.json' : apis[index].name)
+			expect(entry.uuid).to.equal(apis[index].uuid)
+		})
+	})
+
+	it('getPage: throw if more than one asset', async () => {
+
+		let apis = [
+			{
+				uuid: 0,
+				type: 'JSON',
+				name: '0.json',
+				definition: { swagger: '2.0' },
+				apiServiceType: 'REST'
+			}
+		]
+		
+		nock('https://myhost.com:9443/mybasepath')
+			.get('/api-management/1.0/apis?size=100&page=0')
+			.reply(200, { results: apis.map(a => ({ uuid: a.uuid }))})
+
+		apis.map(a => {
+
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/api-management/1.0/apis/${a.uuid}?size=100&page=1`)
+				.reply(200, a)
+
+			nock('https://myhost.com:9443/mybasepath')
+				.get(`/api-management/1.0/apis/${a.uuid}/assets?size=100&page=1`)
+				.reply(200, [ a, a ])
+		})
+
+		let svc = new Service(okConfig);
+		try {
+			await svc.getPage({ page: 0, size: 100 })
+			expect(true).to.equal(false);
+		} catch (error) {
+			expect(error.message).to.equal('More than one spec file found');
+		}
 	})
 
 	it('getPage: gets WSDL, WADL, OAS via speccontent, return definitions', () => {
@@ -223,7 +404,8 @@ describe("Layer7 service", () => {
       './utils': {
         isOASExtension: () => true,
         commitToFs,
-        getIconData: () => ''
+				getIconData: () => '',
+				requestPromise
       }
     });
     const svc = new Stubbed({
@@ -323,15 +505,87 @@ describe("Layer7 service", () => {
 		expect(commitToFs.lastCall.args[2][2].spec.endpoint.length).to.equal(0);
 	});
 
-	it('login: sets access_token', () => {
-		// TODO: login
+	it('writeAPI4Central: oas3 with no servers', async () => {
+    commitToFs = sandbox.stub()
+    let Stubbed = proxyquire('./service', {
+      './utils': {
+        isOASExtension: () => true,
+        commitToFs,
+        getIconData: () => ''
+      }
+    });
+    const svc = new Stubbed({
+      ...okConfig
+    });
+		await svc.writeAPI4Central({
+			...okMeta,
+			__assetType: 'WADL',
+			__fileName: 'test.wadl'
+		}, '');
+		expect(commitToFs.callCount).to.equal(1);
+		expect(commitToFs.lastCall.args[2][1].spec.definition.type).to.equal('wadl')
+	});
+
+	it('login: sets access_token', async () => {
+		requestPromise = sandbox.stub()
+		requestPromise.resolves({
+			access_token: '123'
+		});
+		let Stubbed = proxyquire('./service', {
+      '@axway/amplify-cli-utils': {
+        loadConfig: () => (proxyConfig)
+      },
+      './utils': {
+        requestPromise
+      }
+    });
+		const svc = new Stubbed({
+      ...okConfig
+		});
+		await svc.login();
+		expect(svc.accessToken).to.equal('123');
 	})
 
-	it('login: throw on err', () => {
-		// TODO: login
+	it('login: throw on err', async () => {
+		requestPromise = sandbox.stub()
+		requestPromise.throws(new Error('someerror'));
+
+		let Stubbed = proxyquire('./service', {
+      '@axway/amplify-cli-utils': {
+        loadConfig: () => (proxyConfig)
+      },
+      './utils': {
+        requestPromise
+      }
+    });
+		const svc = new Stubbed({
+      ...okConfig
+		});
+		try {
+			await svc.login();
+			expect(true).to.equal(false);
+		} catch (error) {
+			expect(error.message).to.equal('someerror');
+		}
 	})
 
-	it('read: calls request promise with params', () => {
-		// TODO: read
+	it('read: calls request promise with params', async () => {
+		requestPromise = sandbox.stub()
+		requestPromise.resolves();
+
+		let Stubbed = proxyquire('./service', {
+      '@axway/amplify-cli-utils': {
+        loadConfig: () => (proxyConfig)
+      },
+      './utils': {
+        requestPromise
+      }
+    });
+		const svc = new Stubbed({
+      ...okConfig
+		});
+		await svc.read()
+		expect(requestPromise.callCount).to.equal(1);
+		expect(requestPromise.lastCall.args[0].url).to.equal('https://myhost.com:9443/mybasepath/?size=100&page=1');
 	})
 });
