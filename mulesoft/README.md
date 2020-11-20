@@ -42,7 +42,7 @@ Make sure you log out from all active sessions.
 amplify auth logout --all
 ```
 
-Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
+Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
 To run the command, you need to have jq installed. 
 ```powershell
 amplify auth login --client-id apicentral
@@ -76,10 +76,10 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
  <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
 
-5. Copy the access token. You will use this to set the AMPLIFY Central Production evironment variables. 
+5. Copy the access token. You will use this to set the AMPLIFY Central Production environment variables. 
 
-6. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdow, and then click on the eye button next to the dropdown. 
-   - Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY plarform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
+6. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
+   - Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
    - Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
 
 <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/ConfigureEnvironmentPostman.PNG" width="600" height="400" /> 

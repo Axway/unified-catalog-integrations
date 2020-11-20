@@ -84,7 +84,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 Copy the access token. You will use this to set the AMPLIFY Central Production environment variables. 
 
 5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
-* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assinged the Administrator platform role, and copy the OrgID. 
+* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
 * Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
 
 ![postman_env](../images/ConfigureEnvironmentPostman.PNG) 
