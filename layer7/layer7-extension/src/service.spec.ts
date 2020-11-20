@@ -8,20 +8,16 @@ const testOas3 = require('../test/testOas3.json');
 const testOas3MultipleServers = require('../test/testOas3MultipleServers.json');
 const testOas3NoServers = require('../test/testOas3NoServers.json');
 
-// TODO: Fix tsconfig
 describe("Layer7 service", () => {
   const sandbox = Sinon.createSandbox();
   let commitToFs: SinonStub = sandbox.stub();
   let processStub: SinonStub;
   let consoleStub: SinonStub;
-  let writeSpecification: SinonStub;
 	let getPage: SinonStub;
 	let login: SinonStub;
   let clientRead: SinonStub;
-  let peek: SinonStub;
   let writeAPI4Central: SinonStub;
 	let requestPromise: SinonStub;
-	let read: SinonStub;
 
   let proxyConfig:any = {
 		values: {}
@@ -340,22 +336,6 @@ describe("Layer7 service", () => {
 		} catch (error) {
 			expect(error.message).to.equal('More than one spec file found');
 		}
-	})
-
-	it('getPage: gets WSDL, WADL, OAS via speccontent, return definitions', () => {
-		//TODO: getPage
-	})
-
-	it('getPage: no apis', () => {
-		//TODO: getPage
-	})
-
-	it('getPage: no assets', () => {
-		//TODO: getPage
-	})
-
-	it('getPage: no speccontent', () => {
-		//TODO: getPage
 	})
 
   it('peek: return definition if yml is likely spec and name undefined', async () => {
