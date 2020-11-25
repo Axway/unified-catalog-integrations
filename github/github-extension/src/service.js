@@ -254,19 +254,8 @@ module.exports = class GithubService {
       }
       else {
         for (const server of api.servers) {
-          let parsedUrl = new URL(server.url);
-          let endpoint = {
-            host: parsedUrl.hostname,
-            protocol: parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(':'))
-          };
-  
-          if (parsedUrl.port) {
-            endpoint.port = parseInt(parsedUrl.port, 10);
-          }
-          endpoint.routing = { basePath: parsedUrl.pathname };
-          endpoints.push(endpoint);
+          endpoints.push(this.getEndpoint(server.url));
         }
-             
       }
 
       // APIServiceInstance
@@ -315,5 +304,26 @@ module.exports = class GithubService {
       resources.push(consumerInstance);
       await commitToFs(consumerInstance, this.config.outputDir, resources)
     }
+
+  getEndpoint(url) {
+    var endpoint = {
+      host: 'localhost',
+      protocol: 'https',
+      port: 443
+    };
+    try {
+      let parsedUrl = new URL(url);
+      endpoint.host = parsedUrl.hostname;
+      endpoint.protocol = parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(':'));
+      if (parsedUrl.port) {
+        endpoint.port = parseInt(parsedUrl.port, 10);
+      }
+      endpoint.routing = { basePath: parsedUrl.pathname };
+    }
+    catch (error) {
+      endpoint.routing = { basePath: url};
+    }
+    return endpoint;
+  }
 }
 
