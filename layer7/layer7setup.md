@@ -28,7 +28,7 @@ c	In the above case you would see a DC1 tenant and a DC2 tenant.
 
 ****
 
-##API Portal Servies
+## API Portal Servies
 
 The API Portal solution includes the following Docker services:
 
