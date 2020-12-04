@@ -14,12 +14,12 @@ This document will highlight how to create a client id and secret for accessing 
 There are 2 areas that you need to worry about when accessing a customer’s API Portal:
 
 1. Portal administration
-a Admin portion of the layer 7 api portal
-b	Portal API (PAPI) – API’s we’ll be using to gain meta data surrounding the applications and apis being exposed on the portal.
+    1. Admin portion of the layer 7 api portal
+    2. Portal API (PAPI) – API’s we’ll be using to gain meta data surrounding the applications and apis being exposed on the portal.
 2. Tenant
-a	Tenant provisioned for the customers gateway for a particular environment.  
-b	For example – Layer 7 API Gateway cluster in the customers DC1 and possibly a second DC2.
-c	In the above case you would see a DC1 tenant and a DC2 tenant.
+    1. Tenant provisioned for the customers gateway for a particular environment.  
+    2. For example – Layer 7 API Gateway cluster in the customers DC1 and possibly a second DC2.
+    3. In the above case you would see a DC1 tenant and a DC2 tenant.
 
 
 **Below is an architecture diagram of the portal**
@@ -91,17 +91,17 @@ The Portal API has a swagger document for your consumption and this is what Axwa
 ![](./assets/images/addApplication.png)
 
 6. Add the details to the client application. Click Next.
-1. Selected Organization – Select the Portal API Org for "APIM" from the drop-down list.  
-2. Application Name – Choose a name 
-2. Public Description – Choose a description
+    1. Selected Organization – Select the Portal API Org for "APIM" from the drop-down list.  
+    2. Application Name – Choose a name 
+    3. Public Description – Choose a description
 
 
 ![](./assets/images/applicationDetails.png)
 
 7. Select the APIs to work with for this client. Accept EULA. Click Next.
-a Login API
-b Portal API (apim)
-c Portal Authorization API (apim)
+    1. Login API
+    2. Portal API (apim)
+    3. Portal Authorization API (apim)
 
 ![](./assets/images/selectApis.png)
 
@@ -150,8 +150,8 @@ You should create a new application for accessing all meta data around the tenan
 **Authentication**
 
 1. Choose a callback URI. Example:
-a https://<your domain>/admin/oauthCallback
-2. Choose scope as 'oob'
+    1. ```https://<your domain>/admin/oauthCallback```
+2. Choose scope as ```oob```
 3. Click Confidential and click create.
 
 ![](./assets/images/confidential2.png)
