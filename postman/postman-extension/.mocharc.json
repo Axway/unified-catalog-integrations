@@ -1,0 +1,9 @@
+{
+  "colors": true,
+  "exit": true,
+  "extension": ["ts"],
+  "spec": ["src/**/*.spec.*"],
+  "opts": false,
+  "recursive": true,
+  "require": ["test/setup.ts"]
+}
