@@ -378,11 +378,14 @@ module.exports =  class ApigeeService {
 							spec: {
 								apiServiceInstance: apiServiceInstanceName,
 								state: 'PUBLISHED',
-								description: revisionDetails.description,
+								description: revisionDetails.description && revisionDetails.description.length >= 350
+										? (revisionDetails.description.slice(0, 350 - "...".length) + "...")
+										: revisionDetails.description,
 								subscription: {
 									enabled: false,
 									autoSubscribe: false
 								},
+								documentation: revisionDetails.description,
 								version: `${revisionDetails.configurationVersion.majorVersion}.${revisionDetails.configurationVersion.minorVersion}`
 							}
 						};
