@@ -121,7 +121,7 @@ module.exports = class GithubService {
             try {
               var contents = await this.getContents(owner, repo, item, ref);
               if (peek(item.name, contents)) {
-                var api = await SwaggerParser.validate(item.download_url);
+                var api = await SwaggerParser.bundle(item.download_url);
                 await this.writeAPI4Central(repo, item, api);
               }
             } catch (err) {
@@ -177,7 +177,7 @@ module.exports = class GithubService {
     }
     async getContents(owner, repo, item, ref) {
       console.log(`Downloading spec from ${item.path}`);
-      const result = await this.octokit.repos.getContent({ "owner": owner, "repo": repo, "path": item.path, "ref": ref })
+      const result = await this.octokit.git.getBlob({ "owner": owner, "repo": repo, file_sha: item.sha })
       return Buffer.from(result.data.content, 'base64').toString('utf8')
     }
 
