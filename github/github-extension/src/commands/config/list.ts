@@ -16,6 +16,6 @@ export const list = {
 
     console.log(readJsonSync(configFilePath));
   },
-  desc: "View AMPLIFY Central github-extension configuration",
+  desc: "View Amplify Central github-extension configuration",
   aliases: ["ls", "view"],
 };
