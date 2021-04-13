@@ -19,8 +19,8 @@ export const generate = {
     config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
     const swaggerHubService = new Service(config);
     // fetch & generate assets
-    await createSupportResources(config);
     await swaggerHubService.generateResources()
+    await createSupportResources(config);
 
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
     console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));

@@ -20,8 +20,8 @@ export const generate = {
     const apigeeService = new Service(config, log)
 
     // fetch & generate assets
-    await apigeeService.generateResources()
     await createSupportResources(config);
+    await apigeeService.generateResources()
 
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
     console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));

@@ -20,8 +20,8 @@ export const generate = {
     const azureService = new AzureService(config, log)
 
     // fetch & generate assets
-    await azureService.generateResources(config);
     await createSupportResources(config);
+    await azureService.generateResources(config);
 
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
     console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
