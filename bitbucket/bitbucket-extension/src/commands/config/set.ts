@@ -16,7 +16,9 @@ export const set = {
     log("Setting config");
     const config: Partial<Config> = readJsonSync(configFilePath);
     (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
-      if (Object.values(ConfigKeys).includes(k)) {
+      const isConfig = Object.values(ConfigKeys).includes(k);
+      // add the undefined check
+      if (isConfig && argv[k] !== undefined) {
         log(`Overriding config for ${k}`);
         log(`Current: ${config[k]}. New: ${argv[k]}`);
         config[k] = argv[k];
@@ -26,7 +28,7 @@ export const set = {
     log(`Writing updated config file: ${configFilePath}`);
     outputJsonSync(configFilePath, config);
   },
-  desc: "Set AMPLIFY Central bitbucket-extension configuration",
+  desc: "Set Amplify Central bitbucket-extension configuration",
   aliases: ["set"],
   options: {
     "--output-dir [value]": "Set absolute path for output directory",

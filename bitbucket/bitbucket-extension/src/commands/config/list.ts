@@ -16,6 +16,6 @@ export const list = {
 
     console.log(readJsonSync(configFilePath));
   },
-  desc: "View AMPLIFY Central bitbucket-extension configuration",
+  desc: "View Amplify Central bitbucket-extension configuration",
   aliases: ["ls", "view"],
 };

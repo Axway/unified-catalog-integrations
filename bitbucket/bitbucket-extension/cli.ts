@@ -8,7 +8,7 @@ import { ensureConfigFileExists } from "./src/utils";
 ensureConfigFileExists();
 
 export default new CLI({
-  title: "AMPLIFY Central Extension for Bitbucket",
+  title: "Amplify Central Extension for Bitbucket",
   name,
   banner,
   version,
