@@ -25,7 +25,7 @@ module.exports = class GithubService {
       }, []);
   
       if (missingParam.length) {
-        console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central github-extension config set -h' to see a list of params`);
+        console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central github-extension config set -h' to see a list of params`);
         process.exit(1);
       }
 
