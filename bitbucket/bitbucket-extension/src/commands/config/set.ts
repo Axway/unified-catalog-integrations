@@ -17,7 +17,6 @@ export const set = {
     const config: Partial<Config> = readJsonSync(configFilePath);
     (Object.keys(argv) as Array<keyof Config>).forEach((k) => {
       const isConfig = Object.values(ConfigKeys).includes(k);
-      // add the undefined check
       if (isConfig && argv[k] !== undefined) {
         log(`Overriding config for ${k}`);
         log(`Current: ${config[k]}. New: ${argv[k]}`);
