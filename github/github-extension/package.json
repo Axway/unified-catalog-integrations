@@ -1,7 +1,7 @@
 {
   "name": "@axway/amplify-central-github-extension",
   "version": "0.0.3-dev.2",
-  "description": "Create AMPLIFY Central resources from Github API Management APIs",
+  "description": "Create Amplify Central resources from Github API Management APIs",
   "author": {
     "email": "support@axway.com",
     "name": "Axway",

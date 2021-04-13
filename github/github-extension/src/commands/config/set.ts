@@ -27,7 +27,7 @@ export const set = {
     log(`Writing updated config file: ${configFilePath}`);
     outputJsonSync(configFilePath, config);
   },
-  desc: "Set AMPLIFY Central github-extension configuration",
+  desc: "Set Amplify Central github-extension configuration",
   aliases: ["set"],
   options: {
     "--output-dir [value]": "Set absolute path for output directory",

@@ -1,6 +1,6 @@
 # @axway/amplify-central-github-extension
 
-Axway Central CLI extension for downloading and creating AMPLIFY Central resources for GitHub.
+Axway Central CLI extension for downloading and creating Amplify Central resources for GitHub.
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
 
@@ -14,7 +14,7 @@ This assumes you already have npm installed and have an github account setup. Vi
 
 # Installation
 
-Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/axway), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central:
+Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway Amplify CLI](https://www.npmjs.com/package/axway), which will give you connectivity to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in Amplify Central:
 
 ```bash
 $ [sudo] npm install -g axway
@@ -35,17 +35,9 @@ $ axway central config set extensions.github <path to where you installed module
 
 # Getting started
 
-You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
-
-```bash
-$ axway auth login --client-id <DOSA Service Account> --secret-file <Private Key>
-```
-
-To see available help, options and examples add `-h` or `--help` option on any command:
-
-```bash
-$ axway auth logout -h
-```
+You must be logged into the Axway Amplify Platform before uploading any generated resource files. 
+For more information on how to use the Axway Amplify Central CLI please refer to:
+https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_central/cli_install/index.html
 
 # General usage
 
@@ -55,9 +47,9 @@ There are two main extension commands; `config` and `resources`. You can run eac
 $ axway central github-extension -h
 USAGE: axway central github-extension <command> [options]
 
-Create AMPLIFY Central resources from GitHub API Management APIs
+Create Amplify Central resources from GitHub API Management APIs
 
-AMPLIFY CENTRAL EXTENSION FOR GITHUB API MANAGEMENT COMMANDS:
+Amplify CENTRAL EXTENSION FOR GITHUB API MANAGEMENT COMMANDS:
   config  Manage GitHub Extension Configuration
   resources  Generate resources from GitHub API Management APIs
 ```
@@ -75,8 +67,8 @@ USAGE: axway central github-extension config <command> [options]
 Manage GitHub Extension Configuration
 
 CONFIG COMMANDS:
-  list  View AMPLIFY Central github-extension configuration
-  set  Set AMPLIFY Central github-extension configuration
+  list  View Amplify Central github-extension configuration
+  set  Set Amplify Central github-extension configuration
 ```
 
 ### config examples:
@@ -124,9 +116,9 @@ $ axway central github-extension resources generate
 
 ### Generated Files
 
-The generate command will create AMPLIFY Central resource files for your configured GitHub instance. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
+The generate command will create Amplify Central resource files for your configured GitHub instance. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
 
-After generating these files you can modify and upload them to AMPLIFY Central with the `axway central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
+After generating these files you can modify and upload them to Amplify Central with the `axway central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
 ```bash
 $ axway central create -h

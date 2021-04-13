@@ -18,8 +18,8 @@ export const generate = {
     const config: Config = readJsonSync(configFilePath);
     config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
     const githubService = new GithubService(config);
-    await githubService.generateResources();
     await createSupportResources(config);
+    await githubService.generateResources();
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
     console.log(chalk['yellow']("Upload example: 'axway central create -f=<path to resource>'\n"));
   },
