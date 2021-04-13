@@ -317,6 +317,8 @@ module.exports = class GithubService {
       endpoint.protocol = parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(':'));
       if (parsedUrl.port) {
         endpoint.port = parseInt(parsedUrl.port, 10);
+      } else {
+        delete endpoint.port;
       }
       endpoint.routing = { basePath: parsedUrl.pathname };
     }
