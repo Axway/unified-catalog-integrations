@@ -65,25 +65,24 @@ echo "[INFO] Running with VERSION=$VERSION"
 
 if [[ ${AUTH_TYPE} != "DOSA" ]]; then
 	echo "Authenticating using browser"
-	amplify auth login --client-id apicentral
+	axway auth login --client-id apicentral
 	#login and get token
-	TOKEN=$(amplify auth list --json | jq -r '.[0].tokens.access_token')
-	TENANT_ID=$(amplify auth list --json | jq -r '.[0].org.org_id')
+	TOKEN=$(axway auth list --json | jq -r '.[0].tokens.access_token')
+	TENANT_ID=$(axway auth list --json | jq -r '.[0].org.id')
 else
 	echo "Authenticating using DOSA and private key from: ${PK_FILE_LOCATION}"
-	authResult=$(amplify auth login --json --secret-file ${PK_FILE_LOCATION} --client-id $DOSA_CLIENT_ID) ||
+	authResult=$(axway auth login --json --secret-file ${PK_FILE_LOCATION} --client-id $DOSA_CLIENT_ID) ||
         { echo "[ERROR] failed to login with cli" && exit 1; }
 	TOKEN=$(echo $authResult | jq -r '.tokens.access_token')
-	TENANT_ID=$(echo $authResult | jq -r '.org.org_id')
-	amplify central config set --client-id=$DOSA_CLIENT_ID"
+	TENANT_ID=$(echo $authResult | jq -r '.[0].org.id')
+	axway central config set --client-id=$DOSA_CLIENT_ID
 fi
 
 echo "[INFO] Using tenant id: $TENANT_ID"
 
 # base64 encoded image to be added.
 export SERVICE_IMAGE=$(cat ${IMAGE_LOCATION_FILE_PATH} | base64 -w 0 )
-# catalog documentation to be published.
-export CATALOG_DOCUMENTAION=$(cat ${CATALOG_DOCUMENTAION_FILE_PATH} | awk 'ORS=NR?"\\n":"\n"')
+
 # create a tmp directory for substituted environment variables.
 rm -rf .tmp
 mkdir -p .tmp
@@ -95,17 +94,26 @@ curl --retry 60 --retry-delay 1 --retry-max-time 60 \
 #replace the env varibales in the api service
 envsubst < ./$RESOURCES_PATH/apiservice.yaml > .tmp/apiservice.yaml
 echo "[INFO] Applying api service defined in ./.tmp/apiservice.yaml"
-amplify central apply -f .tmp/apiservice.yaml || { echo "[ERROR] Create/update apiservice" && exit 1; }
+axway central apply -f .tmp/apiservice.yaml || { echo "[ERROR] Create/update apiservice" && exit 1; }
 envsubst < ./$RESOURCES_PATH/apiservicerevision.yaml > .tmp/apiservicerevision.yaml
 echo "[INFO] Creating api service revision defined in ./.tmp/apiservicerevision.yaml"
 # Since envsubst has a limit on the values, sed is used here as specification might be a very large file. 
 sed -f <(printf '%s\n' "s,SPECIFICATION_BASE64,$(cat .tmp/encoded_specification.txt),g") .tmp/apiservicerevision.yaml > .tmp/apiservicerevision_spec.yaml
-amplify central apply -f .tmp/apiservicerevision_spec.yaml || { echo "[ERROR] Create/update api service revision" && exit 1; }
+axway central apply -f .tmp/apiservicerevision_spec.yaml || { echo "[ERROR] Create/update api service revision" && exit 1; }
 envsubst < ./$RESOURCES_PATH/apiserviceinstance.yaml > .tmp/apiserviceinstance.yaml
 echo "[INFO] Creating api service instance defined in ./.tmp/apiserviceinstance.yaml"
-amplify central apply -f .tmp/apiserviceinstance.yaml || { echo "[ERROR] Create/update apiserviceinstance" && exit 1; }
+axway central apply -f .tmp/apiserviceinstance.yaml || { echo "[ERROR] Create/update apiserviceinstance" && exit 1; }
 envsubst < ./$RESOURCES_PATH/consumerinstance.yaml > .tmp/consumerinstance.yaml
+
+if [[ -f "./$RESOURCES_PATH/$CATALOG_DOCUMENTATION_FILE_NAME" ]]; then
+    echo "Injecting catalogDocumentation.md content"
+ed -s .tmp/consumerinstance.yaml <<END_ED
+/documentation/r !sed 's/^/    /' ./$RESOURCES_PATH/catalogDocumentation.md
+wq
+END_ED
+fi
+
 echo "[INFO] Creating consumerInstance defined in ./.tmp/consumerinstance.yaml"
-amplify central apply -f .tmp/consumerinstance.yaml || { echo "[ERROR] Create/update consumerinstance" && exit 1; }
+axway central apply -f .tmp/consumerinstance.yaml || { echo "[ERROR] Create/update consumerinstance" && exit 1; }
 #remove the tmp folder created.
 rm -rf .tmp

@@ -21,7 +21,7 @@ We also download the specification file of petstore and add it in APIServiceRevi
 * Local machine setup needs:
     - docker (optional: Needed if you want to build the docker image with all tools and script)
     - Node.js
-    - AMPLIFY cli
+    - Axway cli
 * AMPLIFY Central Provisioned Organization
 * DOSA Service Account in AMPLIFY Central
 * AMPLIFY Central Environment
@@ -30,16 +30,16 @@ We also download the specification file of petstore and add it in APIServiceRevi
 
 ### Configure the DOSA (Service Account) on AMPLIFY central
 * Follow the below procedure to create DOSA (Service Account) step by generating the key pair.
-https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html
+https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_central/cli_install/index.html
 
 * Create a new service account with generated public key. Make a note of the client-id, it will be used as an environment variable in the pipeline.
 
 ### Create an Environment in AMPLIFY central
 
-Environments can be created with AMPLIFY central cli. Refer: https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_environments/index.html
+Environments can be created with Axway central cli. Refer: https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_environments/index.html
 
 UI:
-* Login to AMPLIFY central and navigate from Topology to Environments option.
+* Login to Axway central and navigate from Topology to Environments option.
 * Create a new environment. Make a note of the environment name as it will be used as env variable in pipelines.
 ![Environments Screen](../images/environments.png)
 
@@ -47,12 +47,12 @@ For this tutorial we have created two environments as shown in the above screens
 
 ### Docker Image 
 In the workflow script we have used the node:stretch-slim base docker image with added tools like gettext-base,jq,curl and gnupg. 
-The docker image axway-docker-public-registry.bintray.io/node-amplify-cli:0.1.3-dev.10 used here is in public docker registry and can be used.
+The docker image axway.jfrog.io/ampc-public-docker-release/node-axway-cli used here is in public docker registry and can be used.
 You can use any node base image to build your custom image and add the below line to install few tools
 ```bash
 RUN apt-get update
 RUN apt-get install -y gettext-base jq curl gnupg
-RUN npm install -g @axway/amplify-cli
+RUN npm install -g @axway/axway-cli
 ```
 ## GITHUB
 
@@ -106,7 +106,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
-      image: axway-docker-public-registry.bintray.io/node-amplify-cli:0.1.3-dev.10
+      image: axway.jfrog.io/ampc-public-docker-release/node-axway-cli
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a set of commands using the runners shell
@@ -115,16 +115,16 @@ jobs:
     # update the AMPLIFY central cli to specific version eg: Change CLI_VERSION variable to point 0.1.3-dev.10
     - name: update-cli
       run: |
-            amplify pm install @axway/amplify-central-cli@$CLI_VERSION
+            axway pm install @axway/axway-central-cli@$CLI_VERSION
             gpg --quiet --batch --yes --decrypt --passphrase=${{ secrets.LARGE_SECRET_PASSPHRASE }} --output $HOME/key.pem private_key.pem.gpg
-            amplify config set auth.tokenStoreType file
+            axway config set auth.tokenStoreType file
     # this step will use the shell script with the below env variables to create the resources in AMPLIFY central
     - name: petstore-publish
       run: |
             ./create.sh -did=$DOSA_CLIENT_ID -pk=$HOME/key.pem -cet=$CENTRAL_ENV_TYPE -cen=$CENTRAL_ENV_NAME -rp=$RESOURCES_PATH
     env:
       # AMPLIFY central cli version to be used.
-      CLI_VERSION: 0.1.3-dev.10
+      CLI_VERSION: 1.5.0
       # User Resource file paths to create in AMPLIFY central using the cli.
       RESOURCES_PATH: resources/petstore-sample
       # User Documentation to be added in the catalog item. 
@@ -170,9 +170,9 @@ stages:
 
 publish_amplify_catalog_staging:
   stage: publish
-  image: axway-docker-public-registry.bintray.io/node-amplify-cli:0.1.3-dev.10
+  image: axway.jfrog.io/ampc-public-docker-release/node-axway-cli
   variables:
-      CLI_VERSION: 0.1.3-dev.10
+      CLI_VERSION: 1.5.0
       RESOURCES_PATH: resources/petstore-sample
       CATALOG_DOCUMENTATION_FILE_NAME: catalogDocumentation.md
       IMAGE_LOCATION_FILE_NAME: image.png
@@ -187,8 +187,8 @@ publish_amplify_catalog_staging:
       CATALOG_ITEM_VISIBILITY: RESTRICTED
       OWNING_TEAM_NAME: "Default Team"
   before_script:
-     - amplify pm install @axway/amplify-central-cli@$CLI_VERSION
-     - amplify config set auth.tokenStoreType file
+     - axway pm install @axway/axway-central-cli@$CLI_VERSION
+     - axway config set auth.tokenStoreType file
   script:
      - ./create.sh -did=$DOSA_CLIENT_ID -pk="$DOSA_SECRET" -cet=$CENTRAL_ENV_TYPE -cen=$CENTRAL_ENV_NAME -rp=$RESOURCES_PATH
   only:
@@ -205,9 +205,9 @@ stages:
 
 publish_amplify_catalog_production:
   stage: publish
-  image: axway-docker-public-registry.bintray.io/node-amplify-cli:0.1.3-dev.10
+  image: axway.jfrog.io/ampc-public-docker-release/node-axway-cli
   variables:
-      CLI_VERSION: 0.1.3-dev.10
+      CLI_VERSION: 1.5.0
       RESOURCES_PATH: resources/petstore-sample
       CATALOG_DOCUMENTATION_FILE_NAME: catalogDocumentation.md
       IMAGE_LOCATION_FILE_NAME: image.png
@@ -222,8 +222,8 @@ publish_amplify_catalog_production:
       CATALOG_ITEM_VISIBILITY: PUBLIC
       OWNING_TEAM_NAME: "Default Team"
   before_script:
-     - amplify pm install @axway/amplify-central-cli@$CLI_VERSION
-     - amplify config set auth.tokenStoreType file
+     - axway pm install @axway/axway-central-cli@$CLI_VERSION
+     - axway config set auth.tokenStoreType file
   script:
      - ./create.sh -did=$DOSA_CLIENT_ID -pk="$DOSA_SECRET" -cet=$CENTRAL_ENV_TYPE -cen=$CENTRAL_ENV_NAME -rp=$RESOURCES_PATH
   only:
@@ -268,7 +268,7 @@ Following tools are needed to run the script:
 - envsubst
 - curl
 - gnupg
-- AMPLIFY cli
+- Axway cli
 
 #### Description
 The script will create/update all the resources from the resources folder.
