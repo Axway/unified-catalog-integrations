@@ -26,7 +26,7 @@ module.exports =  class AzureService {
 		}, []);
 
 		if (missingParam.length) {
-			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central azure-extension config set -h' to see a list of params`);
+			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central azure-extension config set -h' to see a list of params`);
 			return process.exit(1);
 		} 
 		

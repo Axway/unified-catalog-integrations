@@ -2,17 +2,17 @@
 
 ### Pre-Reqs
 
-1. Have the amplify and amplify central cli already installed
+1. Have the axway and axway central cli already installed
 
 ```
-npm install -g @axway/amplify-cli
-amplify pm install @axway/amplify-central-cli
+npm install -g axway
+axway pm install @axway/axway-central-cli 
 ```
 
 2. Link your new/current extension to the central CLI
 
 ```
-amplify central config set extensions.<extension name> <path to the directory of your extension>
+axway central config set extensions.<extension name> <path to the directory of your extension>
 ```
 
 ## Adding/Removing config options
@@ -48,11 +48,11 @@ There are several ways you can debug a new/current extension. Several extensions
 
 1. Add your breakpoints with 'debugger' statements
 
-2. Modify the amplify cli
+2. Modify the axway cli
 
 ```
 // get path to cli
-which amplify
+which axway
 
 // add debug setting to node
 vim <path to cli>
@@ -67,13 +67,13 @@ vim <path to cli>
 
 5. Run the CLI command you're debugging
 
-```amplify central azure-extension config list```
+```axway central azure-extension config list```
 
 ## Example commands
 
-1. Azure list config ```amplify central azure-extension config list```
+1. Azure list config ```axway central azure-extension config list```
 
-2. Azure set tenantid ```amplify central azure-extension config set --tenant-id=<tenant>```
+2. Azure set tenantid ```axway central azure-extension config set --tenant-id=<tenant>```
 
-3. Azure generate resources ```amplify central azure-extension resources generate```
+3. Azure generate resources ```axway central azure-extension resources generate```
 

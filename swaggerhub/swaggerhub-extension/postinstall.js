@@ -24,5 +24,5 @@ const info = (header, example) => {
 };
 info(
 	'Extension Installed: You may now add it to the Central CLI\n',
-	`$ amplify central config set extensions.swaggerhub-extension ${process.cwd()}`
+	`$ axway central config set extensions.swaggerhub-extension ${process.cwd()}`
 );

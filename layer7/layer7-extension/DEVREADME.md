@@ -6,7 +6,7 @@ This extension is example code and comes with no guarantee of support or mainten
 
 ## Setup
 
-amplify central layer7-extension config set -h
+axway central layer7-extension config set -h
 
 ## Debugging
 

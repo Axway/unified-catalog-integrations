@@ -38,13 +38,13 @@ $ axway central config set extensions.apigee <path to where you installed module
 You must be logged into the Axway Amplify Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one visit [Get started with Amplify CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). Log in to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify) using the following command:
 
 ```bash
-$ amplify auth login --client-id <DOSA Service Account> --secret-file <Private Key>
+$ axway auth login --client-id <DOSA Service Account> --secret-file <Private Key>
 ```
 
 To see available help, options and examples add `-h` or `--help` option on any command:
 
 ```bash
-$ amplify auth logout -h
+$ axway auth logout -h
 ```
 
 # General usage
@@ -52,8 +52,8 @@ $ amplify auth logout -h
 There are two main extension commands; `config` and `resources`. You can run each command with a `-h` to get help on that specific command.
 
 ```bash
-$ amplify central apigee-extension -h
-USAGE: amplify central apigee-extension <command> [options]
+$ axway central apigee-extension -h
+USAGE: axway central apigee-extension <command> [options]
 
 Create Amplify Central resources from Apigee API Management APIs
 

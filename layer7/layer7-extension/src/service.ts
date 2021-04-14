@@ -29,7 +29,7 @@ module.exports = class Layer7Service {
     }, []);
 
     if (missingParam.length) {
-      console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central layer7-extension config set -h' to see a list of params`);
+      console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central layer7-extension config set -h' to see a list of params`);
       return process.exit(1);
     }
 

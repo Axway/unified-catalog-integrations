@@ -664,7 +664,7 @@ Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://n
 Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
 
 ```powershell
-amplify pm install @axway/axway-central-cli
+axway pm install @axway/axway-central-cli
 ```
 
 You can then install the @axway/amplify-central-mulesoft-extension:

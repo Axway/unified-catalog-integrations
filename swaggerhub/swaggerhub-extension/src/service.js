@@ -23,7 +23,7 @@ module.exports = class SwaggerHubService {
 		}, []);
 
 		if (missingParam.length) {
-			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central swaggerhub-extension config set -h' to see a list of params`);
+			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central swaggerhub-extension config set -h' to see a list of params`);
 			return process.exit(1);
     }
 
