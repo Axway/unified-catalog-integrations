@@ -40,7 +40,7 @@ describe('service', () => {
 		'./unzipper': {
 			downloadAndUnzip
 		},
-		'@axway/amplify-config': {
+		'@axway/amplify-cli-utils': {
 			loadConfig: () => ({
 				get: () => (proxyConfig)
 			})

@@ -45,9 +45,7 @@ describe('service', () => {
 		
 	}
 	
-	let proxyConfig:any = {
-		values: {}
-	};
+	let proxyConfig:any = {};
 
 	let Service = proxyquire('./service', {
 		'./utils': {
@@ -62,7 +60,9 @@ describe('service', () => {
 			bundle: () => (testSwagger)
 		},
 		'@axway/amplify-cli-utils': {
-			loadConfig: () => (proxyConfig)
+			loadConfig: () => ({
+				get: () => (proxyConfig)
+			})
 		}
 	});
 
@@ -78,7 +78,7 @@ describe('service', () => {
 		sandbox.restore();
 		getContent.reset();
 		getBlob.reset();
-		proxyConfig.values = {};
+		proxyConfig = {};
 		commitToFs.reset();
 	});
 
@@ -101,10 +101,8 @@ describe('service', () => {
 	it('init: construct class ok & sets proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpProxy: "http://127.0.0.1"
-			}
+		proxyConfig = {
+			httpProxy: "http://127.0.0.1"
 		}
 		new Service(okConfig);
 	
@@ -114,10 +112,8 @@ describe('service', () => {
 	it('init: construct class ok & sets https proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpsProxy: "https://test:as@127.0.0.1",
-			}
+		proxyConfig = {
+			httpsProxy: "https://test:as@127.0.0.1",
 		}
 		new Service(okConfig);
 	
@@ -127,10 +123,8 @@ describe('service', () => {
 	it('init: construct class ok & sets rejectUnauthorized', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				strictSSL: true
-			}
+		proxyConfig = {
+			strictSSL: true
 		}
 		new Service(okConfig);
 	

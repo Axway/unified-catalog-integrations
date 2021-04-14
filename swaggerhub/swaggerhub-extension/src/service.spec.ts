@@ -23,7 +23,7 @@ describe('service', () => {
 		'@apidevtools/swagger-parser': {
 			validate
 		},
-		'@axway/amplify-config': {
+		'@axway/amplify-cli-utils': {
 			loadConfig: () => ({
 				get: () => (proxyConfig)
 			})

@@ -19,13 +19,13 @@ describe("Layer7 service", () => {
   let writeAPI4Central: SinonStub;
 	let requestPromise: SinonStub;
 
-  let proxyConfig:any = {
-		values: {}
-  };
+  let proxyConfig:any = {};
   
   let Service = proxyquire('./service', {
     '@axway/amplify-cli-utils': {
-			loadConfig: () => (proxyConfig)
+			loadConfig: () => ({
+				get: () => (proxyConfig)
+			})
 		}
   });
 
@@ -55,7 +55,7 @@ describe("Layer7 service", () => {
 	})
   afterEach(() => {
     sandbox.restore();
-    proxyConfig.values = {};
+    proxyConfig = {};
   });
 
   it('init: should exit if required configurations are not provided', async () => {
@@ -78,11 +78,9 @@ describe("Layer7 service", () => {
   it('init: construct class ok & sets proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-        httpProxy: "http://127.0.0.1", 
-        strictSSL: false
-			}
+		proxyConfig = {
+			httpProxy: "http://127.0.0.1", 
+			strictSSL: false
 		}
 		new Service(okConfig);
 	
@@ -92,10 +90,8 @@ describe("Layer7 service", () => {
   it('init: construct class exit if proxy is wrong', () => {
 		consoleStub = sandbox.stub(console, 'log');
 		processStub = sandbox.stub(process, 'exit');
-		proxyConfig.values = {
-			network: {
-				httpProxy: "notAURL",
-			}
+		proxyConfig = {
+			httpProxy: "notAURL"
     }
     try {
       new Service(okConfig);
@@ -513,7 +509,9 @@ describe("Layer7 service", () => {
 		});
 		let Stubbed = proxyquire('./service', {
       '@axway/amplify-cli-utils': {
-        loadConfig: () => (proxyConfig)
+        loadConfig: () => ({
+					get: () => (proxyConfig)
+				})
       },
       './utils': {
         requestPromise
@@ -532,7 +530,9 @@ describe("Layer7 service", () => {
 
 		let Stubbed = proxyquire('./service', {
       '@axway/amplify-cli-utils': {
-        loadConfig: () => (proxyConfig)
+        loadConfig: () => ({
+					get: () => (proxyConfig)
+				})
       },
       './utils': {
         requestPromise
@@ -555,7 +555,9 @@ describe("Layer7 service", () => {
 
 		let Stubbed = proxyquire('./service', {
       '@axway/amplify-cli-utils': {
-        loadConfig: () => (proxyConfig)
+        loadConfig: () => ({
+					get: () => (proxyConfig)
+				})
       },
       './utils': {
         requestPromise
