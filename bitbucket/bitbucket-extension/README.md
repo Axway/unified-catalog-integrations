@@ -129,7 +129,7 @@ The generate command will create Amplify Central resource files. These files wil
 After generating these files you can modify and upload them to Amplify Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
 ```bash
-$ amplify central create -h
+$ axway central create -h
 USAGE: axway central create <command> [options]
 
 Create a resource from a file. JSON and YAML formats are accepted.

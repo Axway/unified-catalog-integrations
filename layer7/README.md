@@ -10,15 +10,15 @@ The basic use case is as follows:
 **API Consumer**
 * Discovers the API in the Unified Catalog and request access by subscribing.
 * On approval, an Application will be created in Layer7 and the keys will be sent to the API Consumer's email. After the keys have been sent, the state of the Subscription in Unified Catalog gets updated to Active and the Consumer can now use the API with the information received over email. 
-* Can cancel the subscription from the Unified Catalog. When cancelled, the subscription in Layer7 will be removed and the state of the Unified Catalog will be updated to unsubscribed, indicating the consumer will no longer be able to use the API. 
+* Can cancel the subscription from the Unified Cmplifatalog. When cancelled, the subscription in Layer7 will be removed and the state of the Unified Catalog will be updated to unsubscribed, indicating the consumer will no longer be able to use the API. 
   
 ![](./assets/images/Layer7ToUnifiedCatalog.png)
 
 
 The technologies that were used for this project: 
 
-* [AMPLIFY Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs. 
-* [AMPLIFY Central CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html) to fetch the APIs from Layer7 Portal and promote them to the Unified Catalog.
+* [Amplify Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs. 
+* [Amplify Central CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html) to fetch the APIs from Layer7 Portal and promote them to the Unified Catalog.
 * [Integration Builder](https://www.axway.com/en/products/application-integration) to implement the logic for the subscription management and email notifications. 
 * [Microsoft Teams](https://www.microsoft.com/en-us/microsoft-365/microsoft-teams/group-chat-software) for notifications and approval or rejection of subscription requests. 
 * [Layer7 Gateway](https://www.broadcom.com/products/software/api-management/layer7-api-gateways) and [Portal](https://techdocs.broadcom.com/us/en/ca-enterprise-software/layer7-api-management/api-developer-portal/4-5.html).
@@ -37,20 +37,20 @@ Make sure you log out from all active sessions.
 
 
 ```powershell
-amplify auth logout --all
+axway auth logout --all
 ```
 
-Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
+Go to the Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
 To run the command, you need to have jq installed. 
-```powershell
-amplify auth login --client-id apicentral
-ORG_ID=<org_id_value> && TOKEN=$(amplify auth list --json | jq -r ".[] | select( .org.org_id == $ORG_ID ) | .tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
+```sh
+axway auth login
+ORG_ID=<org_id_value> && TOKEN=$(axway auth list --json | jq -r ".[] | select( .org.id == $ORG_ID ) | .auth.tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
 --header "Authorization: Bearer ${TOKEN}" \
 --header "X-Axway-Tenant-Id: ${ORG_ID}" \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "serviceAccountType": "DOSA",
-  "serviceAccountName": "IntegrationBuilderSA",
+  "serviceAccountName": "catalog-integration",
   "clientAuthType": "SECRET"
 }'
 ```
@@ -61,7 +61,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
 
-2. Import the [AMPLFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
+2. Import the [AMPLIFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
 
 3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
 
@@ -74,10 +74,10 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 ![](../images/GetAccessTokenPostman.PNG)
 
-Copy the access token. You will use this to set the AMPLIFY Central Production environment variables. 
+Copy the access token. You will use this to set the Amplify Central Production environment variables. 
 
-5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
-* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
+5. Set the Amplify Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
+* Set the CURRENT VALUE for the **org_id**: Go to the Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
 * Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
 
 ![](../images/ConfigureEnvironmentPostman.PNG)
@@ -131,7 +131,7 @@ This Integration Builder flow will receive the approve or reject requests from M
 
 Flow these steps to configure the flow: 
 1. Download the [Layer7 Registration Flow.json](./assets/integration-builder/subscriptionflow.json). 
-2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [AMPLIFY Platform](https://platform.axway.com/).  
+2. Navigate to [Integration Builder](https://sandbox-ib.platform.axway.com/welcome) on the [Amplify Platform](https://platform.axway.com/).  
 3. Import the flow as a **Flow template**. 
    * Go to `Flows`, click on `Build New Flow`. 
    * Select `Import` and choose the flow that you downloaded in the previous step.  
@@ -148,18 +148,18 @@ Flow these steps to configure the flow:
 * Provide values for all required Variables:
   * `axwayClientId`: The `clientId` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
   * `axwayClientSecret`: The `clientSecret` from Axway Service Account. Please refer to _Step 1: Create Amplify Central Service Account_.
-  * `axwayTenantId`: The organization id of your AMPLIFY account.
+  * `axwayTenantId`: The organization id of your Amplify account.
   * `layer7ClientId`: The Layer7 Client ID from your Layer7 Application configured to access the Layer7 Portal APIs. 
   * `layer7ClientScope`: The scope configured in the Layer7 Application, `OOB` in the provided example.
   * `layer7ClientSecret`: The Client Secret from your Layer7 Application configured to access the Layer7 Portal APIs.
   * `layer7PortalUrl`: The URL where the Layer Portal APIs are exposed.
   * `layer7SubscriptionsOrgId`: The Layer 7 Organization ID where subscriptions the Consumer Application will be created.
-  * `apiCentralUrl`: Optional parameter to configure access to AMPLIFY Central APIs. Defaults to `https://apicentral.axway.com`. For AMPLIFY Central EU deployment, use `https://central.eu-fr.axway.com`
+  * `apiCentralUrl`: Optional parameter to configure access to Amplify Central APIs. Defaults to `https://apicentral.axway.com`. For Amplify Central EU deployment, use `https://central.eu-fr.axway.com`
 
 ### Step 4: Configure Microsoft Teams flow to Approve / Reject subscription requests
 ***
 
-**AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.
+**Amplify Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.
 This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. 
 The API provider can then approve or reject the subscription requests from within the MS Active card. This action will trigger the Integration Builder flow, as a post execution step. 
 The MS flow will also post notifications in the channel for any subscription updates. 
@@ -652,7 +652,7 @@ Subscription "@{triggerBody()?['payload']?['subscription']?['name']}" processed 
 ### Step 5: Install and configure the @axway/amplify-central-layer7-extension 
 ___
 
-CLI extension that fetches the APIs from Layer7 Portal and builds the resources needed to publish to the AMPLIFY Unified Catalog.  The following set of resources were configured. 
+CLI extension that fetches the APIs from Layer7 Portal and builds the resources needed to publish to the Amplify Unified Catalog.  The following set of resources were configured. 
 
 * **Environment** groups the set of APIs that are fetched from Layer7 Portal. An environment represents the logical grouping of APIs. 
 * **Webhook** defines the webhook URL that will be invoked to post a notification in Microsoft Teams and update the subscription in Layer7.
@@ -671,16 +671,16 @@ Before you proceed, you can check the full list of supported commands [here](./l
 
 **1. Install @axway/layer7-extension**
 
-Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central. 
+Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway Amplify CLI](https://npmjs.com/package/axway), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central. 
 
 ```powershell
-[sudo] npm install -g @axway/amplify-cli
+[sudo] npm install -g axway
 ```
 
-Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
+Use the Amplify package manager command to install the Amplify Central CLI:
 
 ```powershell
-amplify pm install @axway/amplify-central-cli
+axway pm install @axway/axway-central-cli
 ```
 
 You can then install the @axway/amplify-central-layer7-extension:
@@ -689,100 +689,100 @@ You can then install the @axway/amplify-central-layer7-extension:
 npm install @axway/amplify-central-layer7-extension
 ```
 
-The installation would present the command to add this extension to the AMPLIFY Central CLI following this template:
+The installation would present the command to add this extension to the Amplify Central CLI following this template:
 
 ```powershell
-amplify central config set extensions.layer7-extension <path to where you installed the extension>
+axway central config set extensions.layer7-extension <path to where you installed the extension>
 ```
 
-To verify if the CLI extension was successfully set, you can run: `amplify central layer7-extension config -h`.
+To verify if the CLI extension was successfully set, you can run: `axway central layer7-extension config -h`.
 
 **2. Configure extension**
 
 Configure the extension prior to generating the resources. 
-You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. 
-You'll can use your platform account or setup a Service Account (DOSA). To find out how to create a Service Account, visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). 
+You must be logged into the Axway Amplify Platform before uploading any generated resource files. 
+You'll can use your platform account or setup a Service Account (DOSA). To find out how to create a Service Account, visit [Get started with Amplify CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). 
 
-* Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using DOSA account using the following command:
+* Log in to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify) using DOSA account using the following command:
 ```powershell
-amplify auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
+axway auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
 ```
-Example: `amplify auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
+Example: `axway auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`
  
 * Set the output directory where you want the resources to be generated. 
 ```powershell
-amplify central layer7-extension config set --output-dir=<directory_name>
+axway central layer7-extension config set --output-dir=<directory_name>
 ```
-Example: `amplify central layer7-extension config set --output-dir="./layer7-resources"`.
+Example: `axway central layer7-extension config set --output-dir="./layer7-resources"`.
 
 * Set the environment name: 
 ```powershell
-amplify central layer7-extension config set --environment-name=<env_name>
+axway central layer7-extension config set --environment-name=<env_name>
 ```
-Example: `amplify central layer7-extension config set --environment-name=layer7-env`
+Example: `axway central layer7-extension config set --environment-name=layer7-env`
 
 * Set the image for the environment
 ```powershell
-amplify central layer7-extension config set --icon=<path_to_your_image>
+axway central layer7-extension config set --icon=<path_to_your_image>
 ```
 
 * Set the Webhook URL to send the HTTP POST request for a subscription update event.
 ```powershell
-amplify central layer7-extension config set --webhook-url="MS_FLOW_HTTP_POST_URL"
+axway central layer7-extension config set --webhook-url="MS_FLOW_HTTP_POST_URL"
 ```
 
 * Set the Layer7 Client Id from the Layer7 Application linked to the Portal APIs.
 
 ```powershell
-amplify central layer7-extension config set --client-id=<your_layer7_client_id>
+axway central layer7-extension config set --client-id=<your_layer7_client_id>
 ```
   
 * Set the Layer7 Client Secret from the Layer7 Application linked to the Portal APIs
 ```powershell
-amplify central layer7-extension config set --client-secret=<your_layer7_client_secret>
+axway central layer7-extension config set --client-secret=<your_layer7_client_secret>
 ```
 
 * Set the Layer7 Portal APIs base URL for where the Layer7 Portal APIs are exposed.
 ```powershell
-amplify central layer7-extension config set --base-url=<your_layer7_portal_url>
+axway central layer7-extension config set --base-url=<your_layer7_portal_url>
 ```
-Example: `amplify central layer7-extension config set --base-url="https://apim-ssg.dev.com:9443/apim"`.
+Example: `axway central layer7-extension config set --base-url="https://apim-ssg.dev.com:9443/apim"`.
 
- You can run `amplify central layer7-extension config list` to see the layer7-extension configuration.  
+ You can run `axway central layer7-extension config list` to see the layer7-extension configuration.  
  
-**3. Generate AMPLIFY Central resources**`
+**3. Generate Amplify Central resources**`
 
-The generate command will create AMPLIFY Central resource files for your configured Layer7 APIs instance. 
+The generate command will create Amplify Central resource files for your configured Layer7 APIs instance. 
 These files will be generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting. 
 
 ```
-amplify central layer7-extension resources generate
+axway central layer7-extension resources generate
 ```
 
 **4. Publish to Unified Catalog**
 
-After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
+After generating these files you can modify and upload them to Amplify Central with the `axway central create -f=<file>` command. You'll want be sure to upload any Environment files before other generated resources.
 
-Create the Environment in AMPLIFY Central.
+Create the Environment in Amplify Central.
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
-amplify central create --file=<path_to_environment_file>
+axway central create --file=<path_to_environment_file>
 ```
-Import the APIs in AMPLIFY Central and publish them to the Unified Catalog. You need to run this command for each _service_yaml_ file. 
+Import the APIs in Amplify Central and publish them to the Unified Catalog. You need to run this command for each _service_yaml_ file. 
 
 ```powershell
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
-amplify central create -f=~<path_to_service_yaml_file>
+axway central create -f=~<path_to_service_yaml_file>
 ```
 
 **Example**
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
-amplify central create -f=~/Desktop/Environment.yaml
+axway central create -f=~/Desktop/Environment.yaml
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
-amplify central create -f=~/Desktop/APIService-swagger-petstore.yaml
+axway central create -f=~/Desktop/APIService-swagger-petstore.yaml
 ```
 
 For full list of supported commands, please refer to [here](./layer7-extension/README.md). 
