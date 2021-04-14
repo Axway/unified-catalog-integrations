@@ -1,7 +1,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 import { requestPromise, getIconData, commitToFs } from './utils';
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 module.exports =  class AzureService {
 	constructor(config, log) {

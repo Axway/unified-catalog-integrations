@@ -3,7 +3,7 @@ const yaml = require("js-yaml");
 const urlParser = require("url");
 const SwaggerParser = require("@apidevtools/swagger-parser");
 import { requestPromise, commitToFs, getIconData } from "./utils";
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 module.exports = class SwaggerHubService {
   constructor(config) {

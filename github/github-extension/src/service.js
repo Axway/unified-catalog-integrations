@@ -29,12 +29,12 @@ module.exports = class GithubService {
         process.exit(1);
       }
 
-      const centralConfig = loadConfig().values;
+      const network = loadConfig().get('network') || undefined;
     
-      if (centralConfig.network && !isEmpty(centralConfig.network)) {
+      if (network && !isEmpty(network)) {
         // using strict ssl mode by default
-        const sslConfig = { rejectUnauthorized: centralConfig.network.strictSSL === undefined || centralConfig.network.strictSSL };
-        const proxyUrl = centralConfig.network.httpProxy || centralConfig.network.httpsProxy || centralConfig.network.proxy;
+        const sslConfig = { rejectUnauthorized: network.strictSSL === undefined || network.strictSSL };
+        const proxyUrl = network.httpProxy || network.httpsProxy || network.proxy;
         // using HttpsProxyAgent if proxy url configured, else - regular node agent.
         let agent;
         if (proxyUrl) {

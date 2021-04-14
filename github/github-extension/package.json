@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^9.0.1",
-    "@axway/amplify-cli-utils": "2.0.0",
+    "@axway/amplify-cli-utils": "^4.2.5",
     "@octokit/rest": "18.0.6",
     "adm-zip": "^0.4.14",
     "form-data": "^3.0.0",

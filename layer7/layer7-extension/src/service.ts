@@ -34,10 +34,10 @@ module.exports = class Layer7Service {
     }
 
     // read amplify-cli config values for network settings
-    const amplifyConfig = loadConfig().values;
+    const network = loadConfig().get('network') || undefined;
 
     // Configure a proxy if it is configured
-    const { strictSSL, httpProxy: proxy } = amplifyConfig.network || {};
+    const { strictSSL, httpProxy: proxy } = network || {};
 
     if (strictSSL === false) {
 			this.proxySettings.strictSSL = false;

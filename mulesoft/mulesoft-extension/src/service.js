@@ -2,7 +2,7 @@ const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
 import { commitToFs, requestPromise } from './utils';
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 const ORDER = [
 	'Environment',

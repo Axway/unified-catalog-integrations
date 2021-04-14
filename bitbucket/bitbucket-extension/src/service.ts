@@ -103,13 +103,13 @@ module.exports = class BitbucketService {
     this.config.apiVersion = this.config.apiVersion || 'v2'
 
     // read amplify-cli config values for network settings
-    const amplifyConfig = loadConfig().values;
+    const networkSettings = loadConfig().get('network') || undefined;
 
     // Configure a proxy if it is configured
     let agent;
-    if (amplifyConfig?.network && this.config.apiVersion !== 'v1') {
-      const sslConfig = { rejectUnauthorized: amplifyConfig.network.strictSSL === undefined || amplifyConfig.network.strictSSL };
-      const proxyUrl = amplifyConfig.network.httpProxy || amplifyConfig.network.httpsProxy || amplifyConfig.network.proxy;
+    if (networkSettings && this.config.apiVersion !== 'v1') {
+      const sslConfig = { rejectUnauthorized: networkSettings.strictSSL === undefined || networkSettings.strictSSL };
+      const proxyUrl = networkSettings.httpProxy || networkSettings.httpsProxy || networkSettings.proxy;
       if (proxyUrl) {
         let parsedProxyUrl;
         try {
@@ -138,7 +138,7 @@ module.exports = class BitbucketService {
     if (this.config.apiVersion === 'v1') {
       this.client = new BitBucketV1({
         auth: { username: config[ConfigKeys.USERNAME], password: config[ConfigKeys.APP_PASSWORD], token: config[ConfigKeys.ACCESS_TOKEN] },
-        network: amplifyConfig?.network
+        network: networkSettings
       });
     } else {
       this.client = new Bitbucket({

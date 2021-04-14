@@ -1,7 +1,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 const { requestPromise, commitToFs } = require('./utils');
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 module.exports =  class ApigeeService {
 	constructor(config, log) {
