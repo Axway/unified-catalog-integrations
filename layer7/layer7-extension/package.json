@@ -13,7 +13,7 @@
     "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'",
     "test": "ts-mocha --timeout 10000",
     "test:coverage": "nyc yarn test",
-    "postinstall": "yarn --only=dev --ignore-scripts && yarn build && node ./postinstall.js",
+    "postinstall": "npm i --only=dev --ignore-scripts && npm run build && node ./postinstall.js",
     "tsc": "tsc"
   },
   "engines": {
