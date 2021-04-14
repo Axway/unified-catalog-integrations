@@ -126,7 +126,7 @@ $ axway central bitbucket-extension resources generate
 
 The generate command will create Amplify Central resource files. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
 
-After generating these files you can modify and upload them to Amplify Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
+After generating these files you can modify and upload them to Amplify Central with the `axway central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
 ```bash
 $ axway central create -h

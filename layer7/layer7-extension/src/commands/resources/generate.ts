@@ -19,6 +19,6 @@ export const generate = {
     await createSupportResource(config);
     await new Layer7Service(config).generateResources();
     console.log(chalk["yellow"](`Resources created in ${config.outputDir}`));
-    console.log(chalk["yellow"]("Upload example: 'amplify central create -f=<path to resource>'\n"));
+    console.log(chalk["yellow"]("Upload example: 'axway central create -f=<path to resource>'\n"));
   },
 };

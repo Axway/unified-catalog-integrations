@@ -24,6 +24,6 @@ export const generate = {
     await apigeeService.generateResources()
 
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
-    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
+    console.log(chalk['yellow']("Upload example: 'axway central create -f=<path to resource>'\n"));
   },
 };
