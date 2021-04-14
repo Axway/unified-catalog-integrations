@@ -233,7 +233,7 @@ publish_amplify_catalog_production:
 ### Jenkins
 Setup a jenkins job for publishing to central. 
  
-Note: Jenkins should be able to run docker. If docker is not used, then you can install the below prerequisite tools(node, amplify-cli, jq, curl, bash, envsubst) in jenkins machine. 
+Note: Jenkins should be able to run docker. If docker is not used, then you can install the below prerequisite tools(node, axway-cli, jq, curl, bash, envsubst) in jenkins machine. 
 
 1. Copy the contents of cicd folder into your github/gitlab root directory.
 2. Add a secret file type credential with the ID DOSA_SECRET eg:
