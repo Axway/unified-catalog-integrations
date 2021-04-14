@@ -2,7 +2,7 @@
 pipeline {
     agent {
         docker {
-            image 'node-amplify-cli:0.1.3-dev.10'
+            image 'node-axway-cli:latest'
             registryUrl 'https://axway-docker-public-registry.bintray.io/'
             alwaysPull true
         }
@@ -11,11 +11,11 @@ pipeline {
     parameters {
         string(
             name: 'CLI_VERSION',
-            description: 'amplify central cli version to be used.',
+            description: 'axway central cli version to be used.',
             defaultValue: params.CLI_VERSION ?: '0.1.3-dev.10')
         string(
             name: 'RESOURCES_PATH',
-            description: 'User Resource file paths to create in amplify central using the cli.',
+            description: 'User Resource file paths to create in axway central using the cli.',
             defaultValue: params.RESOURCES_PATH ?: '')
         string(
             name: 'CATALOG_DOCUMENTATION_FILE_NAME',
@@ -74,11 +74,11 @@ pipeline {
 
     }
     stages {
-        stage('Updating the amplify central cli') {
+        stage('Updating the axway central cli') {
             steps {
                     sh '''
-                    amplify pm install @axway/amplify-central-cli@${CLI_VERSION}
-                    amplify config set auth.tokenStoreType file
+                    axway pm install @axway/axway-central-cli@${CLI_VERSION}
+                    axway config set auth.tokenStoreType file
                     '''
             }
         }

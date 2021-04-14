@@ -738,7 +738,7 @@ axway central azure-extension config set --icon=<path_to_your_image>
 ```powershell
 axway central azure-extension config set --filter="tags=<tag_value>"
 ```
-Example: `ax cwayentral azure-extension config set --filter="tags=unifiedcatalog"`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
+Example: `axway central azure-extension config set --filter="tags=unifiedcatalog"`. Please make sure the APIs in Azure are tagged correctly with the value set with the filter command. 
 
 ![Set API tags](https://github.com/Axway/unified-catalog-integrations/blob/master/images/AzureAPISetTags.png)
 
