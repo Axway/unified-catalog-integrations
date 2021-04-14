@@ -17,13 +17,13 @@ This assumes you already have npm installed and have an apigee account setup. Vi
 Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway Amplify CLI](https://npmjs.com/package/axway), which will give you connectivity to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in Amplify Central:
 
 ```bash
-$ [sudo] npm install -g @axway/amplify-cli
+$ [sudo] npm install -g axway
 ```
 
 Use the Amplify package manager command to install the Amplify Central CLI:
 
 ```bash
-$ axway pm install @axway/amplify-central-cli
+$ axway pm install @axway/axway-central-cli
 ```
 
 You can then install the @axway/amplify-central-apigee-extension:
