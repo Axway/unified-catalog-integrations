@@ -1,6 +1,6 @@
 # @axway/mulesoft-extension
 
-AMPLIFY Central CLI extension for downloading and creating AMPLIFY Central resources for Mulesoft.
+Amplify Central CLI extension for downloading and creating Amplify Central resources for Mulesoft.
 
 **For more documentation and examples please visit [Unified Catalog integrations](https://github.com/Axway/unified-catalog-integrations).**
 
@@ -14,37 +14,37 @@ This assumes you already have npm installed and have an mulesoft account setup. 
 
 # Installation
 
-Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway AMPLIFY CLI](https://www.npmjs.com/package/@axway/amplify-cli), which will give you connectivity to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in AMPLIFY Central:
+Assuming you are familiar with [Node.js](https://nodejs.org) and [npm](https://npmjs.com), you should first install the [Axway Amplify CLI](https://npmjs.com/package/axway), which will give you connectivity to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify). Note that you must first have an account on [https://platform.axway.com](https://platform.axway.com/), and be provisioned in Amplify Central:
 
 ```bash
-$ [sudo] npm install -g @axway/amplify-cli
+$ [sudo] npm install -g axway
 ```
 
-Use the AMPLIFY package manager command to install the AMPLIFY Central CLI:
+Use the Amplify package manager command to install the Amplify Central CLI:
 
 ```bash
-$ amplify pm install @axway/amplify-central-cli
+$ axway pm install @axway/axway-central-cli
 ```
 
 You can then install the @axway/amplify-central-mulesoft-extension:
 
 ```bash
 $ npm install @axway/amplify-central-mulesoft-extension
-$ amplify central config set extensions.mulesoft <path to where you installed module>
+$ axway central config set extensions.mulesoft <path to where you installed module>
 ```
 
 # Getting started
 
-You must be logged into the Axway AMPLIFY Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one visit [Get started with AMPLIFY CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). Log in to the [Axway AMPLIFY Platform](https://www.axway.com/en/products/amplify) using the following command:
+You must be logged into the Axway Amplify Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one visit [Get started with Amplify CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). Log in to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify) using the following command:
 
 ```bash
-$ amplify auth login --client-id <DOSA Service Account> --secret-file <Private Key>
+$ axway auth login --client-id <DOSA Service Account> --secret-file <Private Key>
 ```
 
 To see available help, options and examples add `-h` or `--help` option on any command:
 
 ```bash
-$ amplify auth logout -h
+$ axway auth logout -h
 ```
 
 # General usage
@@ -52,10 +52,10 @@ $ amplify auth logout -h
 There are two main extension commands; `config` and `resources`. You can run each command with a `-h` to get help on that specific command.
 
 ```bash
-$ amplify central mulesoft-extension -h
-USAGE: amplify central mulesoft-extension <command> [options]
+$ axway central mulesoft-extension -h
+USAGE: axway central mulesoft-extension <command> [options]
 
-Create AMPLIFY Central resources from Mulesoft API Management APIs
+Create Amplify Central resources from Mulesoft API Management APIs
 
 AMPLIFY CENTRAL EXTENSION FOR MULESOFT API MANAGEMENT COMMANDS:
   config  Manage Mulesoft Extension Configuration
@@ -69,25 +69,25 @@ AMPLIFY CENTRAL EXTENSION FOR MULESOFT API MANAGEMENT COMMANDS:
 The `config` command is utilized to configure the extension prior to generating resources. There are two config sub-commands; `list` and `set`.
 
 ```powershell
-$ amplify central mulesoft-extension config -h
-USAGE: amplify central mulesoft-extension config <command> [options]
+$ axway central mulesoft-extension config -h
+USAGE: axway central mulesoft-extension config <command> [options]
 
 Manage Mulesoft Extension Configuration
 
 CONFIG COMMANDS:
-  list  View AMPLIFY Central mulesoft-extension configuration
-  set  Set AMPLIFY Central mulesoft-extension configuration
+  list  View Amplify Central mulesoft-extension configuration
+  set  Set Amplify Central mulesoft-extension configuration
 ```
 
 ### config examples:
 
 ```powershell
 # set output dir for the generated resources:
-$ amplify central mulesoft-extension config set --output-dir=<directory>
+$ axway central mulesoft-extension config set --output-dir=<directory>
 # view config:
-$ amplify central mulesoft-extension config list
+$ axway central mulesoft-extension config list
 # view list of available options
-$ amplify central mulesoft-extension config set -h
+$ axway central mulesoft-extension config set -h
 
 SET OPTIONS:
   --environment-name=<value>  Required: Set environment name to create
@@ -110,9 +110,9 @@ SET OPTIONS:
 The `resources` command is utilized to generate mulesoft resources for Central. There is one resources sub-command: `generate`
 
 ```powershell
-$ amplify central mulesoft-extension resources -h
+$ axway central mulesoft-extension resources -h
 
-USAGE: amplify central mulesoft-extension resources <command> [options]
+USAGE: axway central mulesoft-extension resources <command> [options]
 
 Generate resources from Mulesoft API Management APIs
 
@@ -123,18 +123,18 @@ RESOURCES COMMANDS:
 ### resources examples:
 
 ```
-$ amplify central mulesoft-extension resources generate
+$ axway central mulesoft-extension resources generate
 ```
 
 ### Generated Files
 
-The generate command will create AMPLIFY Central resource files for your configured Mulesoft instance. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
+The generate command will create Amplify Central resource files for your configured Mulesoft instance. These files will generated into either `./resources` or the directory you configured with the `--output-dir` configuration setting.
 
-After generating these files you can modify and upload them to AMPLIFY Central with the `amplify central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
+After generating these files you can modify and upload them to Amplify Central with the `axway central create -f=<file>` command. You'll want be sure to upload any Environment files before other generate resources.
 
 ```powershell
-$ amplify central create -h
-USAGE: amplify central create <command> [options]
+$ axway central create -h
+USAGE: axway central create <command> [options]
 
 Create a resource from a file. JSON and YAML formats are accepted.
 
@@ -151,9 +151,9 @@ CREATE OPTIONS:
 
 ```powershell
 # Upload the Environment, Webhook, and ConsumerSubscriptionDefinition
-amplify central create -f=~/Desktop/Environment.yaml
+axway central create -f=~/Desktop/Environment.yaml
 # Upload the APIService, APIServiceRevision, APIServiceInstance, and ConsumerInstance
-amplify central create -f=~/Desktop/APIService-swagger-petstore.yaml
+axway central create -f=~/Desktop/APIService-swagger-petstore.yaml
 ```
 
 ---
@@ -166,7 +166,7 @@ Axway <support@axway.com> https://axway.com
 
 ## License
 
-Copyright 2020 Axway
+Copyright 2021 Axway
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

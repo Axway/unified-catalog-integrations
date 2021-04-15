@@ -28,7 +28,7 @@ spec:
   icon:
     contentType: image/jpeg
     data: ${SERVICE_IMAGE}
-  documentation: "${CATALOG_DOCUMENTAION}"
+  documentation: |
   subscription:
     enabled: false
     autoSubscribe: true

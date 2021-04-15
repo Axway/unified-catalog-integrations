@@ -25,16 +25,16 @@ module.exports = class GithubService {
       }, []);
   
       if (missingParam.length) {
-        console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central github-extension config set -h' to see a list of params`);
+        console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central github-extension config set -h' to see a list of params`);
         process.exit(1);
       }
 
-      const centralConfig = loadConfig().values;
+      const network = loadConfig().get('network') || undefined;
     
-      if (centralConfig.network && !isEmpty(centralConfig.network)) {
+      if (network && !isEmpty(network)) {
         // using strict ssl mode by default
-        const sslConfig = { rejectUnauthorized: centralConfig.network.strictSSL === undefined || centralConfig.network.strictSSL };
-        const proxyUrl = centralConfig.network.httpProxy || centralConfig.network.httpsProxy || centralConfig.network.proxy;
+        const sslConfig = { rejectUnauthorized: network.strictSSL === undefined || network.strictSSL };
+        const proxyUrl = network.httpProxy || network.httpsProxy || network.proxy;
         // using HttpsProxyAgent if proxy url configured, else - regular node agent.
         let agent;
         if (proxyUrl) {
@@ -121,7 +121,7 @@ module.exports = class GithubService {
             try {
               var contents = await this.getContents(owner, repo, item, ref);
               if (peek(item.name, contents)) {
-                var api = await SwaggerParser.validate(item.download_url);
+                var api = await SwaggerParser.bundle(item.download_url);
                 await this.writeAPI4Central(repo, item, api);
               }
             } catch (err) {
@@ -177,7 +177,7 @@ module.exports = class GithubService {
     }
     async getContents(owner, repo, item, ref) {
       console.log(`Downloading spec from ${item.path}`);
-      const result = await this.octokit.repos.getContent({ "owner": owner, "repo": repo, "path": item.path, "ref": ref })
+      const result = await this.octokit.git.getBlob({ "owner": owner, "repo": repo, file_sha: item.sha })
       return Buffer.from(result.data.content, 'base64').toString('utf8')
     }
 
@@ -317,6 +317,8 @@ module.exports = class GithubService {
       endpoint.protocol = parsedUrl.protocol.substring(0, parsedUrl.protocol.indexOf(':'));
       if (parsedUrl.port) {
         endpoint.port = parseInt(parsedUrl.port, 10);
+      } else {
+        delete endpoint.port;
       }
       endpoint.routing = { basePath: parsedUrl.pathname };
     }

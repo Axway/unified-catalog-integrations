@@ -1,7 +1,7 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 import { requestPromise, getIconData, commitToFs } from './utils';
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 module.exports =  class AzureService {
 	constructor(config, log) {
@@ -26,7 +26,7 @@ module.exports =  class AzureService {
 		}, []);
 
 		if (missingParam.length) {
-			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central azure-extension config set -h' to see a list of params`);
+			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central azure-extension config set -h' to see a list of params`);
 			return process.exit(1);
 		} 
 		

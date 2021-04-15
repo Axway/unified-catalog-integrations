@@ -18,13 +18,13 @@ describe("Bitbucket service", () => {
   let writeAPI4Central: SinonStub;
   let requestPromise: SinonStub;
 
-  let proxyConfig:any = {
-		values: {}
-  };
+  let proxyConfig:any = {};
   
   let Service = proxyquire('./service', {
     '@axway/amplify-cli-utils': {
-			loadConfig: () => (proxyConfig)
+			loadConfig: () => ({
+        get: () => (proxyConfig)
+      })
 		}
   });
 
@@ -39,7 +39,7 @@ describe("Bitbucket service", () => {
 
   afterEach(() => {
     sandbox.restore();
-    proxyConfig.values = {};
+    proxyConfig = {};
   });
 
   it("init: should exit if required configurations are not provided", async () => {
@@ -95,11 +95,9 @@ describe("Bitbucket service", () => {
   it('init: construct class ok & sets proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-        httpProxy: "http://127.0.0.1", 
-        strictSSL: false
-			}
+		proxyConfig = {
+      httpProxy: "http://127.0.0.1", 
+      strictSSL: false
 		}
 		new Service(okConfig);
 	
@@ -109,10 +107,8 @@ describe("Bitbucket service", () => {
   it('init: construct class ok & sets https proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpsProxy: "https://test:as@127.0.0.1",
-			}
+		proxyConfig = {
+      httpsProxy: "https://test:as@127.0.0.1",
 		}
 		new Service(okConfig);
 	
@@ -121,10 +117,8 @@ describe("Bitbucket service", () => {
 
   it('init: construct class exit if proxy is wrong', () => {
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpsProxy: "notAURL",
-			}
+		proxyConfig = {
+      httpsProxy: "notAURL",
     }
     try {
       new Service(okConfig);
@@ -136,10 +130,8 @@ describe("Bitbucket service", () => {
   it('init: construct class ok & sets rejectUnauthorized', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				strictSSL: true
-			}
+		proxyConfig = {
+      strictSSL: true
 		}
 		new Service(okConfig);
 	
@@ -157,7 +149,7 @@ describe("Bitbucket service", () => {
 
   it('BitBucketV1: construct class ok & set proxySettings', () => {
     consoleStub = sandbox.stub(console, 'log');
-    proxyConfig.values.network = {
+    proxyConfig = {
       httpProxy: 'http://127.0.0.1:8001',
       strictSSL: false
     }
@@ -168,8 +160,8 @@ describe("Bitbucket service", () => {
       baseUrl: 'http://127.0.0.1:7990/rest/api/1.0'
     });
     expect(svc.client.constructor.name).to.equal('BitBucketV1');
-    expect(svc.client.proxySettings.strictSSL).to.deep.equal(proxyConfig.values.network.strictSSL)
-    expect(svc.client.proxySettings.proxy).to.deep.equal(proxyConfig.values.network.httpProxy)
+    expect(svc.client.proxySettings.strictSSL).to.deep.equal(proxyConfig.strictSSL)
+    expect(svc.client.proxySettings.proxy).to.deep.equal(proxyConfig.httpProxy)
   });
 
   it('BitBucketV1 read: create paths and querystring', async () => {
@@ -184,7 +176,9 @@ describe("Bitbucket service", () => {
     let isOASExtension = sandbox.stub().returns(true)
     let Stubbed = proxyquire('./service', {
       '@axway/amplify-cli-utils': {
-        loadConfig: () => (proxyConfig)
+        loadConfig: () => ({
+          get: () => (proxyConfig)
+        })
       },
       './utils': {
         isOASExtension,
@@ -224,7 +218,7 @@ describe("Bitbucket service", () => {
   it('BitBucketV1: construct class exit if proxy is wrong', () => {
     consoleStub = sandbox.stub(console, 'log');
     processStub = sandbox.stub(process, 'exit');
-    proxyConfig.values.network = {
+    proxyConfig = {
       httpProxy: 'notAURL',
       strictSSL: false
     }
@@ -342,7 +336,9 @@ describe("Bitbucket service", () => {
   it('writeSpecification: call a client, peek, and writeAPI4Central', async () => {
     let Stubbed = proxyquire('./service', {
       '@axway/amplify-cli-utils': {
-        loadConfig: () => (proxyConfig)
+        loadConfig: () => ({
+          get: () => (proxyConfig)
+        })
       },
       './utils': {
         isOASExtension: () => true

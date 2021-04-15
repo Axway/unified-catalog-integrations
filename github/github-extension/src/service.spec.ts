@@ -12,6 +12,7 @@ describe('service', () => {
 	let requestPromise: SinonStub = sandbox.stub();
 	let commitToFs: SinonStub = sandbox.stub();
 	let getContent: SinonStub = sandbox.stub();
+	let getBlob: SinonStub = sandbox.stub();
 	let processStub: SinonStub;
 	let consoleStub: SinonStub;
 	let processRepo: SinonStub;
@@ -33,15 +34,18 @@ describe('service', () => {
 		}
 		public get repos() : object {
 			return {
-				getContent: getContent
+				getContent
+			}
+		}
+		public get git() : object {
+			return {
+				getBlob
 			}
 		}
 		
 	}
 	
-	let proxyConfig:any = {
-		values: {}
-	};
+	let proxyConfig:any = {};
 
 	let Service = proxyquire('./service', {
 		'./utils': {
@@ -53,10 +57,12 @@ describe('service', () => {
 			Octokit
 		},
 		'@apidevtools/swagger-parser': {
-			validate: () => (testSwagger)
+			bundle: () => (testSwagger)
 		},
 		'@axway/amplify-cli-utils': {
-			loadConfig: () => (proxyConfig)
+			loadConfig: () => ({
+				get: () => (proxyConfig)
+			})
 		}
 	});
 
@@ -71,7 +77,8 @@ describe('service', () => {
 	afterEach(() => {
 		sandbox.restore();
 		getContent.reset();
-		proxyConfig.values = {};
+		getBlob.reset();
+		proxyConfig = {};
 		commitToFs.reset();
 	});
 
@@ -94,10 +101,8 @@ describe('service', () => {
 	it('init: construct class ok & sets proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpProxy: "http://127.0.0.1"
-			}
+		proxyConfig = {
+			httpProxy: "http://127.0.0.1"
 		}
 		new Service(okConfig);
 	
@@ -107,10 +112,8 @@ describe('service', () => {
 	it('init: construct class ok & sets https proxy properties', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				httpsProxy: "https://test:as@127.0.0.1",
-			}
+		proxyConfig = {
+			httpsProxy: "https://test:as@127.0.0.1",
 		}
 		new Service(okConfig);
 	
@@ -120,10 +123,8 @@ describe('service', () => {
 	it('init: construct class ok & sets rejectUnauthorized', () => {
 		processStub = sandbox.stub(process, 'exit');
 		consoleStub = sandbox.stub(console, 'log');
-		proxyConfig.values = {
-			network: {
-				strictSSL: true
-			}
+		proxyConfig = {
+			strictSSL: true
 		}
 		new Service(okConfig);
 	
@@ -266,7 +267,7 @@ describe('service', () => {
 	it('getContents', async () => {
 		const service = new Service(okConfig);
 
-		getContent.resolves({
+		getBlob.resolves({
 			data: {
 				content: "test"
 			}
@@ -278,7 +279,7 @@ describe('service', () => {
 			'httpe://example.com',
 			item
 		);
-		expect(getContent.callCount).to.equal(1);
+		expect(getBlob.callCount).to.equal(1);
 		expect(response).to.equal(Buffer.from("test", 'base64').toString('utf8'));
 	});
 

@@ -2,7 +2,7 @@ const fs = require('fs');
 const unzipper = require('./unzipper');
 const urlParser = require('url');
 import { commitToFs, requestPromise } from './utils';
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 const ORDER = [
 	'Environment',
@@ -32,7 +32,7 @@ module.exports = class MulesoftService {
 		}, []);
 
 		if (missingParam.length) {
-			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central mulesoft-extension config set -h' to see a list of params`);
+			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central mulesoft-extension config set -h' to see a list of params`);
 			return process.exit(1);
 		}
 

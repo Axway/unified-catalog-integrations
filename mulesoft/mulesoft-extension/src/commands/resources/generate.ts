@@ -19,9 +19,9 @@ export const generate = {
     const config: Config = readJsonSync(configFilePath);
     config.outputDir = typeof config.outputDir === 'string' ? config.outputDir : './resources';
     const service = new Service(config)
-    await service.generateResources(config);
     await createSupportResources(config);
+    await service.generateResources(config);
     console.log(chalk['yellow'](`Resources created in ${config.outputDir}`));
-    console.log(chalk['yellow']("Upload example: 'amplify central create -f=<path to resource>'\n"));
+    console.log(chalk['yellow']("Upload example: 'axway central create -f=<path to resource>'\n"));
   },
 };

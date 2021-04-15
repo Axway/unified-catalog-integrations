@@ -13,7 +13,7 @@
     "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'",
     "test": "ts-mocha --timeout 10000",
     "test:coverage": "nyc yarn test",
-    "postinstall": "yarn --only=dev --ignore-scripts && yarn build && node ./postinstall.js",
+    "postinstall": "npm i --only=dev --ignore-scripts && npm run build && node ./postinstall.js",
     "tsc": "tsc"
   },
   "engines": {
@@ -40,7 +40,7 @@
   ],
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.0.2",
-    "@axway/amplify-cli-utils": "^2.0.0",
+    "@axway/amplify-cli-utils": "^4.2.5",
     "cli-kit": "^1.8.2",
     "fs-extra": "^9.0.1",
     "https": "^1.0.0",

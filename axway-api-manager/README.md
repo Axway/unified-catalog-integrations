@@ -4,7 +4,7 @@
 The basic use case is as follows:
 
 **API Provider**
-* Will publish APIs from **Axway API Manager** into the AMPLIFY Unified Catalog via the agents.  Those APIs will require manual approval of subscription requests from consumers.
+* Will publish APIs from **Axway API Manager** into the Amplify Unified Catalog via the agents.  Those APIs will require manual approval of subscription requests from consumers.
 * Is notified in Microsoft Teams when there is a new subscription requests, and will approve or reject the request. 
 
 **API Consumer**
@@ -15,8 +15,8 @@ After the key has been sent, the state of the Subscription in Unified Catalog ge
  
 The technologies that were used for this project: 
 * [API Manager agents](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/connect-api-manager/index.html)
-to discover the APIs and publish them to Unified AMPLIFY Unified Catalog
-* [AMPLIFY Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs.   
+to discover the APIs and publish them to Unified Amplify Unified Catalog
+* [Amplify Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs.   
 * [Microsoft Teams](https://www.microsoft.com/en-us/microsoft-365/microsoft-teams) for notifications and approval or rejection of subscription requests. 
 
 Follow the steps below to use this example: 
@@ -26,13 +26,13 @@ Documentation available [here](https://docs.axway.com/bundle/axway-open-docs/pag
 
 ### Step 1: Create Amplify Central Service Account (using OAuth2 Client Credentials Grant Type)
 
-This service account is different from the one used by the AMPLIFY agents or AMPLIFY CLI. 
+This service account is different from the one used by the Amplify agents or Amplify CLI. 
 
 This account can be used in services (Integration Builder or Power Automate for example) where private/public keys can not be stored and used.
 
 Save the **clientId** and **clientSecret** from the response which will be used later in the flow.
 
-##### Option 1 - using amplify cli and jq
+##### Option 1 - using axway cli and jq
 
 Install [Amplify Central CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_central/cli_install/index.html)
 Install [jq](https://stedolan.github.io/jq/download/)
@@ -41,17 +41,17 @@ Make sure you log out from all active sessions.
 
 
 ```powershell
-amplify auth logout --all
+axway auth logout --all
 ```
 
-Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
+Go to Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
 The OrgID (Organization ID) can be obtained by visiting: [https://platform.axway.com/#/org](https://platform.axway.com/#/org).
 
 Set the **ORG_ID** in the command below and execute it. 
  
 ```sh
-amplify auth login --client-id apicentral
-ORG_ID=<org_id_value> && TOKEN=$(amplify auth list --json | jq -r ".[] | select( .org.org_id == $ORG_ID ) | .tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
+axway auth login
+ORG_ID=<org_id_value> && TOKEN=$(axway auth list --json | jq -r ".[] | select( .org.id == $ORG_ID ) | .auth.tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
 --header "Authorization: Bearer ${TOKEN}" \
 --header "X-Axway-Tenant-Id: ${ORG_ID}" \
 --header 'Content-Type: application/json' \
@@ -68,7 +68,7 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
 
-2. Import the [AMPLIFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
+2. Import the [Amplify Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
 
 3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
 
@@ -83,8 +83,8 @@ Use the postman **[collection](https://github.com/Axway/unified-catalog-integrat
 
 Copy the access token. You will use this to set the AMPLIFY Central Production environment variables. 
 
-5. Set the AMPLIFY Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
-* Set the CURRENT VALUE for the **org_id**: Go to the AMPLIFY platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
+5. Set the Amplify Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
+* Set the CURRENT VALUE for the **org_id**: Go to the Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
 * Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
 
 ![postman_env](../images/ConfigureEnvironmentPostman.PNG) 
@@ -120,7 +120,7 @@ Save the **clientId** and **clientSecret** from the response which will be used 
 ### Step 2: Configure Microsoft Teams flow to Approve / Reject subscription requests
 ***
 
-**AMPLIFY Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.
+**Amplify Central Unified Catalog** has the option to configure Webhooks that can be invoked when Consumers of Catalog asset update their subscriptions.
 This flow will send notifications to MS teams channel as an Active card when a consumer subscribes to the API from the Unified Catalog. 
 The API provider can then approve or reject the subscription requests from within the MS Active card.
  
@@ -534,7 +534,7 @@ On the top right corner of the card, click the ellipsis (...), then pick *Rename
 #### 5. Get a Bearer token from platform using the **clientId** and **clientSecret** from **Step 1**
 
 
-Add an action of type `HTTP` to configure doing REST API Calls to AMPLIFY Central.
+Add an action of type `HTTP` to configure doing REST API Calls to Amplify Central.
 
    * Set `Method`to `POST`
    * Set `URI`to `https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token` 

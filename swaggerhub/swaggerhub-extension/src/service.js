@@ -3,7 +3,7 @@ const yaml = require("js-yaml");
 const urlParser = require("url");
 const SwaggerParser = require("@apidevtools/swagger-parser");
 import { requestPromise, commitToFs, getIconData } from "./utils";
-import { loadConfig } from '@axway/amplify-config';
+import { loadConfig } from '@axway/amplify-cli-utils';
 
 module.exports = class SwaggerHubService {
   constructor(config) {
@@ -23,7 +23,7 @@ module.exports = class SwaggerHubService {
 		}, []);
 
 		if (missingParam.length) {
-			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'amplify central swaggerhub-extension config set -h' to see a list of params`);
+			console.log(`Missing required config: [${missingParam.join(', ')}]. Run 'axway central swaggerhub-extension config set -h' to see a list of params`);
 			return process.exit(1);
     }
 

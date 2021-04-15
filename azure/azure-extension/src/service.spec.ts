@@ -22,7 +22,7 @@ describe('service', () => {
 			commitToFs,
 			getIconData: () => ({})
 		},
-		'@axway/amplify-config': {
+		'@axway/amplify-cli-utils': {
 			loadConfig: () => ({
 				get: () => (proxyConfig)
 			})

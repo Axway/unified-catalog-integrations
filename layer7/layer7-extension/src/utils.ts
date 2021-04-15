@@ -36,7 +36,7 @@ export const createSupportResource = async (config: any) => {
   const environment = {
     apiVersion: "v1alpha1",
     title: `${environmentName} Environment`,
-    name: environmentName,
+    name: environmentName.toLowerCase().replace(/\W+/gm, "-"),
     kind: "Environment",
     attributes: {
       createdBy: "yaml",

@@ -8,7 +8,7 @@ import { ensureConfigFileExists } from "./src/utils";
 ensureConfigFileExists();
 
 export default new CLI({
-  title: "AMPLIFY Central Extension for GitHub API Management",
+  title: "Amplify Central Extension for GitHub API Management",
   name,
   banner,
   version,
