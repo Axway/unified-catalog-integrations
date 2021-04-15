@@ -69,6 +69,16 @@ jobs:
         npm version "${GITHUB_REF##*/}" --no-git-tag-version 
         yarn && yarn build
         npm publish  --tag latest --access public      
-        fi                             
+        fi
+    # Publish layer7 extension to npm with release tag version.    
+    - run: |           
+        export EXTENSION=$(echo "${GITHUB_REF##*/}" | awk -F'_' '{print $2}')
+        if [ -z "$EXTENSION" ] || [ "$EXTENSION" == "layer7" ]; then        
+        cd layer7/layer7-extension
+        npm config set //registry.npmjs.org/:_authToken=${NPM_EXTERNAL_AUTH_TOKEN}
+        npm version "${GITHUB_REF##*/}" --no-git-tag-version 
+        yarn && yarn build
+        npm publish  --tag latest --access public      
+        fi                                    
       env:
         NPM_EXTERNAL_AUTH_TOKEN: ${{ secrets.NPM_EXTERNAL_AUTH_TOKEN }}
