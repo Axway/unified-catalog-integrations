@@ -241,7 +241,7 @@ module.exports = class BitbucketService {
       let api;
       try {
         api = await SwaggerParser.validate(content as any);
-      } catch (error) {
+      } catch (error: any) {
         if ((error?.message || '').includes('Unsupported OpenAPI version')) {
           api = content;
         } else {
