@@ -26,5 +26,8 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": false,
     "sourceMap": true
-  }
+  },
+  "exclude": [
+    "src/**/*.spec.*"
+  ]
 }

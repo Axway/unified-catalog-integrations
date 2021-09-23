@@ -99,7 +99,7 @@ module.exports = class Layer7Service {
           let api;
           try {
             api = await SwaggerParser.validate(definition);
-          } catch (error) {
+          } catch (error: any) {
             if ((error?.message || '').includes('Unsupported OpenAPI version')) {
               api = definition;
             } else {
