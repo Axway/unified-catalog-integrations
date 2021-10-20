@@ -9,7 +9,7 @@
     "url": "https://axway.com"
   },
   "scripts": {
-    "build": "yarn tsc && yarn copy:assets",
+    "build": "npm run tsc && npm run copy:assets",
     "copy:assets": "npx cpx 'src/assets/**' 'dist/src/assets'",
     "test": "ts-mocha --timeout 10000",
     "test:coverage": "nyc yarn test",
