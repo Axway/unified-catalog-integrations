@@ -35,17 +35,9 @@ $ axway central config set extensions.mulesoft <path to where you installed modu
 
 # Getting started
 
-You must be logged into the Axway Amplify Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one visit [Get started with Amplify CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html). Log in to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify) using the following command:
+You must be logged into the Axway Amplify Platform before uploading any generated resource files. 
+Refer to the Axway Central CLI [documentation](https://docs.axway.com/bundle/amplify-central/page/docs/integrate_with_central/cli_central/cli_install/index.html) for more information.
 
-```bash
-$ axway auth login --client-id <DOSA Service Account> --secret-file <Private Key>
-```
-
-To see available help, options and examples add `-h` or `--help` option on any command:
-
-```bash
-$ axway auth logout -h
-```
 
 # General usage
 

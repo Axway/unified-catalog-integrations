@@ -23,16 +23,16 @@ We also download the specification file of petstore and add it in APIServiceRevi
     - Node.js
     - Axway cli
 * AMPLIFY Central Provisioned Organization
-* DOSA Service Account in AMPLIFY Central
+* Service Account in AMPLIFY
 * AMPLIFY Central Environment
 * Github Account or Gitlab Account
 
 
-### Configure the DOSA (Service Account) on AMPLIFY central
-* Follow the below procedure to create DOSA (Service Account) step by generating the key pair.
-https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_central/cli_install/index.html
+### Configure the (Service Account) on AMPLIFY central
 
-* Create a new service account with generated public key. Make a note of the client-id, it will be used as an environment variable in the pipeline.
+The Service Account can be created using the [Platform UI](https://docs.axway.com/bundle/platform-management/page/docs/management_guide/organizations/managing_organizations/index.html#managing-service-accounts) or the [Axway CLI](https://docs.axway.com/bundle/axwaycli-open-docs/page/docs/authentication/service_accounts/index.html)
+
+After creating the Service Account with method Client Certificate, make a note of the client-id, it will be used as an environment variable in the pipeline.
 
 ### Create an Environment in AMPLIFY central
 
@@ -61,7 +61,7 @@ RUN npm install -g @axway/axway-cli
 1. Download the pipeline folder files into your own github repository for which you want to publish in AMPLIFY Catalog.
     In order to create a new github repository, please use this link https://help.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-new-repository
 
-2. Encrypt the private key generated for the DOSA service account using the gpg. 
+2. Encrypt the private key generated for the service account using the gpg. 
 Refer: https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#limits-for-secrets
 ```bash
 gpg --symmetric --cipher-algo AES256 private_key.pem
@@ -141,7 +141,7 @@ jobs:
       SERVICE_HOST_BASEPATH: /v2
       # Central Environment name used for creation of these resources.
       CENTRAL_ENV_NAME: petstore-staging
-      # Central DOSA Service account client Id. 
+      # Platform Service Account client Id. 
       DOSA_CLIENT_ID: DOSA_CLIENT_ID_VALUE
       # User service specification url for fetching the swagger/oas3 etc. Used in the script
       SPECIFICATION_URL: https://petstore.swagger.io/v2/swagger.json
@@ -158,7 +158,7 @@ jobs:
 
 1. Download the pipeline folder files into your own gitlab repository for which you want to publish in AMPLIFY Catalog.
     In order to create a new gitlab repository, please use this link https://docs.gitlab.com/ee/gitlab-basics/create-project.html
-2. Add the DOSA secret key (DOSA_SECRET) in the gitlab variables as a file type. Eg: $DOSA_SECRET Refer the process here https://docs.gitlab.com/ee/ci/variables/README.html#create-a-custom-variable-in-the-ui
+2. Add the Service Account secret key (DOSA_SECRET) in the gitlab variables as a file type. Eg: $DOSA_SECRET Refer the process here https://docs.gitlab.com/ee/ci/variables/README.html#create-a-custom-variable-in-the-ui
 3. Copy the resources directory under cicd into your gitlab repository at root level. 
 4. Create a .gitlab-ci.yml file in the root directory. Setup the runner for your project. You can follow this link https://docs.gitlab.com/ee/ci/runners/ for setup.
 5. Modify the details of each resource files in the resources folder depending on the project details if needed.
@@ -278,7 +278,7 @@ Command line parameters for the `create.sh` script:
 
 | Name                      | Default value                 |  Description                                                                          |
 |---------------------------|-------------------------------|---------------------------------------------------------------------------------------|
-| -a or --auth-type         | DOSA or web                   | The type if authentication used by the CLI                                            |
+| -a or --auth-type         | SA or web                     | The type if authentication used by the CLI                                            |
 | -pk or --primary-key      | ./private_key.pem             | The location of the pem encoded private key if DOSA is used                           |
 | -did or --dosa-id         | NO_DEFAULT_VALUE              | DOSA cline id if DOSA used for auth                                                   |
 | -cen or --central-env-name| petstore-sample               | The Environment resource name where AMPLIFY Catalog resources will be created         |
