@@ -47,7 +47,7 @@ pipeline {
             defaultValue: params.CENTRAL_ENV_NAME ?: '')
         string(
             name: 'DOSA_CLIENT_ID',
-            description: 'Central DOSA Service account client Id. ',
+            description: 'Service Account client Id. ',
             defaultValue: params.DOSA_CLIENT_ID ?: '')
         string(
             name: 'SPECIFICATION_URL',
@@ -69,7 +69,7 @@ pipeline {
             name: 'DOSA_SECRET',
             credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl',
             required: true,
-            description: 'DevOps Service Account secret key file to be used for managing Amplify Central resources. ',
+            description: 'Service Account secret key file to be used for managing Amplify Central resources. ',
             defaultValue: params.DOSA_SECRET ?: '')
 
     }

@@ -20,7 +20,7 @@ Watch the [demo video](https://youtu.be/R4SPnhTp6TE) as we break down and explai
 The technologies that were used for this project:
 
 - [Amplify Unified Catalog](https://docs.axway.com/bundle/axway-open-docs/page/docs/catalog/index.html) as the central place to publish and discover the APIs.
-- [Amplify Central CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html) to fetch the APIs from Mulesoft Anypoint Exchange and promote them to the Unified Catalog.
+- [Amplify Central CLI](https://docs.axway.com/bundle/amplify-central/page/docs/integrate_with_central/cli_central/cli_install/index.html) to fetch the APIs from Mulesoft Anypoint Exchange and promote them to the Unified Catalog.
 - [Integration Builder](https://www.axway.com/en/products/application-integration) to implement the logic for the subscription management and email notifications.
 - MS Teams for notifications and approval or rejection of subscription requests.
 - Mulesoft Anypoint Exchange.
@@ -28,89 +28,13 @@ The technologies that were used for this project:
 Follow the steps bellow to use this example:
 
 
-### Step 1: Create Amplify Central Service Account
-***
+### Step 1: Create Platform Service Account (using Client Secret)
 
-Save the clientId and clientSecret from the response which will be used in Integration Builder flow.
+The Service Account can be created using the [Platform UI](https://docs.axway.com/bundle/platform-management/page/docs/management_guide/organizations/managing_organizations/index.html#managing-service-accounts) or the [Axway CLI](https://docs.axway.com/bundle/axwaycli-open-docs/page/docs/authentication/service_accounts/index.html)
 
-##### Option 1
+More details on how to achieve this are also presented in this [blog post](https://blog.axway.com/apis/axway-amplify-platform-api-calls).
 
-Make sure you log out from all active sessions. 
-
-
-```powershell
-axway auth logout --all
-```
-
-Go to the Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. Set the **ORG_ID** in the command below and execute it. 
-To run the command, you need to have jq installed. 
-```sh
-axway auth login
-ORG_ID=<org_id_value> && TOKEN=$(axway auth list --json | jq -r ".[] | select( .org.id == $ORG_ID ) | .auth.tokens.access_token") && curl -vv 'https://apicentral.axway.com/api/v1/serviceAccounts' \
---header "Authorization: Bearer ${TOKEN}" \
---header "X-Axway-Tenant-Id: ${ORG_ID}" \
---header 'Content-Type: application/json' \
---data-raw '{
-  "serviceAccountType": "DOSA",
-  "serviceAccountName": "catalog-integration",
-  "clientAuthType": "SECRET"
-}'
-```
-
-##### Option 2
-
-Use the postman **[collection](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman)**. 
-
-1. Import the [Manage service accounts.postman_collection.json](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/Manage%20service%20accounts.postman_collection.json) collection in Postman. 
-
-2. Import the [AMPLIFY Environment configuration file](https://github.com/Axway/unified-catalog-integrations/blob/axwayTokenFromSA/utils/postman/AMPLIFY%20Central%20Production.postman_environment.json) in Postman. 
-
-3. For authentication, the APIs require OAuth2 implicit. To authenticate, go to Postman Collection, click on the "..." button and then select _Edit_. 
-
-<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/PostmanAuthenticate.PNG" width="300" height="450" /> 
- 
-4. From the new screen, go to _Authorization_ and click on _Get New Access Token_. To authenticate use: 
-   - Grant Type: `Implicit`
-   - Auth URL:`https://login.axway.com/auth/realms/Broker/protocol/openid-connect/auth?idpHint=360`
-   - Client ID: `apicentral`.
-
- <img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/GetAccessTokenPostman.PNG" width="600" height="400" /> 
-
-5. Copy the access token. You will use this to set the Amplify Central Production environment variables. 
-
-6. Set the Amplify Central Production environment variables. From the top right corner, select the _AMPLIFY Central Production_ environment from the dropdown, and then click on the eye button next to the dropdown. 
-   - Set the CURRENT VALUE for the **org_id**: Go to the Amplify platform, login with an account that is assigned the Administrator platform role, and copy the OrgID. 
-   - Set the CURRENT VALUE for the **auth_token**: Copy and paste the access token from the previous step.  
-
-<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/ConfigureEnvironmentPostman.PNG" width="600" height="400" /> 
-
-
-6. Run the **Create Service Account of type SECRET** POST request. In the body payload, you could change the `serviceAccountName` to a value of your choice. 
-
-<img src="https://github.com/Axway/unified-catalog-integrations/blob/master/images/CreateServiceAccount.PNG" width="600" height="250" /> 
-
-7. Save the **clientId** and **clientSecret** from the response which will be used in Integration Builder flow. Below is an example of the response body. 
-
-```json
-{
-  "name": "amplify-integration",
-  "type": "DOSA",
-  "clientId": "DOSA_f0c4b70**********",
-  "clientAuthType": "SECRET",
-  "clientSecret": "07b*************",
-  "registrationToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NjE5OGUwZS1lNTcz******",
-  "tokenUrl": "https://login.axway.com/auth/realms/Broker/protocol/openid-connect/token",
-  "aud": "https://login.axway.com/auth",
-  "realm": "Broker",
-  "certificate": {},
-  "metadata": {
-    "createTimestamp": "2020-07-01T20:24:02.059Z",
-    "createUserId": "e1add099-59da-40b6-b13f-912bfa816697",
-    "modifyTimestamp": "2020-07-01T20:24:02.059Z",
-    "modifyUserId": "e1add099-59da-40b6-b13f-912bfa816697"
-  }
-}
-```
+After creating the Service Account, save the **clientId** and **clientSecret**.
 
 ### Step 2: Configure Integration Builder flow to update subscriptions and send email notifications
 ---
@@ -683,13 +607,12 @@ To verify if the CLI extension was successfully set, you can run: `axway central
 
 #### 2. Configure extension
 
-Configure the extension prior to generating the resources.
-You must be logged into the Axway Amplify Platform before uploading any generated resource files. You'll also need to setup a Service (DOSA) account. To find out how to create one, visit [Get started with Amplify CLI](https://docs.axway.com/bundle/axway-open-docs/page/docs/central/cli_getstarted/index.html).
-
+You must be logged into the Axway Amplify Platform before uploading any generated resource files. 
+Refer to the Axway Central CLI [documentation](https://docs.axway.com/bundle/amplify-central/page/docs/integrate_with_central/cli_central/cli_install/index.html) for more information.
 Log in to the [Axway Amplify Platform](https://www.axway.com/en/products/amplify) using the following command:
 
 ```powershell
-axway auth login --client-id <DOSA Service Account> --secret-file <private_key_for_service_account>
+axway auth login --client-id <Service Account> --secret-file <private_key_for_service_account>
 ```
 
 **Example**: `axway auth login --client-id DOSA_105cf15d051c432c8cd2e1313f54c2da --secret-file ~/test/private_key.pem`

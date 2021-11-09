@@ -2,9 +2,9 @@
 # !!! IMPORTANT !!!
 # Script will create the API Server resources and its related Catalog Item based on resources in ./resources folder.
 
-#auth type can be web or DOSA
-AUTH_TYPE="DOSA"
-#primary key location for DOSA
+#auth type can be web or SA (Service Account)
+AUTH_TYPE="SA"
+#primary key location for the Service Account
 PK_FILE_LOCATION="./private_key.pem"
 # Resource files path
 RESOURCES_PATH="resources/petstore-sample"
@@ -63,18 +63,18 @@ echo "[INFO] Running with CATALOG_DOCUMENTAION_FILE_PATH=$CATALOG_DOCUMENTAION_F
 echo "[INFO] Running with IMAGE_LOCATION_FILE_PATH=$IMAGE_LOCATION_FILE_PATH . "
 echo "[INFO] Running with VERSION=$VERSION"
 
-if [[ ${AUTH_TYPE} != "DOSA" ]]; then
+if [[ ${AUTH_TYPE} != "SA" ]]; then
 	echo "Authenticating using browser"
 	axway auth login --client-id apicentral
 	#login and get token
-	TOKEN=$(axway auth list --json | jq -r '.[0].tokens.access_token')
-	TENANT_ID=$(axway auth list --json | jq -r '.[0].org.id')
+	TOKEN=$(axway auth list --json | jq -r '.[] | .auth.tokens.access_token')
+	TENANT_ID=$(axway auth list --json | jq -r '.[] | .org.id')
 else
-	echo "Authenticating using DOSA and private key from: ${PK_FILE_LOCATION}"
+	echo "Authenticating using SA and private key from: ${PK_FILE_LOCATION}"
 	authResult=$(axway auth login --json --secret-file ${PK_FILE_LOCATION} --client-id $DOSA_CLIENT_ID) ||
         { echo "[ERROR] failed to login with cli" && exit 1; }
-	TOKEN=$(echo $authResult | jq -r '.tokens.access_token')
-	TENANT_ID=$(echo $authResult | jq -r '.[0].org.id')
+	TOKEN=$(echo $authResult | jq -r '.auth.tokens.access_token')
+	TENANT_ID=$(echo $authResult | jq -r '.org.org_id')
 	axway central config set --client-id=$DOSA_CLIENT_ID
 fi
 
