@@ -1,3 +1,4 @@
+⛔️ DEPRECATED
 ### Unified Catalog integrations
 This repo provides a set of assets that can help you automate the discovery of all integration assets and APIs, from across multiple environments, such as Azure, and publish them in a centralized catalog to drive consumption and reuse of your existing APIs. These environments can also be repositories such as GitHub, SwaggerHub.
 
